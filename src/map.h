@@ -17,7 +17,7 @@ public:
     void        at(int, int, TileID&, MaterialID&);
     TileID      tile_at(int, int);
     MaterialID  material_at(int, int);
-    int         toIndex(int, int);
+    int         index(int, int);
 
 private:
     int                     _width;

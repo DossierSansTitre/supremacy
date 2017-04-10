@@ -20,13 +20,13 @@ void Map::at(int x, int y, TileID &tile_id, MaterialID &material_id) {
 }
 
 TileID Map::tile_at(int x, int y) {
-    return _tiles[toIndex(x, y)];
+    return _tiles[index(x, y)];
 }
 
 MaterialID Map::material_at(int x, int y) {
-    return _materials[toIndex(x, y)];
+    return _materials[index(x, y)];
 }
 
-int Map::toIndex(int x, int y) {
+int Map::index(int x, int y) {
     return x + y * _width;
 }
