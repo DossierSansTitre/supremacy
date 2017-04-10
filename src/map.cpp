@@ -15,12 +15,22 @@ void Map::generate() {
 }
 
 void Map::at(int x, int y, TileID &tile_id, MaterialID &material_id) {
-    tile_id = tile_at(x, y);
-    material_id = material_at(x, y);
+    int i = index(x, y);
+
+    tile_id = tile_at(i);
+    material_id = material_at(i);
+}
+
+TileID Map::tile_at(int i) {
+    return _tiles[i];
 }
 
 TileID Map::tile_at(int x, int y) {
     return _tiles[index(x, y)];
+}
+
+MaterialID Map::material_at(int i) {
+    return _materials[i];
 }
 
 MaterialID Map::material_at(int x, int y) {
