@@ -7,6 +7,7 @@ static void init_screen(Screen& screen)
     wish_view_fullscreen(screen.screen);
     wish_read_block(screen.term, 0);
     wish_read_delay(screen.term, 0);
+    wish_cursor_show(screen.term, 0);
 }
 
 static void destroy_screen(Screen& screen)
