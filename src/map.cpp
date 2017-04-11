@@ -7,13 +7,6 @@ Map::Map(int width, int height) {
     _materials = std::vector<MaterialID>(width * height);
 }
 
-void Map::generate() {
-    for (int i = 0; i < _width * _height; ++i) {
-        _tiles[i] = TileID::BLOCK;
-        _materials[i] = MaterialID::ROCK;
-    }
-}
-
 void Map::at(int x, int y, TileID &tile_id, MaterialID &material_id) {
     int i = index(x, y);
 

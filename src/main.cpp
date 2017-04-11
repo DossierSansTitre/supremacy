@@ -1,10 +1,12 @@
-#include <screen.h>
+#include <game.h>
 
 static void init_screen(Screen& screen)
 {
     screen.term = wish_init();
     screen.screen = wish_view_create(screen.term);
     wish_view_fullscreen(screen.screen);
+    wish_read_block(screen.term, 0);
+    wish_read_delay(screen.term, 0);
 }
 
 static void destroy_screen(Screen& screen)
@@ -18,10 +20,12 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
-    Screen screen;
+    Game game;
 
-    init_screen(screen);
-    destroy_screen(screen);
+    game.debug = 0;
+    init_screen(game.screen);
+    game_loop(game);
+    destroy_screen(game.screen);
 
     return 0;
 }
