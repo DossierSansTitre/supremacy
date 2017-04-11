@@ -8,25 +8,35 @@
 class Map
 {
 public:
-    Map(int width, int height);
-    ~Map() {}
+    Map();
+    ~Map();
 
     void        create(int width, int height);
+    void        destroy();
+
     int         width() { return _width; }
     int         height() { return _height; }
-    void        at(int, int, TileID&, MaterialID&);
+
+    void        at(int x, int y, TileID& out_tile, MaterialID& out_material);
     TileID      tile_at(int index);
     TileID      tile_at(int x, int y);
     MaterialID  material_at(int index);
     MaterialID  material_at(int x, int y);
+
     int         index(int x, int y);
+
+    void        set_tile(int index, TileID tile);
+    void        set_tile(int x, int y, TileID tile);
+    void        set_material(int index, MaterialID material);
+    void        set_material(int x, int y, MaterialID material);
 
 private:
     int                     _width;
     int                     _height;
-    int                     _depth;
-    std::vector<TileID>     _tiles;
-    std::vector<MaterialID> _materials;
+    TileID*                 _tiles;
+    MaterialID*             _materials;
 };
+
+void generate_map(Map& map);
 
 #endif

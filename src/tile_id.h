@@ -1,9 +1,12 @@
 #ifndef TILE_ID_H
-# define TILE_ID_H
+#define TILE_ID_H
 
-enum TileID {
-    BLOCK,
-    STAIRS,
+#include <cstdint>
+
+enum class TileID : uint8_t {
+    None,
+    Block,
+    Stairs,
 };
 
 #endif

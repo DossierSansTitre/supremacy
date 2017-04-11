@@ -1,10 +1,13 @@
 #ifndef MATERIAL_ID_H
 #define MATERIAL_ID_H
 
-enum MaterialID {
-    DIRT,
-    ROCK,
-    WOOD,
+#include <cstdint>
+
+enum class MaterialID : uint8_t {
+    None,
+    Dirt,
+    Rock,
+    Wood
 };
 
 #endif

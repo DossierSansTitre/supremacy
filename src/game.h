@@ -2,14 +2,14 @@
 #define GAME_H
 
 #include <non_copyable.h>
-#include <world.h>
 #include <screen.h>
+#include <map.h>
 
 struct Game : private NonCopyable
 {
-    int     debug;
     bool    running;
     Screen  screen;
+    Map     map;
 };
 
 void game_loop(Game& game);

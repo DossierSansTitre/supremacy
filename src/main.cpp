@@ -22,8 +22,8 @@ int main(int argc, char** argv)
 
     Game game;
 
-    game.debug = 0;
     init_screen(game.screen);
+    generate_map(game.map);
     game_loop(game);
     destroy_screen(game.screen);
 

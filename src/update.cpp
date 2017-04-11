@@ -3,5 +3,4 @@
 void game_update(Game& game)
 {
     (void)game;
-    game.debug++;
 }
