@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include <cstdint>
 #include <non_copyable.h>
 #include <tile_id.h>
 #include <material_id.h>
@@ -39,6 +40,6 @@ private:
     MaterialID*             _materials;
 };
 
-void generate_map(Map& map);
+void generate_map(Map& map, uint32_t seed);
 
 #endif

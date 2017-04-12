@@ -1,3 +1,4 @@
+#include <ctime>
 #include <game.h>
 
 static void init_screen(Screen& screen)
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
 
     // KLUDGE
     game.camera_depth = 0;
+    game.seed = time(nullptr);
     init_screen(game.screen);
 
     wish_attr_init(&attr);
@@ -36,7 +38,7 @@ int main(int argc, char** argv)
     wish_puts(game.screen.screen, "Done\n", attr);
     wish_draw(game.screen.term);
 
-    generate_map(game.map);
+    generate_map(game.map, game.seed);
     game_loop(game);
     destroy_screen(game.screen);
 

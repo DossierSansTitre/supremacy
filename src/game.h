@@ -4,13 +4,15 @@
 #include <non_copyable.h>
 #include <screen.h>
 #include <map.h>
+#include <cstdint>
 
 struct Game : private NonCopyable
 {
-    bool    running;
-    Screen  screen;
-    Map     map;
-    int     camera_depth;
+    bool        running;
+    Screen      screen;
+    Map         map;
+    int         camera_depth;
+    uint32_t    seed;
 };
 
 void game_loop(Game& game);
