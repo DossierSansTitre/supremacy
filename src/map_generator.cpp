@@ -25,7 +25,7 @@ void generate_map(Map& map)
     {
         for (int i = 0; i < width; ++i)
         {
-            n = noise_fractal_octave_2d(0xbadb00b5, i, j, 2.0f, 4);
+            n = noise_fractal_octave_2d(0xbadb00b5, i, j, 2.0f, 6);
             n *= n;
             h = 15 + n * 10;
             fill_height(map, i, j, h, TileID::Block, MaterialID::Rock);
