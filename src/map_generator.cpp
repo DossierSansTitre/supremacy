@@ -1,4 +1,14 @@
+#include <noise.h>
 #include <map.h>
+
+static void fill_height(Map& map, int x, int y, int height, TileID tile, MaterialID material)
+{
+    for (int z = 0; z < height; ++z)
+    {
+        map.set_tile(x, y, z, tile);
+        map.set_material(x, y, z, material);
+    }
+}
 
 void generate_map(Map& map)
 {
@@ -6,28 +16,19 @@ void generate_map(Map& map)
     static const int height = 256;
     static const int depth = 64;
 
-    static const TileID tiles[] = {
-        TileID::Block,
-        TileID::Stairs
-    };
-
-    static const MaterialID materials[] = {
-        MaterialID::Dirt,
-        MaterialID::Rock,
-        MaterialID::Wood
-    };
+    float n;
+    int h;
 
     map.create(width, height, depth);
 
-    for (int k = 0; k < depth; ++k)
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
-            for (int i = 0; i < width; ++i)
-            {
-                map.set_tile(i, j, k, tiles[k % 2]);
-                map.set_material(i, j, k, materials[(k / 2) % 3]);
-            }
+            n = noise_fractal_octave_2d(0xbadb00b5, i, j, 2.0f, 4);
+            n *= n;
+            h = 15 + n * 10;
+            fill_height(map, i, j, h, TileID::Block, MaterialID::Rock);
         }
     }
 }
