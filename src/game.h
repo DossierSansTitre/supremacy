@@ -11,6 +11,8 @@ struct Game : private NonCopyable
     bool        running;
     Screen      screen;
     Map         map;
+    int         camera_x;
+    int         camera_y;
     int         camera_depth;
     uint32_t    seed;
 };

@@ -5,6 +5,9 @@
 
 void game_render(Game& game)
 {
+    int x;
+    int y;
+
     bool under;
     wish_attr attr;
     wish_size size;
@@ -15,19 +18,21 @@ void game_render(Game& game)
 
     for (int j = 0; j < size.y; ++j)
     {
+        y = game.camera_y + j;
         wish_move(game.screen.screen, 0, j);
         for (int i = 0; i < size.x; ++i)
         {
             TileID tile_id;
             MaterialID material_id;
 
+            x = game.camera_x + i;
             under = false;
-            game.map.at(i, j, game.camera_depth, tile_id, material_id);
+            game.map.at(x, y, game.camera_depth, tile_id, material_id);
 
             if (tile_id == TileID::None)
             {
                 under = true;
-                game.map.at(i, j, game.camera_depth - 1, tile_id, material_id);
+                game.map.at(x, y, game.camera_depth - 1, tile_id, material_id);
             }
 
             const Tile& tile = Tile::from_id(tile_id);

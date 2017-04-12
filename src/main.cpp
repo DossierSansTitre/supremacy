@@ -27,6 +27,8 @@ int main(int argc, char** argv)
 
     // KLUDGE
     game.camera_depth = 0;
+    game.camera_x = 0;
+    game.camera_y = 0;
     game.seed = time(nullptr);
     init_screen(game.screen);
 
