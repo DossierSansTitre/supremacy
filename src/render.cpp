@@ -20,7 +20,7 @@ void game_render(Game& game)
             TileID tile_id;
             MaterialID material_id;
 
-            game.map.at(i, j, tile_id, material_id);
+            game.map.at(i, j, game.camera_depth, tile_id, material_id);
             const Tile& tile = Tile::from_id(tile_id);
             const Material& material = Material::from_id(material_id);
 

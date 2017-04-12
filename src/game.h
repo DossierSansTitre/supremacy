@@ -10,6 +10,7 @@ struct Game : private NonCopyable
     bool    running;
     Screen  screen;
     Map     map;
+    int     camera_depth;
 };
 
 void game_loop(Game& game);

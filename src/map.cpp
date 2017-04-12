@@ -1,8 +1,10 @@
+#include <algorithm>
 #include <map.h>
 
 Map::Map()
 : _width(0)
 , _height(0)
+, _depth(0)
 , _tiles(nullptr)
 , _materials(nullptr)
 {
@@ -14,14 +16,15 @@ Map::~Map()
     destroy();
 }
 
-void Map::create(int width, int height)
+void Map::create(int width, int height, int depth)
 {
     size_t size;
 
     _width = width;
     _height = height;
+    _depth = depth;
 
-    size = width * height;
+    size = width * height * depth;
 
     _tiles = new TileID[size];
     _materials = new MaterialID[size];
@@ -36,13 +39,14 @@ void Map::destroy()
     delete [] _materials;
     _width = 0;
     _height = 0;
+    _depth = 0;
     _tiles = nullptr;
     _materials = nullptr;
 }
 
-void Map::at(int x, int y, TileID &tile_id, MaterialID &material_id)
+void Map::at(int x, int y, int z, TileID &tile_id, MaterialID &material_id)
 {
-    int i = index(x, y);
+    int i = index(x, y, z);
 
     tile_id = tile_at(i);
     material_id = material_at(i);
@@ -55,9 +59,9 @@ TileID Map::tile_at(int i)
     return _tiles[i];
 }
 
-TileID Map::tile_at(int x, int y)
+TileID Map::tile_at(int x, int y, int z)
 {
-    return tile_at(index(x, y));
+    return tile_at(index(x, y, z));
 }
 
 MaterialID Map::material_at(int i)
@@ -67,18 +71,17 @@ MaterialID Map::material_at(int i)
     return _materials[i];
 }
 
-MaterialID Map::material_at(int x, int y)
+MaterialID Map::material_at(int x, int y, int z)
 {
-    return material_at(index(x, y));
+    return material_at(index(x, y, z));
 }
 
-int Map::index(int x, int y)
+int Map::index(int x, int y, int z)
 {
-    if (x < 0 || x >= _width || y < 0 || y >= _height)
+    if (x < 0 || x >= _width || y < 0 || y >= _height || z < 0 || z >= _depth)
         return -1;
-    return x + y * _width;
+    return x + y * _width + z * _width * _height;
 }
-
 
 void Map::set_tile(int index, TileID tile)
 {
@@ -87,9 +90,9 @@ void Map::set_tile(int index, TileID tile)
     _tiles[index] = tile;
 }
 
-void Map::set_tile(int x, int y, TileID tile)
+void Map::set_tile(int x, int y, int z, TileID tile)
 {
-    set_tile(index(x, y), tile);
+    set_tile(index(x, y, z), tile);
 }
 
 void Map::set_material(int index, MaterialID material)
@@ -99,7 +102,7 @@ void Map::set_material(int index, MaterialID material)
     _materials[index] = material;
 }
 
-void Map::set_material(int x, int y, MaterialID material)
+void Map::set_material(int x, int y, int z, MaterialID material)
 {
-    set_material(index(x, y), material);
+    set_material(index(x, y, z), material);
 }

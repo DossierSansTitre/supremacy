@@ -21,9 +21,21 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
+    wish_attr attr;
     Game game;
 
+    // KLUDGE
+    game.camera_depth = 0;
     init_screen(game.screen);
+
+    wish_attr_init(&attr);
+    wish_color(&attr, 15);
+    wish_puts(game.screen.screen, "Generating map...\n", attr);
+    wish_draw(game.screen.term);
+
+    wish_puts(game.screen.screen, "Done\n", attr);
+    wish_draw(game.screen.term);
+
     generate_map(game.map);
     game_loop(game);
     destroy_screen(game.screen);

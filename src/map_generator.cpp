@@ -2,17 +2,32 @@
 
 void generate_map(Map& map)
 {
-    static const int width = 200;
-    static const int height = 200;
+    static const int width = 256;
+    static const int height = 256;
+    static const int depth = 64;
 
-    map.create(width, height);
+    static const TileID tiles[] = {
+        TileID::Block,
+        TileID::Stairs
+    };
 
-    for (int j = 0; j < height; ++j)
+    static const MaterialID materials[] = {
+        MaterialID::Dirt,
+        MaterialID::Rock,
+        MaterialID::Wood
+    };
+
+    map.create(width, height, depth);
+
+    for (int k = 0; k < depth; ++k)
     {
-        for (int i = 0; i < width; ++i)
+        for (int j = 0; j < height; ++j)
         {
-            map.set_tile(i, j, TileID::Stairs);
-            map.set_material(i, j, MaterialID::Rock);
+            for (int i = 0; i < width; ++i)
+            {
+                map.set_tile(i, j, k, tiles[k % 2]);
+                map.set_material(i, j, k, materials[(k / 2) % 3]);
+            }
         }
     }
 }
