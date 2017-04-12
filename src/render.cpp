@@ -5,6 +5,7 @@
 
 void game_render(Game& game)
 {
+    bool under;
     wish_attr attr;
     wish_size size;
 
@@ -20,12 +21,28 @@ void game_render(Game& game)
             TileID tile_id;
             MaterialID material_id;
 
+            under = false;
             game.map.at(i, j, game.camera_depth, tile_id, material_id);
+
+            if (tile_id == TileID::None)
+            {
+                under = true;
+                game.map.at(i, j, game.camera_depth - 1, tile_id, material_id);
+            }
+
             const Tile& tile = Tile::from_id(tile_id);
             const Material& material = Material::from_id(material_id);
 
-            wish_color(&attr, material.color);
-            wish_bcolor(&attr, material.bgcolor);
+            if (under)
+            {
+                wish_color(&attr, material.dim_color);
+                wish_bcolor(&attr, material.dim_bgcolor);
+            }
+            else
+            {
+                wish_color(&attr, material.color);
+                wish_bcolor(&attr, material.bgcolor);
+            }
             wish_putchar(game.screen.screen, tile.sym, attr);
         }
     }
