@@ -12,8 +12,8 @@ static void fill_height(Map& map, int x, int y, int height, TileID tile, Materia
 
 void generate_map(Map& map, uint32_t seed)
 {
-    static const int width = 256;
-    static const int height = 256;
+    static const int width = 512;
+    static const int height = 512;
     static const int depth = 64;
 
     float n;
