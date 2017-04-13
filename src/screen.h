@@ -8,6 +8,7 @@ struct Screen : private NonCopyable
 {
     wish_term*  term;
     wish_view*  screen;
+    wish_view*  top_bar;
 };
 
 #endif

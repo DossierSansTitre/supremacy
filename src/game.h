@@ -1,16 +1,19 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <cstdint>
 #include <non_copyable.h>
 #include <screen.h>
 #include <map.h>
-#include <cstdint>
+#include <fps_counter.h>
 
 struct Game : private NonCopyable
 {
     bool        running;
     Screen      screen;
     Map         map;
+    FpsCounter  fps_counter_update;
+    FpsCounter  fps_counter_render;
     int         camera_x;
     int         camera_y;
     int         camera_depth;

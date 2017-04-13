@@ -8,14 +8,25 @@ void game_render(Game& game)
     int x;
     int y;
 
+    int fps_render;
+    int fps_update;
+
     bool under;
     wish_attr attr;
     wish_size size;
+
+    game.fps_counter_render.update();
 
     wish_attr_init(&attr);
     wish_get_view_size(game.screen.screen, &size);
     wish_clear(game.screen.term);
 
+    fps_render = game.fps_counter_render.get();
+    fps_update = game.fps_counter_update.get();
+
+    wish_color(&attr, 15);
+    wish_move(game.screen.top_bar, 0, 0);
+    wish_printf(game.screen.top_bar, "FPS: %d(%d)", attr, fps_render, fps_update);
     for (int j = 0; j < size.y; ++j)
     {
         y = game.camera_y + j;
@@ -23,7 +34,7 @@ void game_render(Game& game)
         for (int i = 0; i < size.x; ++i)
         {
             x = game.camera_x + i;
-            if (1 || game.map.visible(x, y, game.camera_depth))
+            if (game.map.visible(x, y, game.camera_depth))
             {
                 TileID tile_id;
                 MaterialID material_id;

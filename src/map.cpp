@@ -134,8 +134,9 @@ void Map::compute_visibility(int x, int y, int z)
         || (x < _width - 1 && _tiles[index(x + 1, y, z)] == TileID::None)
         || (y > 0 && _tiles[index(x, y - 1, z)] == TileID::None)
         || (y < _height - 1 && _tiles[index(x, y + 1, z)] == TileID::None)
-        || (z > 0 && _tiles[index(x, y, z - 1)] == TileID::None)
-        || (z < _depth - 1 && _tiles[index(x, y, z + 1)] == TileID::None))
+//        || (z > 0 && _tiles[index(x, y, z - 1)] == TileID::None)
+//        || (z < _depth - 1 && _tiles[index(x, y, z + 1)] == TileID::None)
+        )
         _visible[i] = true;
 }
 

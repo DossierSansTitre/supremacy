@@ -3,9 +3,17 @@
 
 static void init_screen(Screen& screen)
 {
+    wish_size size;
+
     screen.term = wish_init();
+    wish_get_size(screen.term, &size);
+
     screen.screen = wish_view_create(screen.term);
-    wish_view_fullscreen(screen.screen);
+    screen.top_bar = wish_view_create(screen.term);
+
+    wish_view_resize(screen.screen, 0, 1, size.x, size.y - 1);
+    wish_view_resize(screen.top_bar, 0, 0, size.x, 1);
+
     wish_read_block(screen.term, 0);
     wish_read_delay(screen.term, 0);
     wish_cursor_show(screen.term, 0);
@@ -13,6 +21,7 @@ static void init_screen(Screen& screen)
 
 static void destroy_screen(Screen& screen)
 {
+    wish_view_free(screen.top_bar);
     wish_view_free(screen.screen);
     wish_quit(screen.term);
 }

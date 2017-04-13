@@ -2,5 +2,5 @@
 
 void game_update(Game& game)
 {
-    (void)game;
+    game.fps_counter_update.update();
 }
