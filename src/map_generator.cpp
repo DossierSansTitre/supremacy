@@ -32,4 +32,5 @@ void generate_map(Map& map, uint32_t seed)
             fill_height(map, i, j, h - 4, 4, TileID::Block, MaterialID::Dirt);
         }
     }
+    map.compute_visibility();
 }
