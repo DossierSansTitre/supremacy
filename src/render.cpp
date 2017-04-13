@@ -27,6 +27,10 @@ void game_render(Game& game)
     wish_color(&attr, 15);
     wish_move(game.screen.top_bar, 0, 0);
     wish_printf(game.screen.top_bar, "FPS: %d(%d)", attr, fps_render, fps_update);
+
+    wish_color(&attr, 9);
+    wish_move(game.screen.top_bar, size.x / 2 - 4, 0);
+    wish_puts(game.screen.top_bar, "SUPREMACY", attr);
     for (int j = 0; j < size.y; ++j)
     {
         y = game.camera_y + j;
