@@ -34,7 +34,7 @@ void game_render(Game& game)
         for (int i = 0; i < size.x; ++i)
         {
             x = game.camera_x + i;
-            if (game.map.visible(x, y, game.camera_depth))
+            if (1 || game.map.visible(x, y, game.camera_depth))
             {
                 TileID tile_id;
                 MaterialID material_id;
