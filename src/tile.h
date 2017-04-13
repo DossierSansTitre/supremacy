@@ -6,6 +6,7 @@
 struct Tile
 {
     int     sym;
+    int     dim_sym;
 
     static const Tile tiles[];
 

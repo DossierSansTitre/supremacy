@@ -42,6 +42,7 @@ void game_render(Game& game)
             {
                 TileID tile_id;
                 MaterialID material_id;
+                int sym;
 
                 under = false;
                 game.map.at(x, y, game.camera_depth, tile_id, material_id);
@@ -55,8 +56,11 @@ void game_render(Game& game)
                 const Tile& tile = Tile::from_id(tile_id);
                 const Material& material = Material::from_id(material_id);
 
+                sym = tile.sym;
                 if (under)
                 {
+                    if (tile.dim_sym != 0)
+                        sym = tile.dim_sym;
                     wish_color(&attr, material.dim_color);
                     wish_bcolor(&attr, material.dim_bgcolor);
                 }
@@ -65,7 +69,7 @@ void game_render(Game& game)
                     wish_color(&attr, material.color);
                     wish_bcolor(&attr, material.bgcolor);
                 }
-                wish_putchar(game.screen.screen, tile.sym, attr);
+                wish_putchar(game.screen.screen, sym, attr);
             }
             else
             {
