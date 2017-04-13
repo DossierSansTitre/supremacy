@@ -1,12 +1,12 @@
 #include <noise.h>
 #include <map.h>
 
-static void fill_height(Map& map, int x, int y, int height, TileID tile, MaterialID material)
+static void fill_height(Map& map, int x, int y, int base, int length, TileID tile, MaterialID material)
 {
-    for (int z = 0; z < height; ++z)
+    for (int z = 0; z < length; ++z)
     {
-        map.set_tile(x, y, z, tile);
-        map.set_material(x, y, z, material);
+        map.set_tile(x, y, base + z, tile);
+        map.set_material(x, y, base + z, material);
     }
 }
 
@@ -28,7 +28,8 @@ void generate_map(Map& map, uint32_t seed)
             n = noise_fractal_octave_2d(seed, i, j, 2.0f, 6);
             n *= n;
             h = 15 + n * 10;
-            fill_height(map, i, j, h, TileID::Block, MaterialID::Rock);
+            fill_height(map, i, j, 0, h - 4, TileID::Block, MaterialID::Rock);
+            fill_height(map, i, j, h - 4, 4, TileID::Block, MaterialID::Dirt);
         }
     }
 }
