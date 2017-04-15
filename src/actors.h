@@ -16,18 +16,18 @@ public:
 
     ActorID     actor_id(int id) const { return _actor_id[id]; }
     Vec3        pos(int id) const { return _pos[id]; }
-    float       health(int id) const { return _health[id]; }
-    float       speed(int id) const { return _speed[id]; }
+    int         health(int id) const { return _health[id]; }
+    int         speed(int id) const { return _speed[id]; }
 
     void        set_pos(int id, Vec3 pos);
-    void        set_health(int id, float health);
-    void        set_speed(int id, float speed);
+    void        set_health(int id, int health);
+    void        set_speed(int id, int speed);
 
 private:
     std::vector<ActorID>    _actor_id;
     std::vector<Vec3>       _pos;
-    std::vector<float>      _health;
-    std::vector<float>      _speed;
+    std::vector<int>        _health;
+    std::vector<int>        _speed;
 };
 
 #endif

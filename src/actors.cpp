@@ -32,12 +32,12 @@ void Actors::set_pos(int id, Vec3 pos)
     _pos[id] = pos;
 }
 
-void Actors::set_health(int id, float health)
+void Actors::set_health(int id, int health)
 {
     _health[id] = health;
 }
 
-void Actors::set_speed(int id, float speed)
+void Actors::set_speed(int id, int speed)
 {
     _speed[id] = speed;
 }
