@@ -46,57 +46,6 @@ void Map::destroy()
     _visible.resize(0);
 }
 
-void Map::at(int x, int y, int z, TileID &tile_id, MaterialID &material_id) const
-{
-    int i = index(x, y, z);
-
-    tile_id = tile_at(i);
-    material_id = material_at(i);
-}
-
-TileID Map::tile_at(int i) const
-{
-    if (i == -1)
-        return TileID::None;
-    return _tiles[i];
-}
-
-TileID Map::tile_at(int x, int y, int z) const
-{
-    return tile_at(index(x, y, z));
-}
-
-MaterialID Map::material_at(int i) const
-{
-    if (i == -1)
-        return MaterialID::None;
-    return _materials[i];
-}
-
-MaterialID Map::material_at(int x, int y, int z) const
-{
-    return material_at(index(x, y, z));
-}
-
-bool Map::visible(int i) const
-{
-    if (i == -1)
-        return false;
-    return _visible[i];
-}
-
-bool Map::visible(int x, int y, int z) const
-{
-    return visible(index(x, y, z));
-}
-
-int Map::index(int x, int y, int z) const
-{
-    if (x < 0 || x >= _width || y < 0 || y >= _height || z < 0 || z >= _depth)
-        return -1;
-    return x + y * _width + z * _width * _height;
-}
-
 void Map::set_tile(int index, TileID tile)
 {
     if (index == -1)
