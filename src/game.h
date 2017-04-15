@@ -6,6 +6,7 @@
 #include <screen.h>
 #include <map.h>
 #include <fps_counter.h>
+#include <actors.h>
 
 struct Game : private NonCopyable
 {
@@ -18,6 +19,7 @@ struct Game : private NonCopyable
     int         camera_y;
     int         camera_depth;
     uint32_t    seed;
+    Actors      actors;
 };
 
 void game_loop(Game& game);
