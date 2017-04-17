@@ -3,28 +3,54 @@
 
 Actors::Actors()
 {
+    _count = 0;
 }
 
 Actors::~Actors()
 {
 }
 
-void Actors::add(ActorID actor_id, Vec3 pos)
+int Actors::add(ActorID actor_id, Vec3 pos)
 {
     const ActorData actor_data = ActorData::from_id(actor_id);
     
-    _actor_id.push_back(actor_id);
-    _pos.push_back(pos);
-    _health.push_back(actor_data.max_health);
-    _speed.push_back(actor_data.max_speed);
+    if (_free.size() > 0)
+    {
+        int id = _free.back();
+        _free.pop_back();
+        _actor_id[id] = actor_id;
+        _pos[id] = pos;
+        _health[id] = actor_data.max_health;
+        _speed[id] = actor_data.max_speed;
+        _counter[id] = 1;
+        return id;
+    }
+    else
+    {
+        _actor_id.push_back(actor_id);
+        _pos.push_back(pos);
+        _health.push_back(actor_data.max_health);
+        _speed.push_back(actor_data.max_speed);
+        _counter.push_back(1);
+        return _count++;
+    }
 }
 
 void Actors::remove(int id)
 {
-    _actor_id.erase(_actor_id.begin() + id);
-    _pos.erase(_pos.begin() + id);
-    _health.erase(_health.begin() + id);
-    _speed.erase(_speed.begin() + id);
+    _actor_id[id] = ActorID::NONE;
+    _free.push_back(id);
+}
+
+void Actors::increment(int id)
+{
+    ++_counter[id];
+}
+
+void Actors::decrement(int id)
+{
+    if (--_counter[id] <= 0)
+        remove(id);
 }
 
 void Actors::set_pos(int id, Vec3 pos)

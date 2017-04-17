@@ -3,6 +3,7 @@
 
 enum ActorID
 {
+    NONE,
     DWARF,
     GOBLIN,
 };
