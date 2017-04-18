@@ -38,7 +38,7 @@ int Actors::add(ActorID actor_id, Vec3 pos)
 
 void Actors::remove(int id)
 {
-    _actor_id[id] = ActorID::NONE;
+    _actor_id[id] = ActorID::None;
     _free.push_back(id);
 }
 

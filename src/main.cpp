@@ -46,10 +46,16 @@ int main(int argc, char** argv)
     wish_puts(game.screen.screen, "Generating map...\n", attr);
     wish_draw(game.screen.term);
 
+    generate_map(game.map, game.seed);
+
     wish_puts(game.screen.screen, "Done\n", attr);
     wish_draw(game.screen.term);
 
-    generate_map(game.map, game.seed);
+    game.actors.add(ActorID::Dwarf, {0, 0, 0});
+    game.actors.add(ActorID::Dwarf, {2, 2, 0});
+    game.actors.add(ActorID::Goblin, {2, 0, 0});
+    game.actors.add(ActorID::Goblin, {2, 1, 0});
+
     game_loop(game);
     destroy_screen(game.screen);
 

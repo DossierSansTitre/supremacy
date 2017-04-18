@@ -2,24 +2,18 @@
 #include <game.h>
 #include <tile.h>
 #include <material.h>
+#include <actor_data.h>
 
-void game_render(Game& game)
+static void render_top_bar(Game& game)
 {
-    int x;
-    int y;
-
     int fps_render;
     int fps_update;
 
-    bool under;
     wish_attr attr;
     wish_size size;
 
-    game.fps_counter_render.update();
-
     wish_attr_init(&attr);
     wish_get_view_size(game.screen.screen, &size);
-    wish_clear(game.screen.term);
 
     fps_render = game.fps_counter_render.get();
     fps_update = game.fps_counter_update.get();
@@ -31,6 +25,20 @@ void game_render(Game& game)
     wish_color(&attr, 9);
     wish_move(game.screen.top_bar, size.x / 2 - 4, 0);
     wish_puts(game.screen.top_bar, "SUPREMACY", attr);
+}
+
+static void render_map(Game& game)
+{
+    int x;
+    int y;
+
+    bool under;
+    wish_attr attr;
+    wish_size size;
+
+    wish_attr_init(&attr);
+    wish_get_view_size(game.screen.screen, &size);
+
     for (int j = 0; j < size.y; ++j)
     {
         y = game.camera_y + j;
@@ -79,6 +87,52 @@ void game_render(Game& game)
             }
         }
     }
+}
 
+static void render_actors(Game& game)
+{
+    wish_attr attr;
+    wish_size size;
+    int count;
+    int x;
+    int y;
+
+    wish_attr_init(&attr);
+    wish_get_view_size(game.screen.screen, &size);
+    count = game.actors.count();
+    for (int i = 0; i < count; ++i)
+    {
+        ActorID actor_id;
+        Vec3 pos;
+
+        actor_id = game.actors.actor_id(i);
+        if (actor_id == ActorID::None)
+            continue;
+        pos = game.actors.pos(i);
+        if (pos.z != game.camera_depth)
+            continue;
+
+        x = pos.x - game.camera_x;
+        y = pos.y - game.camera_y;
+
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y)
+            continue;
+
+        const ActorData& actor_data = ActorData::from_id(actor_id);
+        wish_move(game.screen.screen, x, y);
+        wish_color(&attr, actor_data.color);
+        wish_bcolor(&attr, 0);
+        wish_putchar(game.screen.screen, actor_data.sym, attr);
+    }
+}
+
+void game_render(Game& game)
+{
+    game.fps_counter_render.update();
+
+    wish_clear(game.screen.term);
+    render_top_bar(game);
+    render_map(game);
+    render_actors(game);
     wish_draw(game.screen.term);
 }

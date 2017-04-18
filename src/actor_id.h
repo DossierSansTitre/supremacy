@@ -1,11 +1,13 @@
 #ifndef ACTOR_ID
 #define ACTOR_ID
 
-enum ActorID
+#include <cstdint>
+
+enum class ActorID : uint8_t
 {
-    NONE,
-    DWARF,
-    GOBLIN,
+    None,
+    Dwarf,
+    Goblin
 };
 
 #endif
