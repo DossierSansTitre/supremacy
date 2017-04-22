@@ -26,6 +26,8 @@ static void destroy_screen(Screen& screen)
     wish_quit(screen.term);
 }
 
+#include <iostream>
+
 int main(int argc, char** argv)
 {
     (void)argc;
@@ -55,6 +57,8 @@ int main(int argc, char** argv)
     game.actors.add(ActorID::Dwarf, {2, 2, 0});
     game.actors.add(ActorID::Goblin, {2, 0, 0});
     game.actors.add(ActorID::Goblin, {2, 1, 0});
+ 
+    game.items.add(ItemID::Wood, {0, 1, 0}, 30);
 
     game_loop(game);
     destroy_screen(game.screen);
