@@ -2,5 +2,5 @@
 
 const ItemData ItemData::item_data[] = {
     {},
-    {'W', 2, 0},
+    {'W', 94, 0},
 };

@@ -3,6 +3,7 @@
 #include <tile.h>
 #include <material.h>
 #include <actor_data.h>
+#include <item_data.h>
 
 static void render_top_bar(Game& game)
 {
@@ -126,6 +127,43 @@ static void render_actors(Game& game)
     }
 }
 
+static void render_items(Game& game)
+{
+    wish_attr attr;
+    wish_size size;
+    int count;
+    int x;
+    int y;
+
+    wish_attr_init(&attr);
+    wish_get_view_size(game.screen.screen, &size);
+    count = game.items.count();
+    for (int i = 0; i < count; ++i)
+    {
+        ItemID item_id;
+        Vec3 pos;
+
+        item_id = game.items.item_id(i);
+        if (item_id == ItemID::None)
+            continue;
+        pos = game.items.pos(i);
+        if (pos.z != game.camera_depth)
+            continue;
+
+        x = pos.x - game.camera_x;
+        y = pos.y - game.camera_y;
+
+        if (x < 0 || x >= size.x || y < 0 || y >= size.y)
+            continue;
+
+        const ItemData& item_data = ItemData::from_id(item_id);
+        wish_move(game.screen.screen, x, y);
+        wish_color(&attr, item_data.color);
+        wish_bcolor(&attr, 0);
+        wish_putchar(game.screen.screen, item_data.sym, attr);
+    }
+}
+
 void game_render(Game& game)
 {
     game.fps_counter_render.update();
@@ -134,5 +172,6 @@ void game_render(Game& game)
     render_top_bar(game);
     render_map(game);
     render_actors(game);
+    render_items(game);
     wish_draw(game.screen.term);
 }
