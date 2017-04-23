@@ -31,4 +31,6 @@ void game_event(Game& game);
 void game_update(Game& game);
 void game_draw(Game& game);
 
+void game_ai(Game& game);
+
 #endif

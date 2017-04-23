@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <actors.h>
 #include <actor_data.h>
 
@@ -21,7 +22,8 @@ int Actors::add(ActorID actor_id, Vec3 pos)
         _actor_id[id] = actor_id;
         _pos[id] = pos;
         _health[id] = actor_data.max_health;
-        _speed[id] = actor_data.max_speed;
+        _action[id] = ActionID::Wander;
+        _speed[id] = rand() % (10 * actor_data.speed + 1);
         _counter[id] = 1;
         return id;
     }
@@ -29,8 +31,9 @@ int Actors::add(ActorID actor_id, Vec3 pos)
     {
         _actor_id.push_back(actor_id);
         _pos.push_back(pos);
+        _action.push_back(ActionID::Wander);
         _health.push_back(actor_data.max_health);
-        _speed.push_back(actor_data.max_speed);
+        _speed.push_back(rand() % (10 * actor_data.speed + 1));
         _counter.push_back(1);
         return _count++;
     }
@@ -66,4 +69,20 @@ void Actors::set_health(int id, int health)
 void Actors::set_speed(int id, int speed)
 {
     _speed[id] = speed;
+}
+
+void Actors::speed_tick(int id)
+{
+    const ActorData& ad = ActorData::from_id(_actor_id[id]);
+    _speed[id] += ad.speed;
+}
+
+bool Actors::use_speed(int id, int speed)
+{
+    if (_speed[id] >= speed)
+    {
+        _speed[id] -= speed;
+        return true;
+    }
+    return false;
 }

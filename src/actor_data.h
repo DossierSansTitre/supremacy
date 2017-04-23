@@ -9,7 +9,7 @@ struct ActorData
     int     sym;
     Color   color;
     int     max_health;
-    int     max_speed;
+    int     speed;
 
     static const ActorData actor_data[];
 
