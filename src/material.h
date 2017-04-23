@@ -2,13 +2,12 @@
 #define MATERIAL_H
 
 #include <material_id.h>
+#include <color.h>
 
 struct Material
 {
-    int     color;
-    int     bgcolor;
-    int     dim_color;
-    int     dim_bgcolor;
+    Color   color;
+    Color   color_bg;
 
     static const Material materials[];
 

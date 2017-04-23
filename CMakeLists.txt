@@ -12,11 +12,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++14 -fstrict-aliasing")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(Libwish)
+configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/include/config.h")
+
+find_package(OpenGL)
+find_package(SDL2)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 include_directories(src)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 add_executable(supremacy ${SOURCES})
-target_link_libraries(supremacy libwish)
+target_link_libraries(supremacy sdl2 ${OPENGL_LIBRARIES})
+
+install(TARGETS supremacy DESTINATION bin)
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/" DESTINATION "share/supremacy")

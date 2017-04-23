@@ -2,31 +2,38 @@
 
 void game_event(Game& game)
 {
-    wish_unicode cp;
+    SDL_Event event;
 
-    cp = wish_getchar(game.screen.term);
-
-    /* Detect Ctrl-C */
-    if (cp == 3)
-        game.running = false;
-    else if (cp == '>' && game.camera_depth > 0)
-        game.camera_depth--;
-    else if (cp == '<' && game.camera_depth < game.map.depth() - 1)
-        game.camera_depth++;
-    else if (cp == 'w')
-        game.camera_y--;
-    else if (cp == 's')
-        game.camera_y++;
-    else if (cp == 'a')
-        game.camera_x--;
-    else if (cp == 'd')
-        game.camera_x++;
-    else if (cp == 'W')
-        game.camera_y -= 20;
-    else if (cp == 'S')
-        game.camera_y += 20;
-    else if (cp == 'A')
-        game.camera_x -= 20;
-    else if (cp == 'D')
-        game.camera_x += 20;
+    while (game.window.poll_event(event))
+    {
+        if (event.type == SDL_KEYDOWN)
+        {
+            switch (event.key.keysym.sym)
+            {
+                case SDLK_ESCAPE:
+                    game.running = false;
+                    break;
+                case SDLK_q:
+                    if (game.camera_depth < game.map.depth() - 1)
+                        game.camera_depth++;
+                    break;
+                case SDLK_e:
+                    if (game.camera_depth > 0)
+                        game.camera_depth--;
+                    break;
+                case SDLK_w:
+                    game.camera_y--;
+                    break;
+                case SDLK_s:
+                    game.camera_y++;
+                    break;
+                case SDLK_a:
+                    game.camera_x--;;
+                    break;
+                case SDLK_d:
+                    game.camera_x++;
+                    break;
+            }
+        }
+    }
 }

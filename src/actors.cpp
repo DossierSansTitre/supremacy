@@ -13,7 +13,7 @@ Actors::~Actors()
 int Actors::add(ActorID actor_id, Vec3 pos)
 {
     const ActorData actor_data = ActorData::from_id(actor_id);
-    
+
     if (_free.size() > 0)
     {
         int id = _free.back();

@@ -3,16 +3,18 @@
 
 #include <cstdint>
 #include <non_copyable.h>
-#include <screen.h>
 #include <map.h>
 #include <fps_counter.h>
 #include <actors.h>
 #include <items.h>
+#include <window.h>
+#include <renderer.h>
 
 struct Game : private NonCopyable
 {
     bool        running;
-    Screen      screen;
+    Window      window;
+    Renderer    renderer;
     Map         map;
     FpsCounter  fps_counter_update;
     FpsCounter  fps_counter_render;
@@ -27,6 +29,6 @@ struct Game : private NonCopyable
 void game_loop(Game& game);
 void game_event(Game& game);
 void game_update(Game& game);
-void game_render(Game& game);
+void game_draw(Game& game);
 
 #endif

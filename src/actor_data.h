@@ -2,12 +2,12 @@
 #define ACTOR_DATA_H
 
 #include <actor_id.h>
+#include <color.h>
 
 struct ActorData
 {
     int     sym;
-    int     color;
-    int     bgcolor;
+    Color   color;
     int     max_health;
     int     max_speed;
 

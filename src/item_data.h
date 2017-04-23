@@ -1,13 +1,14 @@
 #ifndef ITEM_DATA_H
 #define ITEM_DATA_H
 
+#include <cstdint>
 #include <item_id.h>
+#include <color.h>
 
 struct ItemData
 {
-    int     sym;
-    int     color;
-    int     bg_color;
+    uint16_t    sym;
+    Color       color;
 
     static const ItemData   item_data[];
 

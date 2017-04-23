@@ -1,12 +1,13 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include <cstdint>
 #include <tile_id.h>
 
 struct Tile
 {
-    int     sym;
-    int     dim_sym;
+    uint16_t     sym;
+    uint16_t     dim_sym;
 
     static const Tile tiles[];
 
