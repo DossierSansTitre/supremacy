@@ -8,6 +8,7 @@ struct Material
 {
     Color   color;
     Color   color_bg;
+    bool    minable;
 
     static const Material materials[];
 
