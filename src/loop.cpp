@@ -22,6 +22,9 @@ void game_loop(Game& game)
     {
         game_draw(game);
 
+        if (!game.window.focus())
+            SDL_Delay(50);
+
         while (update_acc >= update_delay)
         {
             update_acc -= update_delay;

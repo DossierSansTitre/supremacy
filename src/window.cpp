@@ -3,6 +3,7 @@
 
 Window::Window()
 : _window(nullptr)
+, _focus(true)
 {
 
 }
@@ -24,13 +25,13 @@ void Window::init()
     sdl_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     _window = SDL_CreateWindow(
-        "Supremacy",
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
-        dm.w,
-        dm.h,
-        sdl_flags
-    );
+            "Supremacy",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            dm.w,
+            dm.h,
+            sdl_flags
+            );
 
     _opengl = SDL_GL_CreateContext(_window);
     //glewInit();
@@ -68,5 +69,28 @@ void Window::swap()
 
 bool Window::poll_event(SDL_Event& event)
 {
-    return SDL_PollEvent(&event);
+    int ret;
+
+    for (;;)
+    {
+        ret = SDL_PollEvent(&event);
+        if (!ret)
+            return false;
+        if (event.type == SDL_WINDOWEVENT) {
+            switch (event.window.event)
+            {
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    _focus = true;
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                    _focus = false;
+                    break;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    return true;
 }
