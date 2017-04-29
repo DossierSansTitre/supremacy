@@ -1,5 +1,20 @@
 #include <game.h>
 
+
+static void toggle_vsync(Game& game)
+{
+    if (game.vsync)
+    {
+        SDL_GL_SetSwapInterval(0);
+    }
+    else
+    {
+        if (SDL_GL_SetSwapInterval(-1))
+            SDL_GL_SetSwapInterval(1);
+    }
+    game.vsync = !game.vsync;
+}
+
 void game_event(Game& game)
 {
     SDL_Event event;
@@ -32,6 +47,9 @@ void game_event(Game& game)
                     break;
                 case SDLK_d:
                     game.camera_x++;
+                    break;
+                case SDLK_v:
+                    toggle_vsync(game);
                     break;
             }
         }

@@ -24,6 +24,7 @@ struct Game : private NonCopyable
     uint32_t    seed;
     Actors      actors;
     Items       items;
+    bool        vsync;
 };
 
 void game_loop(Game& game);

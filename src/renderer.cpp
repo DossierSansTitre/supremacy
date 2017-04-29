@@ -2,49 +2,6 @@
 #include <config.h>
 #include <renderer.h>
 
-static void push_position(char* dst, int x, int y, uint32_t tile_width, uint32_t tile_height)
-{
-    *((float*)(dst + 24 * 0 + 0)) = (x + 0) * tile_width;
-    *((float*)(dst + 24 * 0 + 4)) = (y + 0) * tile_height;
-    *((float*)(dst + 24 * 1 + 0)) = (x + 1) * tile_width;
-    *((float*)(dst + 24 * 1 + 4)) = (y + 0) * tile_height;
-    *((float*)(dst + 24 * 2 + 0)) = (x + 1) * tile_width;
-    *((float*)(dst + 24 * 2 + 4)) = (y + 1) * tile_height;
-    *((float*)(dst + 24 * 3 + 0)) = (x + 0) * tile_width;
-    *((float*)(dst + 24 * 3 + 4)) = (y + 1) * tile_height;
-}
-
-static void push_texture(char* dst, uint16_t i)
-{
-    static const int tile_count = 32;
-    static const float size = 1.f / tile_count;
-
-    int tx;
-    int ty;
-
-    tx = i % 32;
-    ty = i / 32;
-
-    *((float*)(dst + 24 * 0 + 0)) = (tx + 0.f) * size;
-    *((float*)(dst + 24 * 0 + 4)) = (ty + 0.f) * size;
-    *((float*)(dst + 24 * 1 + 0)) = (tx + 1.f) * size;
-    *((float*)(dst + 24 * 1 + 4)) = (ty + 0.f) * size;
-    *((float*)(dst + 24 * 2 + 0)) = (tx + 1.f) * size;
-    *((float*)(dst + 24 * 2 + 4)) = (ty + 1.f) * size;
-    *((float*)(dst + 24 * 3 + 0)) = (tx + 0.f) * size;
-    *((float*)(dst + 24 * 3 + 4)) = (ty + 1.f) * size;
-}
-
-static void push_color(char* dst, Color src)
-{
-    for (int i = 0; i < 4; ++i)
-    {
-        *((uint8_t*)(dst + 24 * i + 0)) = src.r;
-        *((uint8_t*)(dst + 24 * i + 1)) = src.g;
-        *((uint8_t*)(dst + 24 * i + 2)) = src.b;
-    }
-}
-
 Renderer::Renderer()
 : _texture(0)
 , _vbo(0)
@@ -82,9 +39,9 @@ void Renderer::resize(uint32_t width, uint32_t height)
     _colors.resize(size);
     _colors_bg.resize(size);
 
-    _buffer_vertex.resize(size * 96);
-
     clear();
+    build_indices();
+    build_vertices();
 }
 
 void Renderer::clear()
@@ -146,55 +103,81 @@ void Renderer::printf(int x, int y, const char* str, Color color, Color color_bg
  */
 void Renderer::render()
 {
+    static const float texture_size = 1.f / 32.f;
+
     uint16_t    symbol;
     Color       color;
     Color       color_bg;
-    size_t      idx;
-    size_t      index_count;
-    size_t      count;
-    char*       data;
+    size_t      i;
+    float       tx;
+    float       ty;
+    Vertex*     data;
 
-    _buffer_index.clear();
-
-    data = &(_buffer_vertex[0]);
-    index_count = 0;
-    count = 0;
-
-    for (size_t j = 0; j < _tiles_y; ++j)
-    {
-        for (size_t i = 0; i < _tiles_x; ++i)
-        {
-            idx = i + j * _tiles_x;
-            symbol = _symbols[idx];
-            if (symbol == 0)
-                continue;
-           color = _colors[idx];
-           color_bg = _colors_bg[idx];
-
-           push_position(data + count * 96, i, j, _tile_width, _tile_height);
-           push_texture(data + count * 96 + 8, symbol);
-           push_color(data + count * 96 + 16, color);
-           push_color(data + count * 96 + 20, color_bg);
-           _buffer_index.push_back(index_count);
-           _buffer_index.push_back(index_count + 1);
-           _buffer_index.push_back(index_count + 2);
-           _buffer_index.push_back(index_count);
-           _buffer_index.push_back(index_count + 2);
-           _buffer_index.push_back(index_count + 3);
-           index_count += 4;
-           count += 1;
-        }
-    }
-
-    glBindTexture(GL_TEXTURE_2D, _texture);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
-    glBufferData(GL_ARRAY_BUFFER, count * 96, nullptr, GL_STREAM_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, count * 96, data, GL_STREAM_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _buffer_index.size() * 4, nullptr, GL_STREAM_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _buffer_index.size() * 4, _buffer_index.data(), GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
+    data = _vertices.data();
+    for (uint32_t y = 0; y < _tiles_y; ++y)
+    {
+        for (uint32_t x = 0; x < _tiles_x; ++x)
+        {
+            i = x + y * _tiles_x;
+            symbol = _symbols[i];
+            color = _colors[i];
+            color_bg = _colors_bg[i];
 
+            tx = (symbol % 32) * texture_size;
+            ty = (symbol / 32) * texture_size;
+
+            data[i * 4 + 0].x = x * _tile_width;
+            data[i * 4 + 0].y = y * _tile_height;
+            data[i * 4 + 0].texture_x = tx;
+            data[i * 4 + 0].texture_y = ty;
+            data[i * 4 + 0].color_r = color.r;
+            data[i * 4 + 0].color_g = color.g;
+            data[i * 4 + 0].color_b = color.b;
+            data[i * 4 + 0].color_bg_r = color_bg.r;
+            data[i * 4 + 0].color_bg_g = color_bg.g;
+            data[i * 4 + 0].color_bg_b = color_bg.b;
+
+            data[i * 4 + 1].x = (x + 1) * _tile_width;
+            data[i * 4 + 1].y = y * _tile_height;
+            data[i * 4 + 1].texture_x = tx + texture_size;
+            data[i * 4 + 1].texture_y = ty;
+            data[i * 4 + 1].color_r = color.r;
+            data[i * 4 + 1].color_g = color.g;
+            data[i * 4 + 1].color_b = color.b;
+            data[i * 4 + 1].color_bg_r = color_bg.r;
+            data[i * 4 + 1].color_bg_g = color_bg.g;
+            data[i * 4 + 1].color_bg_b = color_bg.b;
+
+            data[i * 4 + 2].x = (x + 1) * _tile_width;
+            data[i * 4 + 2].y = (y + 1) * _tile_height;
+            data[i * 4 + 2].texture_x = tx + texture_size;
+            data[i * 4 + 2].texture_y = ty + texture_size;
+            data[i * 4 + 2].color_r = color.r;
+            data[i * 4 + 2].color_g = color.g;
+            data[i * 4 + 2].color_b = color.b;
+            data[i * 4 + 2].color_bg_r = color_bg.r;
+            data[i * 4 + 2].color_bg_g = color_bg.g;
+            data[i * 4 + 2].color_bg_b = color_bg.b;
+
+            data[i * 4 + 3].x = x * _tile_width;
+            data[i * 4 + 3].y = (y + 1) * _tile_height;
+            data[i * 4 + 3].texture_x = tx;
+            data[i * 4 + 3].texture_y = ty + texture_size;
+            data[i * 4 + 3].color_r = color.r;
+            data[i * 4 + 3].color_g = color.g;
+            data[i * 4 + 3].color_b = color.b;
+            data[i * 4 + 3].color_bg_r = color_bg.r;
+            data[i * 4 + 3].color_bg_g = color_bg.g;
+            data[i * 4 + 3].color_bg_b = color_bg.b;
+        }
+    }
+    glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), data);
+
+    glBindTexture(GL_TEXTURE_2D, _texture);
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glColor4f(1.f, 1.f, 1.f, 1.f);
@@ -202,14 +185,14 @@ void Renderer::render()
     glEnableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
-    glVertexPointer(2, GL_FLOAT, 24, (GLvoid*)0);
-    glColorPointer(3, GL_UNSIGNED_BYTE, 24, (GLvoid*)20);
-    glDrawElements(GL_TRIANGLES, _buffer_index.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+    glVertexPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, x));
+    glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_bg_r));
+    glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, 24, (GLvoid*)8);
-    glColorPointer(3, GL_UNSIGNED_BYTE, 24, (GLvoid*)16);
-    glDrawElements(GL_TRIANGLES, _buffer_index.size(), GL_UNSIGNED_INT, (GLvoid*)0);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
+    glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_r));
+    glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
 int Renderer::index(int x, int y) const
@@ -217,4 +200,35 @@ int Renderer::index(int x, int y) const
     if (x < 0 || x >= (int)_tiles_x || y < 0 || y >= (int)_tiles_y)
         return -1;
     return x + y * _tiles_x;
+}
+
+void Renderer::build_indices()
+{
+    size_t indice_count;
+    uint32_t* data;
+
+    indice_count = _tiles_x * _tiles_y;
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indice_count * 6 * 4, nullptr, GL_STATIC_DRAW);
+    data = (uint32_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+    for (uint32_t i = 0; i < indice_count; ++i)
+    {
+        data[i * 6 + 0] = i * 4 + 0;
+        data[i * 6 + 1] = i * 4 + 1;
+        data[i * 6 + 2] = i * 4 + 2;
+        data[i * 6 + 3] = i * 4 + 0;
+        data[i * 6 + 4] = i * 4 + 2;
+        data[i * 6 + 5] = i * 4 + 3;
+    }
+
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+}
+
+void Renderer::build_vertices()
+{
+    size_t count;
+
+    count = _tiles_x * _tiles_y;
+    _vertices.resize(count * 4);
 }

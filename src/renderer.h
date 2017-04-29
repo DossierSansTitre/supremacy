@@ -28,7 +28,24 @@ public:
     void render();
 
 private:
-    int     index(int x, int y) const;
+    struct Vertex {
+        float       x;
+        float       y;
+        float       texture_x;
+        float       texture_y;
+        uint8_t     color_r;
+        uint8_t     color_g;
+        uint8_t     color_b;
+        uint8_t     unused1;
+        uint8_t     color_bg_r;
+        uint8_t     color_bg_g;
+        uint8_t     color_bg_b;
+        uint8_t     unused2;
+    };
+
+    int                     index(int x, int y) const;
+    void                    build_indices();
+    void                    build_vertices();
 
     GLuint                  _texture;
     GLuint                  _vbo;
@@ -45,8 +62,7 @@ private:
     std::vector<Color>      _colors;
     std::vector<Color>      _colors_bg;
 
-    std::vector<char>       _buffer_vertex;
-    std::vector<uint32_t>   _buffer_index;
+    std::vector<Vertex>     _vertices;
 };
 
 #endif
