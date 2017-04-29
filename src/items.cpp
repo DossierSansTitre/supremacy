@@ -2,6 +2,7 @@
 #include <item_data.h>
 
 Items::Items()
+: _count(0)
 {
 }
 

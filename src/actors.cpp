@@ -3,8 +3,9 @@
 #include <actor_data.h>
 
 Actors::Actors()
+: _count(0)
 {
-    _count = 0;
+
 }
 
 Actors::~Actors()
