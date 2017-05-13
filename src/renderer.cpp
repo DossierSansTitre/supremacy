@@ -70,10 +70,10 @@ void Renderer::putchar(int x, int y, uint16_t symbol, Color color, Color color_b
 
 void Renderer::print(int x, int y, const char* str, Color color, Color color_bg)
 {
-    size_t len;
+    int len;
 
-    len = strlen(str);
-    for (size_t i = 0; i < len; ++i)
+    len = static_cast<int>(strlen(str));
+    for (int i = 0; i < len; ++i)
     {
         putchar(x + i, y, str[i], color, color_bg);
     }
@@ -130,8 +130,8 @@ void Renderer::render()
             tx = (symbol % 32) * texture_size;
             ty = (symbol / 32) * texture_size;
 
-            data[i * 4 + 0].x = x * _tile_width;
-            data[i * 4 + 0].y = y * _tile_height;
+            data[i * 4 + 0].x = static_cast<float>(x * _tile_width);
+            data[i * 4 + 0].y = static_cast<float>(y * _tile_height);
             data[i * 4 + 0].texture_x = tx;
             data[i * 4 + 0].texture_y = ty;
             data[i * 4 + 0].color_r = color.r;
@@ -141,8 +141,8 @@ void Renderer::render()
             data[i * 4 + 0].color_bg_g = color_bg.g;
             data[i * 4 + 0].color_bg_b = color_bg.b;
 
-            data[i * 4 + 1].x = (x + 1) * _tile_width;
-            data[i * 4 + 1].y = y * _tile_height;
+            data[i * 4 + 1].x = static_cast<float>((x + 1) * _tile_width);
+            data[i * 4 + 1].y = static_cast<float>(y * _tile_height);
             data[i * 4 + 1].texture_x = tx + texture_size;
             data[i * 4 + 1].texture_y = ty;
             data[i * 4 + 1].color_r = color.r;
@@ -152,8 +152,8 @@ void Renderer::render()
             data[i * 4 + 1].color_bg_g = color_bg.g;
             data[i * 4 + 1].color_bg_b = color_bg.b;
 
-            data[i * 4 + 2].x = (x + 1) * _tile_width;
-            data[i * 4 + 2].y = (y + 1) * _tile_height;
+            data[i * 4 + 2].x = static_cast<float>((x + 1) * _tile_width);
+            data[i * 4 + 2].y = static_cast<float>((y + 1) * _tile_height);
             data[i * 4 + 2].texture_x = tx + texture_size;
             data[i * 4 + 2].texture_y = ty + texture_size;
             data[i * 4 + 2].color_r = color.r;
@@ -163,8 +163,8 @@ void Renderer::render()
             data[i * 4 + 2].color_bg_g = color_bg.g;
             data[i * 4 + 2].color_bg_b = color_bg.b;
 
-            data[i * 4 + 3].x = x * _tile_width;
-            data[i * 4 + 3].y = (y + 1) * _tile_height;
+            data[i * 4 + 3].x = static_cast<float>(x * _tile_width);
+            data[i * 4 + 3].y = static_cast<float>((y + 1) * _tile_height);
             data[i * 4 + 3].texture_x = tx;
             data[i * 4 + 3].texture_y = ty + texture_size;
             data[i * 4 + 3].color_r = color.r;

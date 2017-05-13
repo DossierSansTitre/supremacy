@@ -11,9 +11,9 @@ struct Color
 
     Color& operator*=(float factor)
     {
-        r *= factor;
-        g *= factor;
-        b *= factor;
+        r = static_cast<uint8_t>(r * factor);
+        g = static_cast<uint8_t>(r * factor);
+        b = static_cast<uint8_t>(r * factor);
 
         return *this;
     }

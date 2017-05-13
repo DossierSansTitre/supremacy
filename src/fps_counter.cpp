@@ -33,5 +33,5 @@ uint32_t FpsCounter::get() const
     for (size_t i = 0; i < _samples.size(); ++i)
         acc += _samples[i];
     acc /= _samples.size();
-    return std::round(1000000000.0 / double(acc));
+    return static_cast<uint32_t>(std::round(1000000000.0 / acc));
 }

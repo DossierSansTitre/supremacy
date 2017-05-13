@@ -15,8 +15,8 @@ static int find_suitable_height(const Map& map, int x, int y)
 
 static void generate_dwarfs(Game& game)
 {
-    size_t w;
-    size_t h;
+    int w;
+    int h;
     int x;
     int y;
     int z;
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     game.renderer.init(game.window.width(), game.window.height());
 
     // KLUDGE
-    game.seed = time(nullptr);
+    game.seed = static_cast<uint32_t>(time(nullptr));
 
     generate_map(game.map, game.seed);
     generate_dwarfs(game);
