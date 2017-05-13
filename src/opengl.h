@@ -5,6 +5,8 @@
 
 #if defined(__APPLE__)
 # include <OpenGL/gl.h>
+#else
+# include <GL/glew.h>
 #endif
 
 GLuint  load_texture_data(const char* data, uint32_t width, uint32_t height);

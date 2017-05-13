@@ -34,7 +34,9 @@ void Window::init()
             );
 
     _opengl = SDL_GL_CreateContext(_window);
-    //glewInit();
+#if defined(_WIN32)
+    glewInit();
+#endif
     glMatrixMode(GL_PROJECTION);
     glOrtho(0, dm.w, dm.h, 0, 1, -1);
     glMatrixMode(GL_MODELVIEW);
