@@ -9,6 +9,7 @@
 #include <items.h>
 #include <window.h>
 #include <renderer.h>
+#include <ui_state.h>
 
 struct Game : private NonCopyable
 {
@@ -18,6 +19,7 @@ struct Game : private NonCopyable
     Map         map;
     FpsCounter  fps_counter_update;
     FpsCounter  fps_counter_render;
+    UiState     ui;
     int         camera_x;
     int         camera_y;
     int         camera_depth;
