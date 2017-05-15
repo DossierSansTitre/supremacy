@@ -11,19 +11,19 @@ Keyboard::~Keyboard()
 
 }
 
-bool Keyboard::pressed_repeat(uint32_t keycode) const
+bool Keyboard::repeated(SDL_Scancode scancode) const
 {
-    static const uint32_t delay_initial = 10;
-    static const uint32_t delay = 5;
+    static const uint32_t delay_initial = 8;
+    static const uint32_t delay = 2;
 
     uint32_t key_tick;
     uint32_t delta;
 
-    if (_pressed[keycode])
+    if (_pressed[scancode])
         return true;
-    if (_down[keycode])
+    if (_down[scancode])
     {
-        key_tick = _pressed_ticks[keycode];
+        key_tick = _pressed_ticks[scancode];
         delta = _tick - key_tick;
         if (delta < delay_initial)
             return false;

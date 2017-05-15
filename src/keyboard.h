@@ -13,9 +13,13 @@ public:
     Keyboard();
     ~Keyboard();
 
-    bool    down(uint32_t keycode) const { return _down[keycode]; }
-    bool    pressed(uint32_t keycode) const { return _pressed[keycode]; }
-    bool    pressed_repeat(uint32_t keycode) const;
+    bool    down(SDL_Scancode scancode) const { return _down[scancode]; }
+    bool    pressed(SDL_Scancode scancode) const { return _pressed[scancode]; }
+    bool    repeated(SDL_Scancode scancode) const;
+
+    bool    key_down(SDL_Keycode keycode) const { return down(SDL_GetScancodeFromKey(keycode)); }
+    bool    key_pressed(SDL_Keycode keycode) const { return pressed(SDL_GetScancodeFromKey(keycode)); }
+    bool    key_repeated(SDL_Keycode keycode) const { return repeated(SDL_GetScancodeFromKey(keycode)); }
 
     void    tick();
     void    press_key(uint32_t keycode);

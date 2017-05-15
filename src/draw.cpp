@@ -4,13 +4,15 @@
 #include <actor_data.h>
 #include <item_data.h>
 
-static void draw_top_bar(Game& game)
+static void draw_bars(Game& game)
 {
     int fps_render;
     int fps_update;
     int view_w;
+    int view_h;
 
     view_w = game.renderer.width();
+    view_h = game.renderer.height();
 
     fps_render = game.fps_counter_render.get();
     fps_update = game.fps_counter_update.get();
@@ -18,9 +20,14 @@ static void draw_top_bar(Game& game)
     for (int i = 0; i < view_w; ++i)
     {
         game.renderer.putchar(i, 0, ' ', {0, 0, 0}, {255, 255, 255});
+        game.renderer.putchar(i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
     }
+    /* Top */
     game.renderer.printf(0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
     game.renderer.print(view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
+
+    /* Bottom */
+    game.renderer.printf(0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera_depth);
 }
 
 static void draw_map(Game& game)
@@ -35,7 +42,7 @@ static void draw_map(Game& game)
     view_w = game.renderer.width();
     view_h = game.renderer.height();
 
-    for (int j = 0; j < (view_h - 1); ++j)
+    for (int j = 0; j < (view_h - 2); ++j)
     {
         y = game.camera_y + j;
         for (int i = 0; i < view_w; ++i)
@@ -115,7 +122,7 @@ static void draw_actors(Game& game)
         x = pos.x - game.camera_x;
         y = pos.y - game.camera_y;
 
-        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 1))
+        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
             continue;
 
         const ActorData& actor_data = ActorData::from_id(actor_id);
@@ -157,7 +164,7 @@ static void draw_items(Game& game)
         x = pos.x - game.camera_x;
         y = pos.y - game.camera_y;
 
-        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 1))
+        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
             continue;
 
         const ItemData& item_data = ItemData::from_id(item_id);
@@ -172,7 +179,7 @@ void game_draw(Game& game)
 {
     game.fps_counter_render.update();
     game.renderer.clear();
-    draw_top_bar(game);
+    draw_bars(game);
     draw_map(game);
     draw_items(game);
     draw_actors(game);
