@@ -22,6 +22,11 @@ static void draw_bars(Game& game)
         game.renderer.putchar(i, 0, ' ', {0, 0, 0}, {255, 255, 255});
         game.renderer.putchar(i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
     }
+    for (int i = 1; i < view_h - 1; ++i)
+    {
+        game.renderer.putchar(0, i, ' ', {0, 0, 0}, {255, 255, 255});
+        game.renderer.putchar(view_w - 1, i, ' ', {0, 0, 0}, {255, 255, 255});
+    }
     /* Top */
     game.renderer.printf(0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
     game.renderer.print(view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
@@ -42,10 +47,10 @@ static void draw_map(Game& game)
     view_w = game.renderer.width();
     view_h = game.renderer.height();
 
-    for (int j = 0; j < (view_h - 2); ++j)
+    for (int j = 0; j < view_h - 2; ++j)
     {
         y = game.camera.y + j;
-        for (int i = 0; i < view_w; ++i)
+        for (int i = 0; i < view_w - 2; ++i)
         {
             x = game.camera.x + i;
             TileID tile_id;
@@ -85,7 +90,7 @@ static void draw_map(Game& game)
                     color_bg *= 0.5f;
                 }
             }
-            game.renderer.putchar_fast(i, j + 1, sym, color, color_bg);
+            game.renderer.putchar_fast(i + 1, j + 1, sym, color, color_bg);
         }
     }
 }
@@ -122,13 +127,13 @@ static void draw_actors(Game& game)
         x = pos.x - game.camera.x;
         y = pos.y - game.camera.y;
 
-        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
+        if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
             continue;
 
         const ActorData& actor_data = ActorData::from_id(actor_id);
         sym = actor_data.sym;
         color = actor_data.color;
-        game.renderer.putchar(x, y + 1, sym, color, color_bg);
+        game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
     }
 }
 
@@ -164,13 +169,13 @@ static void draw_items(Game& game)
         x = pos.x - game.camera.x;
         y = pos.y - game.camera.y;
 
-        if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
+        if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
             continue;
 
         const ItemData& item_data = ItemData::from_id(item_id);
         sym = item_data.sym;
         color = item_data.color;
-        game.renderer.putchar(x, y + 1, sym, color, color_bg);
+        game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
     }
 }
 
