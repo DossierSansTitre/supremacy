@@ -20,8 +20,30 @@ public:
     void clear();
     void destroy();
 
-    void putchar(int i, uint16_t symbol, Color color, Color color_bg);
-    void putchar(int x, int y, uint16_t symbol, Color color, Color color_bg);
+    void putchar(int i, uint16_t symbol, Color color, Color color_bg)
+    {
+        if (i == -1)
+            return;
+        putchar_fast(i, symbol, color, color_bg);
+    }
+
+    void putchar(int x, int y, uint16_t symbol, Color color, Color color_bg)
+    {
+        putchar(index(x, y), symbol, color, color_bg);
+    }
+
+    void putchar_fast(int i, uint16_t symbol, Color color, Color color_bg)
+    {
+        _symbols[i] = symbol;
+        _colors[i] = color;
+        _colors_bg[i] = color_bg;
+    }
+
+    void putchar_fast(int x, int y, uint16_t symbol, Color color, Color color_bg)
+    {
+        putchar_fast(index_fast(x, y), symbol, color, color_bg);
+    }
+
     void print(int x, int y, const char* str, Color color, Color color_bg);
     void printf(int x, int y, const char* format, Color color, Color color_bg, ...);
 
@@ -43,7 +65,18 @@ private:
         uint8_t     unused2;
     };
 
-    int                     index(int x, int y) const;
+    int index(int x, int y) const
+    {
+        if (x < 0 || x >= (int)_tiles_x || y < 0 || y >= (int)_tiles_y)
+            return -1;
+        return index_fast(x, y);
+    }
+
+    int index_fast(int x, int y) const
+    {
+        return x + y * _tiles_x;
+    }
+
     void                    build_indices();
     void                    build_vertices();
 

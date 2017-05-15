@@ -41,50 +41,48 @@ static void draw_map(Game& game)
         for (int i = 0; i < view_w; ++i)
         {
             x = game.camera_x + i;
-            if (1 || game.map.visible(x, y, game.camera_depth))
+            TileID tile_id;
+            MaterialID material_id;
+            uint16_t sym;
+            Color color;
+            Color color_bg;
+
+            under = 0;
+            game.map.at(x, y, game.camera_depth, tile_id, material_id);
+
+            while (tile_id == TileID::None)
             {
-                TileID tile_id;
-                MaterialID material_id;
-                uint16_t sym;
-                Color color;
-                Color color_bg;
-
-                under = 0;
-                game.map.at(x, y, game.camera_depth, tile_id, material_id);
-
-                while (tile_id == TileID::None)
-                {
-                    if (under >= 3)
-                        break;
-                    under++;
-                    game.map.at(x, y, game.camera_depth - under, tile_id, material_id);
-                }
-
-                const Tile& tile = Tile::from_id(tile_id);
-                const Material& material = Material::from_id(material_id);
-
-                sym = tile.sym;
-                color = material.color;
-                color_bg = material.color_bg;
-
-                if (under)
-                {
-                    if (tile.dim_sym != 0)
-                        sym = tile.dim_sym;
-                    while (under--)
-                    {
-                        color *= 0.5f;
-                        color_bg *= 0.5f;
-                    }
-                }
-                game.renderer.putchar(i, j + 1, sym, color, color_bg);
+                if (under >= 3)
+                    break;
+                under++;
+                game.map.at(x, y, game.camera_depth - under, tile_id, material_id);
             }
-            else
+
+            if (tile_id == TileID::None)
+                continue;
+
+            const Tile& tile = Tile::from_id(tile_id);
+            const Material& material = Material::from_id(material_id);
+
+            sym = tile.sym;
+            color = material.color;
+            color_bg = material.color_bg;
+
+            if (under)
             {
+                if (tile.dim_sym != 0)
+                    sym = tile.dim_sym;
+                while (under--)
+                {
+                    color *= 0.5f;
+                    color_bg *= 0.5f;
+                }
             }
+            game.renderer.putchar_fast(i, j + 1, sym, color, color_bg);
         }
     }
 }
+
 
 static void draw_actors(Game& game)
 {

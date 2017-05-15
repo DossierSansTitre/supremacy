@@ -46,26 +46,14 @@ void Renderer::resize(uint32_t width, uint32_t height)
 
 void Renderer::clear()
 {
+    Color black{0, 0, 0};
     std::fill(_symbols.begin(), _symbols.end(), 0);
+    std::fill(_colors_bg.begin(), _colors_bg.end(), black);
 }
 
 void Renderer::destroy()
 {
 
-}
-
-void Renderer::putchar(int i, uint16_t symbol, Color color, Color color_bg)
-{
-    if (i == -1)
-        return;
-    _symbols[i] = symbol;
-    _colors[i] = color;
-    _colors_bg[i] = color_bg;
-}
-
-void Renderer::putchar(int x, int y, uint16_t symbol, Color color, Color color_bg)
-{
-    putchar(index(x, y), symbol, color, color_bg);
 }
 
 void Renderer::print(int x, int y, const char* str, Color color, Color color_bg)
@@ -193,13 +181,6 @@ void Renderer::render()
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
     glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_r));
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
-}
-
-int Renderer::index(int x, int y) const
-{
-    if (x < 0 || x >= (int)_tiles_x || y < 0 || y >= (int)_tiles_y)
-        return -1;
-    return x + y * _tiles_x;
 }
 
 void Renderer::build_indices()
