@@ -27,7 +27,7 @@ static void draw_bars(Game& game)
     game.renderer.print(view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
 
     /* Bottom */
-    game.renderer.printf(0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera_depth);
+    game.renderer.printf(0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
 }
 
 static void draw_map(Game& game)
@@ -44,10 +44,10 @@ static void draw_map(Game& game)
 
     for (int j = 0; j < (view_h - 2); ++j)
     {
-        y = game.camera_y + j;
+        y = game.camera.y + j;
         for (int i = 0; i < view_w; ++i)
         {
-            x = game.camera_x + i;
+            x = game.camera.x + i;
             TileID tile_id;
             MaterialID material_id;
             uint16_t sym;
@@ -55,14 +55,14 @@ static void draw_map(Game& game)
             Color color_bg;
 
             under = 0;
-            game.map.at(x, y, game.camera_depth, tile_id, material_id);
+            game.map.at(x, y, game.camera.z, tile_id, material_id);
 
             while (tile_id == TileID::None)
             {
                 if (under >= 3)
                     break;
                 under++;
-                game.map.at(x, y, game.camera_depth - under, tile_id, material_id);
+                game.map.at(x, y, game.camera.z - under, tile_id, material_id);
             }
 
             if (tile_id == TileID::None)
@@ -116,11 +116,11 @@ static void draw_actors(Game& game)
         if (actor_id == ActorID::None)
             continue;
         pos = game.actors.pos(i);
-        if (pos.z != game.camera_depth)
+        if (pos.z != game.camera.z)
             continue;
 
-        x = pos.x - game.camera_x;
-        y = pos.y - game.camera_y;
+        x = pos.x - game.camera.x;
+        y = pos.y - game.camera.y;
 
         if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
             continue;
@@ -158,11 +158,11 @@ static void draw_items(Game& game)
         if (item_id == ItemID::None)
             continue;
         pos = game.items.pos(i);
-        if (pos.z != game.camera_depth)
+        if (pos.z != game.camera.z)
             continue;
 
-        x = pos.x - game.camera_x;
-        y = pos.y - game.camera_y;
+        x = pos.x - game.camera.x;
+        y = pos.y - game.camera.y;
 
         if (x < 0 || x >= view_w || y < 0 || y >= (view_h - 2))
             continue;

@@ -34,21 +34,21 @@ static void handle_camera(Game& game)
     }
 
     if (game.keyboard.repeated(SDL_SCANCODE_LEFT))
-        game.camera_x -= delta;
+        game.camera.x -= delta;
     if (game.keyboard.repeated(SDL_SCANCODE_RIGHT))
-        game.camera_x += delta;
+        game.camera.x += delta;
     if (game.keyboard.repeated(SDL_SCANCODE_UP))
-        game.camera_y -= delta;
+        game.camera.y -= delta;
     if (game.keyboard.repeated(SDL_SCANCODE_DOWN))
-        game.camera_y += delta;
+        game.camera.y += delta;
     if (game.keyboard.key_repeated(SDLK_q))
-        game.camera_depth += delta_z;
+        game.camera.z += delta_z;
     if (game.keyboard.key_repeated(SDLK_e))
-        game.camera_depth -= delta_z;
-    if (game.camera_depth < 0)
-        game.camera_depth = 0;
-    if (game.camera_depth >= game.map.depth())
-        game.camera_depth = game.map.depth() - 1;
+        game.camera.z -= delta_z;
+    if (game.camera.z < 0)
+        game.camera.z = 0;
+    if (game.camera.z >= game.map.depth())
+        game.camera.z = game.map.depth() - 1;
 }
 
 void game_update(Game& game)

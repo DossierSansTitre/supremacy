@@ -22,9 +22,7 @@ struct Game : private NonCopyable
     FpsCounter  fps_counter_update;
     FpsCounter  fps_counter_render;
     UiState     ui;
-    int         camera_x;
-    int         camera_y;
-    int         camera_depth;
+    Vec3        camera;
     uint32_t    seed;
     Actors      actors;
     Items       items;

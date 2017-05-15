@@ -35,9 +35,9 @@ static void generate_dwarfs(Game& game)
         game.actors.add(ActorID::Dwarf, {x, y, z});
         spawn_count++;
     }
-    game.camera_x = x - game.renderer.width() / 2;
-    game.camera_y = y - game.renderer.height() / 2;
-    game.camera_depth = z;
+    game.camera.x = x - game.renderer.width() / 2;
+    game.camera.y = y - game.renderer.height() / 2;
+    game.camera.z = z;
 }
 
 int main(int argc, char** argv)
