@@ -14,11 +14,42 @@ static void toggle_vsync(Game& game)
     game.vsync = !game.vsync;
 }
 
-static void handle_camera(Game& game)
+static Vec3 clamp_motion(Game& game, Vec3 origin, Vec3 delta)
+{
+    if (origin.x + delta.x < 0)
+        delta.x = -origin.x;
+    else if (origin.x + delta.x >= game.map.width())
+        delta.x = game.map.width() - 1 - origin.x;
+    if (origin.y + delta.y < 0)
+        delta.y = -origin.y;
+    else if (origin.y + delta.y >= game.map.height())
+        delta.y = game.map.height() - 1 - origin.y;
+    if (origin.z + delta.z < 0)
+        delta.z = -origin.z;
+    else if (origin.z + delta.z >= game.map.depth())
+        delta.z = game.map.depth() - 1 - origin.z;
+    return delta;
+}
+
+static void clamp_camera(Game& game)
+{
+    int w;
+    int h;
+
+    w = game.renderer.width() - 2;
+    h = game.renderer.height() - 2;
+    if (game.camera.x + w >= game.map.width())
+        game.camera.x = game.map.width() - w;
+    if (game.camera.y + h >= game.map.height())
+        game.camera.y = game.map.height() - h;
+}
+
+static Vec3 keyboard_motion(Game& game)
 {
     bool shift;
     int delta;
     int delta_z;
+    Vec3 motion = {0, 0, 0};
 
     shift = (game.keyboard.down(SDL_SCANCODE_LSHIFT) || game.keyboard.down(SDL_SCANCODE_RSHIFT));
 
@@ -34,21 +65,30 @@ static void handle_camera(Game& game)
     }
 
     if (game.keyboard.repeated(SDL_SCANCODE_LEFT))
-        game.camera.x -= delta;
+        motion.x -= delta;
     if (game.keyboard.repeated(SDL_SCANCODE_RIGHT))
-        game.camera.x += delta;
+        motion.x += delta;
     if (game.keyboard.repeated(SDL_SCANCODE_UP))
-        game.camera.y -= delta;
+        motion.y -= delta;
     if (game.keyboard.repeated(SDL_SCANCODE_DOWN))
-        game.camera.y += delta;
+        motion.y += delta;
     if (game.keyboard.key_repeated(SDLK_q))
-        game.camera.z += delta_z;
+        motion.z += delta_z;
     if (game.keyboard.key_repeated(SDLK_e))
-        game.camera.z -= delta_z;
-    if (game.camera.z < 0)
-        game.camera.z = 0;
-    if (game.camera.z >= game.map.depth())
-        game.camera.z = game.map.depth() - 1;
+        motion.z -= delta_z;
+    return motion;
+}
+
+static void handle_camera(Game& game)
+{
+    Vec3 motion;
+
+    motion = clamp_motion(game, game.camera, keyboard_motion(game));
+    game.camera.x += motion.x;
+    game.camera.y += motion.y;
+    game.camera.z += motion.z;
+
+    clamp_camera(game);
 }
 
 void game_update(Game& game)
