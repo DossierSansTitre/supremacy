@@ -7,7 +7,8 @@ enum class MaterialID : uint8_t {
     None,
     Dirt,
     Rock,
-    Wood
+    Wood,
+    Grass
 };
 
 #endif

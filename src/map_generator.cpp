@@ -78,8 +78,9 @@ void generate_map(Map& map, uint32_t seed)
             n = noise_fractal_octave_2d(seed, i, j, 2.0f, 6);
             n *= n;
             h = static_cast<int>(15 + n * 10);
-            fill_height(map, i, j, 0, h - 4, TileID::Block, MaterialID::Rock);
-            fill_height(map, i, j, h - 4, 4, TileID::Block, MaterialID::Dirt);
+            fill_height(map, i, j, 0, h, TileID::Block, MaterialID::Rock);
+            fill_height(map, i, j, h, 10, TileID::Block, MaterialID::Dirt);
+            fill_height(map, i, j, h + 10, 1, TileID::Block, MaterialID::Grass);
         }
     }
     ramp_pass(map);
