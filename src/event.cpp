@@ -15,6 +15,7 @@ static void toggle_vsync(Game& game)
     game.vsync = !game.vsync;
 }
 
+#if 0
 void game_event(Game& game)
 {
     SDL_Event event;
@@ -55,3 +56,25 @@ void game_event(Game& game)
         }
     }
 }
+#endif
+
+void game_event(Game& game)
+{
+    SDL_Event event;
+
+    while (game.window.poll_event(event))
+    {
+        switch (event.type)
+        {
+            case SDL_KEYDOWN:
+                game.keyboard.press_key(event.key.keysym.scancode);
+                break;
+            case SDL_KEYUP:
+                game.keyboard.release_key(event.key.keysym.scancode);
+                break;
+            default:
+                break;
+        }
+    }
+}
+

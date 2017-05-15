@@ -8,6 +8,7 @@
 #include <actors.h>
 #include <items.h>
 #include <window.h>
+#include <keyboard.h>
 #include <renderer.h>
 #include <ui_state.h>
 
@@ -15,6 +16,7 @@ struct Game : private NonCopyable
 {
     bool        running;
     Window      window;
+    Keyboard    keyboard;
     Renderer    renderer;
     Map         map;
     FpsCounter  fps_counter_update;
