@@ -79,11 +79,9 @@ static Vec3 keyboard_motion(Game& game)
     return motion;
 }
 
-static void handle_camera(Game& game)
+static void move_camera(Game& game, Vec3 motion)
 {
-    Vec3 motion;
-
-    motion = clamp_motion(game, game.camera, keyboard_motion(game));
+    motion = clamp_motion(game, game.camera, motion);
     game.camera.x += motion.x;
     game.camera.y += motion.y;
     game.camera.z += motion.z;
@@ -91,13 +89,93 @@ static void handle_camera(Game& game)
     clamp_camera(game);
 }
 
+void move_selection(Game& game, Vec3 motion)
+{
+    motion = clamp_motion(game, game.cursor, motion);
+    game.cursor.x += motion.x;
+    game.cursor.y += motion.y;
+    game.cursor.z += motion.z;
+}
+
+void handle_motion(Game& game)
+{
+    Vec3 motion;
+
+    motion = keyboard_motion(game);
+    if (game.ui_state == UiStateID::None)
+    {
+        move_camera(game, motion);
+    }
+    else
+    {
+        move_selection(game, motion);
+    }
+}
+
+static void handle_ui_state_selection(Game& game)
+{
+    if (game.keyboard.key_pressed(SDLK_ESCAPE))
+    {
+        if (game.selected_first)
+            game.selected_first = false;
+        else
+            game.ui_state = UiStateID::None;
+    }
+    else if (game.keyboard.key_pressed(SDLK_RETURN))
+    {
+        if (!game.selected_first)
+        {
+            game.selection[0] = game.cursor;
+            game.selected_first = true;
+        }
+        else
+        {
+            game.selection[1] = game.cursor;
+            game.ui_state = UiStateID::None;
+        }
+    }
+}
+
+static void start_selection(Game& game)
+{
+    game.cursor = game.camera;
+    game.cursor.x += (game.renderer.width() - 2) / 2;
+    game.cursor.y += (game.renderer.height() - 2) / 2;
+    game.ui_state = UiStateID::Selection;
+    game.selected_first = false;
+}
+
+static void handle_ui_state_none(Game& game)
+{
+    if (game.keyboard.key_pressed(SDLK_m))
+    {
+        start_selection(game);
+        return;
+    }
+    if (game.keyboard.key_pressed(SDLK_ESCAPE))
+        game.running = false;
+}
+
+static void handle_ui_state(Game& game)
+{
+    switch (game.ui_state)
+    {
+        case UiStateID::None:
+            handle_ui_state_none(game);
+            break;
+        case UiStateID::Selection:
+            handle_ui_state_selection(game);
+            break;
+    }
+}
+
 void game_update(Game& game)
 {
     game.fps_counter_update.update();
-    if (game.keyboard.pressed(SDL_SCANCODE_ESCAPE))
-        game.running = false;
+    game.tick_render++;
     if (game.keyboard.key_pressed(SDLK_v))
         toggle_vsync(game);
-    handle_camera(game);
+    handle_motion(game);
+    handle_ui_state(game);
     game_ai(game);
 }

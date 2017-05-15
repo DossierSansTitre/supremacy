@@ -54,6 +54,8 @@ int main(int argc, char** argv)
 
     // KLUDGE
     game.seed = static_cast<uint32_t>(time(nullptr));
+    game.tick = 0;
+    game.tick_render = 0;
 
     generate_map(game.map, game.seed);
     generate_dwarfs(game);

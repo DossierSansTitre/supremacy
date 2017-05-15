@@ -21,8 +21,13 @@ struct Game : private NonCopyable
     Map         map;
     FpsCounter  fps_counter_update;
     FpsCounter  fps_counter_render;
-    UiState     ui;
+    uint64_t    tick;
+    uint64_t    tick_render;
+    UiStateID   ui_state;
     Vec3        camera;
+    Vec3        cursor;
+    Vec3        selection[2];
+    bool        selected_first;
     uint32_t    seed;
     Actors      actors;
     Items       items;

@@ -3,6 +3,81 @@
 #include <material.h>
 #include <actor_data.h>
 #include <item_data.h>
+#include <rect3.h>
+
+static void draw_rect_ingame(Game& game, Rect3 rect, int sym, Color color, Color color_bg)
+{
+    int view_w;
+    int view_h;
+
+    if (game.camera.z < rect.origin.z || game.camera.z >= rect.origin.z + rect.size.z)
+        return;
+
+    view_w = game.renderer.width() - 2;
+    view_h = game.renderer.height() - 2;
+
+    rect.origin.x -= game.camera.x;
+    rect.origin.y -= game.camera.y;
+
+    if (rect.origin.x >= view_w)
+        return;
+    if (rect.origin.y >= view_h)
+        return;
+    if (rect.origin.x + rect.size.x < 0)
+        return;
+    if (rect.origin.y + rect.size.y < 0)
+        return;
+
+    if (rect.origin.x < 0)
+    {
+        rect.size.x += rect.origin.x;
+        rect.origin.x = 0;
+    }
+    if (rect.origin.y < 0)
+    {
+        rect.size.y += rect.origin.y;
+        rect.origin.y = 0;
+    }
+
+    if (rect.origin.x + rect.size.x > view_w)
+    {
+        rect.size.x = view_w - rect.origin.x;
+    }
+    if (rect.origin.y + rect.size.y > view_h)
+    {
+        rect.size.y = view_h - rect.origin.y;
+    }
+
+    for (int j = 0; j < rect.size.y; ++j)
+    {
+        for (int i = 0; i < rect.size.x; ++i)
+        {
+            game.renderer.putchar_fast(i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
+        }
+    }
+}
+
+static void draw_ui_state(Game& game)
+{
+    Vec3 cursor;
+    Rect3 rect;
+    char c;
+
+    if (game.tick_render / 4 % 2)
+        c = 'X';
+    else
+        c = ' ';
+    if (game.ui_state == UiStateID::Selection)
+    {
+        cursor = game.cursor;
+        if (game.selected_first)
+        {
+            rect = rect_from_points(cursor, game.selection[0]);
+            draw_rect_ingame(game, rect, c, {200, 127, 127}, {180, 180, 180});
+        }
+        game.renderer.putchar(cursor.x - game.camera.x + 1, cursor.y - game.camera.y + 1, c, {255, 127, 127}, {200, 200, 200});
+    }
+}
 
 static void draw_bars(Game& game)
 {
@@ -106,6 +181,8 @@ static void draw_actors(Game& game)
     uint16_t sym;
     Color color;
     Color color_bg;
+    int anim;
+    static const char anim_str[] = "-\\|/";
 
     view_w = game.renderer.width();
     view_h = game.renderer.height();
@@ -133,6 +210,13 @@ static void draw_actors(Game& game)
         const ActorData& actor_data = ActorData::from_id(actor_id);
         sym = actor_data.sym;
         color = actor_data.color;
+        /* Useless animation to test the system */
+        anim = game.tick_render % 40;
+        if (anim < 4)
+        {
+            color = {255, 255, 255};
+            sym = anim_str[anim];
+        }
         game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
     }
 }
@@ -184,10 +268,11 @@ void game_draw(Game& game)
 {
     game.fps_counter_render.update();
     game.renderer.clear();
-    draw_bars(game);
     draw_map(game);
     draw_items(game);
     draw_actors(game);
+    draw_ui_state(game);
+    draw_bars(game);
     game.renderer.render();
     game.window.swap();
 }
