@@ -9,6 +9,8 @@ FpsCounter::FpsCounter()
 
 void FpsCounter::update()
 {
+    static const size_t sample_count = 512;
+
     if (!_started)
     {
         _last_time = Clock::now();

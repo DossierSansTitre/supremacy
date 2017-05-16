@@ -19,7 +19,6 @@ private:
     using Clock = std::chrono::high_resolution_clock;
     using TimePoint = std::chrono::time_point<Clock, Duration>;
 
-    static const size_t     sample_count = 60;
     std::deque<uint64_t>    _samples;
     TimePoint               _last_time;
     bool                    _started;
