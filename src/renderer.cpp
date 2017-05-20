@@ -2,8 +2,9 @@
 #include <config.h>
 #include <renderer.h>
 
-Renderer::Renderer()
-: _texture(0)
+Renderer::Renderer(ThreadPool& thread_pool)
+: _thread_pool(thread_pool)
+, _texture(0)
 , _vbo(0)
 , _ibo(0)
 {
@@ -91,79 +92,33 @@ void Renderer::printf(int x, int y, const char* str, Color color, Color color_bg
  */
 void Renderer::render()
 {
-    static const float texture_size = 1.f / 32.f;
-
-    uint16_t    symbol;
-    Color       color;
-    Color       color_bg;
-    size_t      i;
-    float       tx;
-    float       ty;
-    Vertex*     data;
+    int render_task;
 
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
     glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
-    data = _vertices.data();
-    for (uint32_t y = 0; y < _tiles_y; ++y)
+
+    size_t thread_count = _thread_pool.pool_size();
+    size_t lines_per_thread = ceil((float)_tiles_y / thread_count);
+    size_t base;
+    size_t count;
+
+    render_task = _thread_pool.task_create();
+
+    for (size_t i = 0; i < thread_count - 1; ++i)
     {
-        for (uint32_t x = 0; x < _tiles_x; ++x)
-        {
-            i = x + y * _tiles_x;
-            symbol = _symbols[i];
-            color = _colors[i];
-            color_bg = _colors_bg[i];
-
-            tx = (symbol % 32) * texture_size;
-            ty = (symbol / 32) * texture_size;
-
-            data[i * 4 + 0].x = static_cast<float>(x * _tile_width);
-            data[i * 4 + 0].y = static_cast<float>(y * _tile_height);
-            data[i * 4 + 0].texture_x = tx;
-            data[i * 4 + 0].texture_y = ty;
-            data[i * 4 + 0].color_r = color.r;
-            data[i * 4 + 0].color_g = color.g;
-            data[i * 4 + 0].color_b = color.b;
-            data[i * 4 + 0].color_bg_r = color_bg.r;
-            data[i * 4 + 0].color_bg_g = color_bg.g;
-            data[i * 4 + 0].color_bg_b = color_bg.b;
-
-            data[i * 4 + 1].x = static_cast<float>((x + 1) * _tile_width);
-            data[i * 4 + 1].y = static_cast<float>(y * _tile_height);
-            data[i * 4 + 1].texture_x = tx + texture_size;
-            data[i * 4 + 1].texture_y = ty;
-            data[i * 4 + 1].color_r = color.r;
-            data[i * 4 + 1].color_g = color.g;
-            data[i * 4 + 1].color_b = color.b;
-            data[i * 4 + 1].color_bg_r = color_bg.r;
-            data[i * 4 + 1].color_bg_g = color_bg.g;
-            data[i * 4 + 1].color_bg_b = color_bg.b;
-
-            data[i * 4 + 2].x = static_cast<float>((x + 1) * _tile_width);
-            data[i * 4 + 2].y = static_cast<float>((y + 1) * _tile_height);
-            data[i * 4 + 2].texture_x = tx + texture_size;
-            data[i * 4 + 2].texture_y = ty + texture_size;
-            data[i * 4 + 2].color_r = color.r;
-            data[i * 4 + 2].color_g = color.g;
-            data[i * 4 + 2].color_b = color.b;
-            data[i * 4 + 2].color_bg_r = color_bg.r;
-            data[i * 4 + 2].color_bg_g = color_bg.g;
-            data[i * 4 + 2].color_bg_b = color_bg.b;
-
-            data[i * 4 + 3].x = static_cast<float>(x * _tile_width);
-            data[i * 4 + 3].y = static_cast<float>((y + 1) * _tile_height);
-            data[i * 4 + 3].texture_x = tx;
-            data[i * 4 + 3].texture_y = ty + texture_size;
-            data[i * 4 + 3].color_r = color.r;
-            data[i * 4 + 3].color_g = color.g;
-            data[i * 4 + 3].color_b = color.b;
-            data[i * 4 + 3].color_bg_r = color_bg.r;
-            data[i * 4 + 3].color_bg_g = color_bg.g;
-            data[i * 4 + 3].color_bg_b = color_bg.b;
-        }
+        base = i * lines_per_thread;
+        count = lines_per_thread;
+        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, base, count));
     }
-    glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), data);
+    base = (thread_count - 1) * lines_per_thread;
+    count = _tiles_y - base;
+    _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, base, count));
+
+    _thread_pool.task_wait(render_task);
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
 
     glBindTexture(GL_TEXTURE_2D, _texture);
     glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -181,6 +136,80 @@ void Renderer::render()
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
     glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_r));
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
+}
+
+void Renderer::render_lines(uint32_t base, uint32_t count)
+{
+    static const float texture_size = 1.f / 32.f;
+
+    uint32_t    y;
+    uint16_t    symbol;
+    Color       color;
+    Color       color_bg;
+    size_t      index;
+    float       tx;
+    float       ty;
+    Vertex*     data;
+
+    data = _vertices.data();
+    for (uint32_t j = 0; j < count; ++j)
+    {
+        y = base + j;
+        for (uint32_t x = 0; x < _tiles_x; ++x)
+        {
+            index = x + y * _tiles_x;
+            symbol = _symbols[index];
+            color = _colors[index];
+            color_bg = _colors_bg[index];
+
+            tx = (symbol % 32) * texture_size;
+            ty = (symbol / 32) * texture_size;
+
+            data[index * 4 + 0].x = static_cast<float>(x * _tile_width);
+            data[index * 4 + 0].y = static_cast<float>(y * _tile_height);
+            data[index * 4 + 0].texture_x = tx;
+            data[index * 4 + 0].texture_y = ty;
+            data[index * 4 + 0].color_r = color.r;
+            data[index * 4 + 0].color_g = color.g;
+            data[index * 4 + 0].color_b = color.b;
+            data[index * 4 + 0].color_bg_r = color_bg.r;
+            data[index * 4 + 0].color_bg_g = color_bg.g;
+            data[index * 4 + 0].color_bg_b = color_bg.b;
+
+            data[index * 4 + 1].x = static_cast<float>((x + 1) * _tile_width);
+            data[index * 4 + 1].y = static_cast<float>(y * _tile_height);
+            data[index * 4 + 1].texture_x = tx + texture_size;
+            data[index * 4 + 1].texture_y = ty;
+            data[index * 4 + 1].color_r = color.r;
+            data[index * 4 + 1].color_g = color.g;
+            data[index * 4 + 1].color_b = color.b;
+            data[index * 4 + 1].color_bg_r = color_bg.r;
+            data[index * 4 + 1].color_bg_g = color_bg.g;
+            data[index * 4 + 1].color_bg_b = color_bg.b;
+
+            data[index * 4 + 2].x = static_cast<float>((x + 1) * _tile_width);
+            data[index * 4 + 2].y = static_cast<float>((y + 1) * _tile_height);
+            data[index * 4 + 2].texture_x = tx + texture_size;
+            data[index * 4 + 2].texture_y = ty + texture_size;
+            data[index * 4 + 2].color_r = color.r;
+            data[index * 4 + 2].color_g = color.g;
+            data[index * 4 + 2].color_b = color.b;
+            data[index * 4 + 2].color_bg_r = color_bg.r;
+            data[index * 4 + 2].color_bg_g = color_bg.g;
+            data[index * 4 + 2].color_bg_b = color_bg.b;
+
+            data[index * 4 + 3].x = static_cast<float>(x * _tile_width);
+            data[index * 4 + 3].y = static_cast<float>((y + 1) * _tile_height);
+            data[index * 4 + 3].texture_x = tx;
+            data[index * 4 + 3].texture_y = ty + texture_size;
+            data[index * 4 + 3].color_r = color.r;
+            data[index * 4 + 3].color_g = color.g;
+            data[index * 4 + 3].color_b = color.b;
+            data[index * 4 + 3].color_bg_r = color_bg.r;
+            data[index * 4 + 3].color_bg_g = color_bg.g;
+            data[index * 4 + 3].color_bg_b = color_bg.b;
+        }
+    }
 }
 
 void Renderer::build_indices()

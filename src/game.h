@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <non_copyable.h>
+#include <thread_pool.h>
 #include <map.h>
 #include <fps_counter.h>
 #include <actors.h>
@@ -14,7 +15,10 @@
 
 struct Game : private NonCopyable
 {
+    Game();
+
     bool        running;
+    ThreadPool  thread_pool;
     Window      window;
     Keyboard    keyboard;
     Renderer    renderer;

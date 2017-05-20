@@ -110,19 +110,19 @@ static void draw_bars(Game& game)
     game.renderer.printf(0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
 }
 
-static void draw_map(Game& game)
+static void draw_map_lines(Game& game, size_t base, size_t count)
 {
     int view_w;
-    int view_h;
 
     int x;
     int y;
     int under;
 
-    view_w = game.renderer.width();
-    view_h = game.renderer.height();
+    int limit = static_cast<int>(base + count);
 
-    for (int j = 0; j < view_h - 2; ++j)
+    view_w = game.renderer.width();
+
+    for (int j = base; j < limit; ++j)
     {
         y = game.camera.y + j;
         for (int i = 0; i < view_w - 2; ++i)
@@ -170,6 +170,28 @@ static void draw_map(Game& game)
     }
 }
 
+static void draw_map(Game& game)
+{
+    static const size_t lines_per_job = 8;
+
+    ThreadPool& thread_pool(game.thread_pool);
+
+    int task;
+    int view_h;
+    size_t job_count;
+
+    view_h = game.renderer.height() - 2;
+
+    job_count = ceil((float)view_h / lines_per_job);
+
+    task = thread_pool.task_create();
+    for (size_t i = 0; i < job_count - 1; ++i)
+    {
+        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(game), i * lines_per_job, lines_per_job));
+    }
+    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(game), (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
+    thread_pool.task_wait(task);
+}
 
 static void draw_actors(Game& game)
 {

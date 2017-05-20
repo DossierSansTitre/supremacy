@@ -5,11 +5,12 @@
 #include <non_copyable.h>
 #include <opengl.h>
 #include <color.h>
+#include <thread_pool.h>
 
 class Renderer : private NonCopyable
 {
 public:
-    Renderer();
+    Renderer(ThreadPool& thread_pool);
     ~Renderer();
 
     uint32_t width() const { return _tiles_x; }
@@ -48,6 +49,7 @@ public:
     void printf(int x, int y, const char* format, Color color, Color color_bg, ...);
 
     void render();
+    void render_lines(uint32_t base, uint32_t count);
 
 private:
     struct Vertex {
@@ -79,6 +81,8 @@ private:
 
     void                    build_indices();
     void                    build_vertices();
+
+    ThreadPool&             _thread_pool;
 
     GLuint                  _texture;
     GLuint                  _vbo;

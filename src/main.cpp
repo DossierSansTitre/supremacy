@@ -1,5 +1,6 @@
 #include <ctime>
 #include <game.h>
+#include <thread_pool.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
