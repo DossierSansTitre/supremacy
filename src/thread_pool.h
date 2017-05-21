@@ -4,7 +4,6 @@
 #include <non_copyable.h>
 #include <thread>
 #include <vector>
-#include <atomic>
 #include <functional>
 #include <condition_variable>
 
@@ -25,24 +24,20 @@ public:
 private:
     void worker_main();
 
+    bool                        _running;
+    mutable std::mutex          _mutex;
     std::vector<std::thread>    _threads;
-    std::atomic_bool            _running;
 
+    size_t                      _task_size;
     std::vector<int>            _free_tasks;
-
-    size_t                      _task_count;
     std::vector<unsigned>       _task_pending_count;
 
-    std::vector<int>            _free_jobs;
-    std::vector<int>            _pending_jobs;
-
-    size_t                      _job_count;
+    size_t                      _job_size;
     std::vector<int>            _job_task;
     std::vector<Job>            _job_function;
 
     std::condition_variable     _cv_worker;
     std::condition_variable     _cv_master;
-    mutable std::mutex          _mutex;
 };
 
 #endif
