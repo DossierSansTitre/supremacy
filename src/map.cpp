@@ -7,6 +7,7 @@ Map::Map()
 , _depth(0)
 , _tiles(nullptr)
 , _materials(nullptr)
+, _map_actions(nullptr)
 {
 
 }
@@ -28,21 +29,25 @@ void Map::create(int width, int height, int depth)
 
     _tiles = new TileID[size];
     _materials = new MaterialID[size];
+    _map_actions = new MapAction[size];
     _visible.resize(size);
 
     std::fill(_tiles, _tiles + size, TileID::None);
     std::fill(_materials, _materials + size, MaterialID::None);
+    std::fill(_map_actions, _map_actions + size, MapAction::None);
 }
 
 void Map::destroy()
 {
     delete [] _tiles;
     delete [] _materials;
+    delete [] _map_actions;
     _width = 0;
     _height = 0;
     _depth = 0;
     _tiles = nullptr;
     _materials = nullptr;
+    _map_actions = nullptr;
     _visible.resize(0);
 }
 
@@ -68,6 +73,18 @@ void Map::set_material(int index, MaterialID material)
 void Map::set_material(int x, int y, int z, MaterialID material)
 {
     set_material(index(x, y, z), material);
+}
+
+void Map::set_action(int index, MapAction action)
+{
+    if (index == -1)
+        return;
+    _map_actions[index] = action;
+}
+
+void Map::set_action(int x, int y, int z, MapAction action)
+{
+    set_action(index(x, y, z), action);
 }
 
 void Map::compute_visibility(int x, int y, int z)

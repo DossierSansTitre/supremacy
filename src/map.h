@@ -6,6 +6,7 @@
 #include <non_copyable.h>
 #include <tile_id.h>
 #include <material_id.h>
+#include <map_action.h>
 
 class Map : private NonCopyable
 {
@@ -59,6 +60,18 @@ public:
         return material_at(index(x, y, z));
     }
 
+    MapAction action_at(int i) const
+    {
+        if (i == -1)
+            return MapAction::None;
+        return _map_actions[i];
+    }
+
+    MapAction action_at(int x, int y, int z) const
+    {
+        return action_at(index(x, y, z));
+    }
+
     bool visible(int i) const
     {
         if (i == -1)
@@ -85,6 +98,8 @@ public:
     void        set_tile(int x, int y, int z, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
+    void        set_action(int index, MapAction action);
+    void        set_action(int x, int y, int z, MapAction action);
 
     void        compute_visibility(int x, int y, int z);
     void        compute_visibility();
@@ -95,6 +110,7 @@ private:
     int                     _depth;
     TileID*                 _tiles;
     MaterialID*             _materials;
+    MapAction*              _map_actions;
     std::vector<bool>       _visible;
 };
 
