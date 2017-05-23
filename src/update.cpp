@@ -1,4 +1,5 @@
 #include <game.h>
+#include <rect3.h>
 
 static void toggle_vsync(Game& game)
 {
@@ -112,6 +113,28 @@ void handle_motion(Game& game)
     }
 }
 
+static void mine(Game& game, Rect3 rect)
+{
+    int x;
+    int y;
+    int z;
+
+    for (int k = 0; k < rect.size.z; ++k)
+    {
+        for (int j = 0; j < rect.size.y; ++j)
+        {
+            for (int i = 0; i < rect.size.x; ++i)
+            {
+                x = rect.origin.x + i;
+                y = rect.origin.y + j;
+                z = rect.origin.z + k;
+
+                game.map.set_action(x, y, z, MapAction::Mine);
+            }
+        }
+    }
+}
+
 static void handle_ui_state_selection(Game& game)
 {
     if (game.keyboard.key_pressed(SDLK_ESCAPE))
@@ -132,6 +155,7 @@ static void handle_ui_state_selection(Game& game)
         {
             game.selection[1] = game.cursor;
             game.ui_state = UiStateID::None;
+            mine(game, rect_from_points(game.selection[0], game.selection[1]));
         }
     }
 }
