@@ -130,12 +130,14 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             x = game.camera.x + i;
             TileID tile_id;
             MaterialID material_id;
+            MapAction action;
             uint16_t sym;
             Color color;
             Color color_bg;
 
             under = 0;
             game.map.at(x, y, game.camera.z, tile_id, material_id);
+            action = game.map.action_at(x, y, game.camera.z);
 
             while (tile_id == TileID::None)
             {
@@ -143,27 +145,34 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                     break;
                 under++;
                 game.map.at(x, y, game.camera.z - under, tile_id, material_id);
+                action = game.map.action_at(x, y, game.camera.z - under);
             }
 
             if (tile_id == TileID::None)
                 continue;
 
-            const Tile& tile = Tile::from_id(tile_id);
-            const Material& material = Material::from_id(material_id);
-
-            sym = tile.sym;
-            color = material.color;
-            color_bg = material.color_bg;
-
-            if (under)
+            if (action != MapAction::None)
             {
-                if (tile.dim_sym != 0)
+                sym = 'M';
+                color = {255, 255, 255};
+                color_bg = {255, 0, 0};
+            }
+            else
+            {
+                const Tile& tile = Tile::from_id(tile_id);
+                const Material& material = Material::from_id(material_id);
+                if (under && tile.dim_sym)
                     sym = tile.dim_sym;
-                while (under--)
-                {
-                    color *= 0.5f;
-                    color_bg *= 0.5f;
-                }
+                else
+                    sym = tile.sym;
+                color = material.color;
+                color_bg = material.color_bg;
+            }
+
+            while (under--)
+            {
+                color *= 0.5f;
+                color_bg *= 0.5f;
             }
             game.renderer.putchar_fast(i + 1, j + 1, sym, color, color_bg);
         }
