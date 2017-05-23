@@ -129,7 +129,8 @@ static void mine(Game& game, Rect3 rect)
                 y = rect.origin.y + j;
                 z = rect.origin.z + k;
 
-                game.map.set_action(x, y, z, MapAction::Mine);
+                if (game.map.tile_at(x, y, z) == TileID::Block)
+                    game.map.set_action(x, y, z, MapAction::Mine);
             }
         }
     }
