@@ -202,11 +202,12 @@ static void draw_map(Game& game)
     thread_pool.task_wait(task);
 }
 
-static void draw_actors(Game& game)
+static void draw_actors(Game& game, int delta_z)
 {
     int count;
     int x;
     int y;
+    int z;
     int view_w;
     int view_h;
     uint16_t sym;
@@ -218,6 +219,7 @@ static void draw_actors(Game& game)
     view_w = game.renderer.width();
     view_h = game.renderer.height();
 
+    z = game.camera.z - delta_z;
     count = game.actors.count();
     color_bg = {0, 0, 0};
     for (int i = 0; i < count; ++i)
@@ -229,7 +231,7 @@ static void draw_actors(Game& game)
         if (actor_id == ActorID::None)
             continue;
         pos = game.actors.pos(i);
-        if (pos.z != game.camera.z)
+        if (pos.z != z)
             continue;
 
         x = pos.x - game.camera.x;
@@ -248,8 +250,16 @@ static void draw_actors(Game& game)
             color = {255, 255, 255};
             sym = anim_str[anim];
         }
+        for (int j = 0; j < delta_z; ++j)
+            color *= 0.5;
         game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
     }
+}
+
+static void draw_actors(Game& game)
+{
+    for (int i = 0; i < 4; ++i)
+        draw_actors(game, 3 - i);
 }
 
 static void draw_items(Game& game)
