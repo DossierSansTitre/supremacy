@@ -92,3 +92,8 @@ bool Actors::use_speed(int id, int speed)
     }
     return false;
 }
+
+void Actors::set_action(int id, ActionID action)
+{
+    _action[id] = action;
+}

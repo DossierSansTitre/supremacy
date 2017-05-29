@@ -20,16 +20,17 @@ public:
     PathFinder();
     ~PathFinder();
 
-    void    start(Vec3 start, uint32_t cost);
+    void    start(Vec3 start, int32_t cost);
     bool    fetch(Vec3& node);
     void    finish(Path& path);
-    void    explore(Vec3 node, uint32_t cost);
+    void    finish_with(Path& path, Vec3 node);
+    void    explore(Vec3 node, int32_t cost);
     void    reset();
 
 private:
     struct InternalNode {
         uint32_t    index;
-        uint32_t    cost;
+        int32_t     cost;
     };
 
     friend bool operator<(InternalNode, InternalNode);

@@ -2,6 +2,7 @@
 #include <game.h>
 #include <tile.h>
 #include <path.h>
+#include <action_id.h>
 
 uint32_t manhattan(Vec3 a, Vec3 b)
 {
@@ -133,7 +134,8 @@ static void try_pathfind(Game& game, int actor)
             tmp = node + dirs[i];
             if (game.map.action_at(tmp.x, tmp.y, tmp.z) != MapAction::None)
             {
-                path_finder.finish(game.actors.path(actor));
+                path_finder.finish_with(game.actors.path(actor), tmp);
+                game.actors.set_action(actor, ActionID::Mine);
                 return;
             }
             for (int j = 0; j < 3; ++j)
@@ -156,7 +158,7 @@ static bool move_with_path(Game& game, int actor)
     Vec3 pos;
     Vec3 delta;
 
-    if (path.empty())
+    if (path.size() < 2)
         return false;
     if (!game.actors.use_speed(actor, 100))
         return true;
@@ -175,6 +177,18 @@ static bool move_with_path(Game& game, int actor)
         return false;
     }
     return true;
+}
+
+static void ai_mine(Game& game, int actor)
+{
+    Vec3 pos;
+
+    if (!game.actors.use_speed(actor, 1200))
+        return;
+    pos = game.actors.path(actor).front();
+    game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
+    game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
+    game.actors.set_action(actor, ActionID::Wander);
 }
 
 static void ai_wander(Game& game, int actor)
@@ -220,6 +234,9 @@ void game_ai(Game& game)
         {
             case ActionID::Wander:
                 ai_wander(game, i);
+                break;
+            case ActionID::Mine:
+                ai_mine(game, i);
                 break;
             default:
                 break;

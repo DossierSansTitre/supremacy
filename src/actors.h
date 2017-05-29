@@ -31,6 +31,7 @@ public:
     void        set_speed(int id, int speed);
     void        speed_tick(int id);
     bool        use_speed(int id, int speed);
+    void        set_action(int id, ActionID action);
 
     PathFinder& path_finder(int id) { return _path_finder[id]; }
     Path&       path(int id) { return _path[id]; }

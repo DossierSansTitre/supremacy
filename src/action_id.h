@@ -7,7 +7,8 @@ enum class ActionID : uint8_t
 {
     None,
     Wander,
-    Attack
+    Attack,
+    Mine
 };
 
 #endif
