@@ -188,6 +188,8 @@ static void ai_mine(Game& game, int actor)
     pos = game.actors.path(actor).front();
     game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
     game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
+    if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)
+        game.map.set_material(pos.x, pos.y, pos.z, MaterialID::Dirt);
     game.actors.set_action(actor, ActionID::Wander);
 }
 
