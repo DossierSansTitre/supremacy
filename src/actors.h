@@ -6,6 +6,7 @@
 #include <action_id.h>
 #include <vec3.h>
 #include <path_finder.h>
+#include <path.h>
 
 class Actors
 {
@@ -32,6 +33,7 @@ public:
     bool        use_speed(int id, int speed);
 
     PathFinder& path_finder(int id) { return _path_finder[id]; }
+    Path&       path(int id) { return _path[id]; }
 
 private:
     std::vector<ActorID>    _actor_id;
@@ -40,6 +42,7 @@ private:
     std::vector<int>        _speed;
     std::vector<ActionID>   _action;
     std::vector<PathFinder> _path_finder;
+    std::vector<Path>       _path;
     std::vector<int>        _counter;
     std::vector<int>        _free;
     int                     _count;

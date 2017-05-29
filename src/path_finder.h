@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <set>
-#include <vec3.h>
+#include <path.h>
 
 class PathFinder
 {
@@ -16,16 +16,13 @@ public:
         Finished
     };
 
-    using Path = std::vector<Vec3>;
-
     PathFinder();
     ~PathFinder();
 
     void    start(Vec3 start);
     bool    fetch(Vec3& node);
     void    explore(Vec3 node);
-    void    finish();
-    void    finish_with(Vec3 node);
+    void    finish(Path& path);
     void    reset();
 
 private:
@@ -37,8 +34,6 @@ private:
     std::set<Vec3>              _closed;
     std::vector<Vec3>           _position;
     std::vector<uint32_t>       _parent;
-
-    Path                        _path;
 };
 
 #endif

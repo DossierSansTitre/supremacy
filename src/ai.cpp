@@ -1,5 +1,7 @@
+#include <cmath>
 #include <game.h>
 #include <tile.h>
+#include <path.h>
 
 static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
 {
@@ -89,7 +91,7 @@ static void try_pathfind(Game& game, int actor)
             tmp = node + dirs[i];
             if (game.map.action_at(tmp.x, tmp.y, tmp.z) != MapAction::None)
             {
-                path_finder.finish();
+                path_finder.finish(game.actors.path(actor));
                 return;
             }
             for (int j = 0; j < 3; ++j)
@@ -103,6 +105,34 @@ static void try_pathfind(Game& game, int actor)
             }
         }
     }
+}
+
+static bool move_with_path(Game& game, int actor)
+{
+    Path& path = game.actors.path(actor);
+    Vec3 next_node;
+    Vec3 pos;
+    Vec3 delta;
+
+    if (path.empty())
+        return false;
+    if (!game.actors.use_speed(actor, 100))
+        return true;
+    next_node = path.back();
+    path.pop_back();
+    pos = game.actors.pos(actor);
+    delta = next_node - pos;
+    if (delta.x * delta.x + delta.y * delta.y > 1)
+    {
+        path.clear();
+        return false;
+    }
+    if (!try_move(game, actor, delta))
+    {
+        path.clear();
+        return false;
+    }
+    return true;
 }
 
 static void ai_wander(Game& game, int actor)
@@ -142,6 +172,8 @@ void game_ai(Game& game)
     for (int i = 0; i < count; ++i)
     {
         actors.speed_tick(i);
+        if (move_with_path(game, i))
+            continue;
         switch (actors.action(i))
         {
             case ActionID::Wander:

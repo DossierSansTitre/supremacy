@@ -10,6 +10,7 @@ Actors::Actors()
 
 Actors::~Actors()
 {
+
 }
 
 int Actors::add(ActorID actor_id, Vec3 pos)
@@ -27,6 +28,7 @@ int Actors::add(ActorID actor_id, Vec3 pos)
         _speed[id] = rand() % (10 * actor_data.speed + 1);
         _counter[id] = 1;
         _path_finder[id].reset();
+        _path[id].clear();
         return id;
     }
     else
@@ -38,6 +40,7 @@ int Actors::add(ActorID actor_id, Vec3 pos)
         _speed.push_back(rand() % (10 * actor_data.speed + 1));
         _counter.push_back(1);
         _path_finder.resize(_count + 1);
+        _path.resize(_count + 1);
         return _count++;
     }
 }

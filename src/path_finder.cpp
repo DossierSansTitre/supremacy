@@ -1,5 +1,4 @@
 #include <path_finder.h>
-#include <iostream>
 
 PathFinder::PathFinder()
 {
@@ -35,19 +34,20 @@ bool PathFinder::fetch(Vec3& node)
     return true;
 }
 
-void PathFinder::finish()
+void PathFinder::finish(Path& path)
 {
-    std::cout << "Found node: " << _position[_current].x << " " << _position[_current].y << " " << _position[_current].z << std::endl;
-    reset();
-}
+    uint32_t index;
 
-void PathFinder::finish_with(Vec3 node)
-{
-    _position.push_back(node);
-    _parent.push_back(_current);
-    _current = _size;
-    _size++;
-    finish();
+    index = _current;
+    path.clear();
+    for (;;)
+    {
+        path.push_back(_position[index]);
+        if (index == 0)
+            break;
+        index = _parent[index];
+    }
+    reset();
 }
 
 void PathFinder::explore(Vec3 node)
@@ -71,5 +71,4 @@ void PathFinder::reset()
     _closed.clear();
     _position.clear();
     _parent.clear();
-    _path.clear();
 }
