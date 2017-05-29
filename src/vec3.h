@@ -35,4 +35,13 @@ inline Vec3 operator-(Vec3 lhs, Vec3 rhs)
     return (lhs -= rhs);
 }
 
+inline bool operator<(Vec3 lhs, Vec3 rhs)
+{
+    if (lhs.x != rhs.x)
+        return (lhs.x < rhs.x);
+    if (lhs.y != rhs.y)
+        return (lhs.y < rhs.y);
+    return (lhs.z < rhs.z);
+}
+
 #endif

@@ -1,12 +1,10 @@
 #include <game.h>
 #include <tile.h>
 
-static bool can_move(Game& game, int actor, Vec3 delta)
+static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
 {
-    Vec3 src;
     Vec3 dst;
 
-    src = game.actors.pos(actor);
     dst = src + delta;
 
     if (delta.z < 0)
@@ -22,6 +20,15 @@ static bool can_move(Game& game, int actor, Vec3 delta)
     if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)
         return true;
     return false;
+
+}
+
+static bool can_move(Game& game, int actor, Vec3 delta)
+{
+    Vec3 src;
+
+    src = game.actors.pos(actor);
+    return can_move_from(game, actor, src, delta);
 }
 
 static bool try_move(Game& game, int actor, Vec3 delta)
@@ -49,12 +56,66 @@ static bool try_move_auto_slope(Game& game, int actor, Vec3 delta)
     return false;
 }
 
+static void try_pathfind(Game& game, int actor)
+{
+    static size_t nodes_max = 500;
+
+    static Vec3 dirs[4] = {
+        {-1, 0, 0},
+        {0, -1, 0},
+        {1, 0, 0},
+        {0, 1, 0}
+    };
+
+    static Vec3 deltas[3] = {
+        {0, 0, 0},
+        {0, 0, 1},
+        {0, 0, -1}
+    };
+
+    PathFinder& path_finder = game.actors.path_finder(actor);
+    Vec3 pos = game.actors.pos(actor);
+    Vec3 node;
+    Vec3 delta;
+    Vec3 tmp;
+
+    path_finder.start(pos);
+    for (size_t count = 0; count < nodes_max; ++count)
+    {
+        if (!path_finder.fetch(node))
+            break;
+        for (int i = 0; i < 4; ++i)
+        {
+            tmp = node + dirs[i];
+            if (game.map.action_at(tmp.x, tmp.y, tmp.z) != MapAction::None)
+            {
+                path_finder.finish();
+                return;
+            }
+            for (int j = 0; j < 3; ++j)
+            {
+                delta = dirs[i] + deltas[j];
+                if (can_move_from(game, actor, node, delta))
+                {
+                    path_finder.explore(node + delta);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 static void ai_wander(Game& game, int actor)
 {
     Actors& actors = game.actors;
     Vec3 delta = {0, 0, 0};
     int r;
 
+    if ((actor + game.tick) % 16 == 0)
+    {
+        try_pathfind(game, actor);
+        return;
+    }
     if (!actors.use_speed(actor, 250))
         return;
 

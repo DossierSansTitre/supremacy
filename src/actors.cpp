@@ -26,6 +26,7 @@ int Actors::add(ActorID actor_id, Vec3 pos)
         _action[id] = ActionID::Wander;
         _speed[id] = rand() % (10 * actor_data.speed + 1);
         _counter[id] = 1;
+        _path_finder[id].reset();
         return id;
     }
     else
@@ -36,6 +37,7 @@ int Actors::add(ActorID actor_id, Vec3 pos)
         _health.push_back(actor_data.max_health);
         _speed.push_back(rand() % (10 * actor_data.speed + 1));
         _counter.push_back(1);
+        _path_finder.resize(_count + 1);
         return _count++;
     }
 }
