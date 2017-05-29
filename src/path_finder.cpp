@@ -10,27 +10,22 @@ PathFinder::~PathFinder()
 
 }
 
-void PathFinder::start(Vec3 start)
+void PathFinder::start(Vec3 start, uint32_t cost)
 {
     reset();
-    explore(start);
+    explore(start, cost);
 }
 
 bool PathFinder::fetch(Vec3& node)
 {
-    uint32_t index;
+    InternalNode internal_node;
 
     if (_open.empty())
-    {
-        if (_open_next.empty())
-            return false;
-        _open = _open_next;
-        _open_next.clear();
-    }
-    index = _open.back();
-    _open.pop_back();
-    node = _position[index];
-    _current = index;
+        return false;
+    internal_node = _open.top();
+    _open.pop();
+    node = _position[internal_node.index];
+    _current = internal_node.index;
     return true;
 }
 
@@ -50,14 +45,14 @@ void PathFinder::finish(Path& path)
     reset();
 }
 
-void PathFinder::explore(Vec3 node)
+void PathFinder::explore(Vec3 node, uint32_t cost)
 {
     if (_closed.count(node) == 0)
     {
         _closed.insert(node);
         _position.push_back(node);
         _parent.push_back(_current);
-        _open_next.push_back(_size);
+        _open.push({_size, cost});
         _size++;
     }
 }
@@ -66,8 +61,7 @@ void PathFinder::reset()
 {
     _current = 0;
     _size = 0;
-    _open.clear();
-    _open_next.clear();
+    _open = OpenQueue();
     _closed.clear();
     _position.clear();
     _parent.clear();

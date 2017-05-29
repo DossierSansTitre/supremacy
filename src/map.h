@@ -7,6 +7,7 @@
 #include <tile_id.h>
 #include <material_id.h>
 #include <map_action.h>
+#include <vec3.h>
 
 class Map : private NonCopyable
 {
@@ -98,11 +99,13 @@ public:
     void        set_tile(int x, int y, int z, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
-    void        set_action(int index, MapAction action);
     void        set_action(int x, int y, int z, MapAction action);
 
     void        compute_visibility(int x, int y, int z);
     void        compute_visibility();
+
+    size_t      action_count() const { return _map_actions_array.size(); }
+    Vec3        action_by_index(size_t index) { return _map_actions_array[index]; }
 
 private:
     int                     _width;
@@ -112,6 +115,7 @@ private:
     MaterialID*             _materials;
     MapAction*              _map_actions;
     std::vector<bool>       _visible;
+    std::vector<Vec3>       _map_actions_array;
 };
 
 void generate_map(Map& map, uint32_t seed);

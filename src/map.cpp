@@ -75,16 +75,16 @@ void Map::set_material(int x, int y, int z, MaterialID material)
     set_material(index(x, y, z), material);
 }
 
-void Map::set_action(int index, MapAction action)
-{
-    if (index == -1)
-        return;
-    _map_actions[index] = action;
-}
-
 void Map::set_action(int x, int y, int z, MapAction action)
 {
-    set_action(index(x, y, z), action);
+    int i;
+
+    i = index(x, y, z);
+
+    if (i == -1)
+        return;
+    _map_actions[i] = action;
+    _map_actions_array.push_back({x, y, z});
 }
 
 void Map::compute_visibility(int x, int y, int z)

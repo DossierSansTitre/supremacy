@@ -3,6 +3,35 @@
 #include <tile.h>
 #include <path.h>
 
+uint32_t manhattan(Vec3 a, Vec3 b)
+{
+    a -= b;
+
+    if (a.x < 0)
+        a.x = -a.x;
+    if (a.y < 0)
+        a.y = -a.y;
+    if (a.z < 0)
+        a.z = -a.z;
+
+    return a.x + a.y + a.z;
+}
+
+uint32_t manhattan(size_t count, Vec3* multi, Vec3 pos)
+{
+    uint32_t value;
+    uint32_t tmp;
+
+    value = manhattan(pos, multi[0]);
+    for (size_t i = 1; i < count; ++i)
+    {
+        tmp = manhattan(pos, multi[i]);
+        if (tmp < value)
+            value = tmp;
+    }
+    return value;
+}
+
 static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
 {
     Vec3 dst;
@@ -60,20 +89,24 @@ static bool try_move_auto_slope(Game& game, int actor, Vec3 delta)
 
 static void try_pathfind(Game& game, int actor)
 {
-    static size_t nodes_max = 500;
+    static const size_t nodes_max = 500;
+    static const size_t sample_size_max = 25;
 
-    static Vec3 dirs[4] = {
+    static const Vec3 dirs[4] = {
         {-1, 0, 0},
         {0, -1, 0},
         {1, 0, 0},
         {0, 1, 0}
     };
 
-    static Vec3 deltas[3] = {
+    static const Vec3 deltas[3] = {
         {0, 0, 0},
         {0, 0, 1},
         {0, 0, -1}
     };
+
+    size_t sample_size;
+    Vec3 samples[sample_size_max];
 
     PathFinder& path_finder = game.actors.path_finder(actor);
     Vec3 pos = game.actors.pos(actor);
@@ -81,7 +114,16 @@ static void try_pathfind(Game& game, int actor)
     Vec3 delta;
     Vec3 tmp;
 
-    path_finder.start(pos);
+    sample_size = game.map.action_count();
+    if (sample_size == 0)
+        return;
+    else if (sample_size > sample_size_max)
+        sample_size = sample_size_max;
+
+    for (size_t i = 0; i < sample_size; ++i)
+        samples[i] = game.map.action_by_index(rand() % game.map.action_count());
+
+    path_finder.start(pos, manhattan(sample_size, samples, pos));
     for (size_t count = 0; count < nodes_max; ++count)
     {
         if (!path_finder.fetch(node))
@@ -99,7 +141,7 @@ static void try_pathfind(Game& game, int actor)
                 delta = dirs[i] + deltas[j];
                 if (can_move_from(game, actor, node, delta))
                 {
-                    path_finder.explore(node + delta);
+                    path_finder.explore(node + delta, manhattan(sample_size, samples, node + delta));
                     break;
                 }
             }
