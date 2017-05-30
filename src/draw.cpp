@@ -151,7 +151,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 flash = game.map.flash({x, y, game.camera.z - under});
             }
 
-            if (tile_id == TileID::None)
+            if (tile_id == TileID::None || (!game.map.visible(x, y, game.camera.z) && action == MapAction::None))
                 continue;
 
             if (flash == Map::Flash::Action)

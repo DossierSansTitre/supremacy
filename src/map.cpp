@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <map.h>
+#include <tile.h>
 
 Map::Map()
 : _width(0)
@@ -120,6 +121,15 @@ void Map::set_flash(Vec3 pos, Flash flash)
     }
 }
 
+static bool transparent(TileID tile)
+{
+    if (tile == TileID::None)
+        return true;
+    if (Tile::from_id(tile).walkable)
+        return true;
+    return false;
+}
+
 void Map::compute_visibility(int x, int y, int z)
 {
     int i;
@@ -128,11 +138,11 @@ void Map::compute_visibility(int x, int y, int z)
 
     if (i == -1)
         return;
-    if ((_tiles[i] == TileID::None)
-        ||(x > 0 && _tiles[index(x - 1, y, z)] == TileID::None)
-        || (x < _width - 1 && _tiles[index(x + 1, y, z)] == TileID::None)
-        || (y > 0 && _tiles[index(x, y - 1, z)] == TileID::None)
-        || (y < _height - 1 && _tiles[index(x, y + 1, z)] == TileID::None)
+    if (transparent(_tiles[i])
+        || (x > 0 && transparent(_tiles[index(x - 1, y, z)]))
+        || (x < _width - 1 && transparent(_tiles[index(x + 1, y, z)]))
+        || (y > 0 && transparent(_tiles[index(x, y - 1, z)]))
+        || (y < _height - 1 && transparent(_tiles[index(x, y + 1, z)]))
 //        || (z > 0 && _tiles[index(x, y, z - 1)] == TileID::None)
 //        || (z < _depth - 1 && _tiles[index(x, y, z + 1)] == TileID::None)
         )
@@ -141,6 +151,10 @@ void Map::compute_visibility(int x, int y, int z)
 
 void Map::compute_visibility()
 {
+    auto size = _visible.size();
+    _visible.resize(0);
+    _visible.resize(size);
+
     for (int z = 0; z < _depth; ++z)
     {
         for (int y = 0; y < _height; ++y)
@@ -162,6 +176,7 @@ void Map::tick()
 
 void Map::post_update(Vec3 pos)
 {
+    neighbor_updated(pos);
     neighbor_updated(pos + Vec3(1, 0, 0));
     neighbor_updated(pos + Vec3(-1, 0, 0));
     neighbor_updated(pos + Vec3(0, 1, 0));
@@ -181,6 +196,7 @@ void Map::neighbor_updated(Vec3 pos)
         {0, -1, 0}
     };
 
+    compute_visibility(pos.x, pos.y, pos.z);
     if (tile_at(pos) == TileID::Ramp)
     {
         collapse = true;
