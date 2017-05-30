@@ -31,10 +31,13 @@ void Map::create(int width, int height, int depth)
     _materials = new MaterialID[size];
     _map_actions = new MapAction[size];
     _visible.resize(size);
+    _occupied.resize(size);
+    _flash.resize(size);
 
     std::fill(_tiles, _tiles + size, TileID::None);
     std::fill(_materials, _materials + size, MaterialID::None);
     std::fill(_map_actions, _map_actions + size, MapAction::None);
+    std::fill(_flash.data(), _flash.data() + size, Flash::None);
 }
 
 void Map::destroy()
@@ -49,6 +52,7 @@ void Map::destroy()
     _materials = nullptr;
     _map_actions = nullptr;
     _visible.resize(0);
+    _occupied.resize(0);
 }
 
 void Map::set_tile(int index, TileID tile)
@@ -87,6 +91,30 @@ void Map::set_action(int x, int y, int z, MapAction action)
     _map_actions_array.push_back({x, y, z});
 }
 
+
+void Map::set_occupied(Vec3 pos, bool occupied)
+{
+    int i = index(pos);
+
+    if (i == -1)
+        return;
+
+    _occupied[i] = occupied;
+}
+
+void Map::set_flash(Vec3 pos, Flash flash)
+{
+    int i = index(pos);
+
+    if (i == -1)
+        return;
+    if (static_cast<int>(_flash[i]) < static_cast<int>(flash))
+    {
+        _flash[i] = flash;
+        _flash_reset.push_back(i);
+    }
+}
+
 void Map::compute_visibility(int x, int y, int z)
 {
     int i;
@@ -118,4 +146,11 @@ void Map::compute_visibility()
             }
         }
     }
+}
+
+void Map::tick()
+{
+    for (int i : _flash_reset)
+        _flash[i] = Flash::None;
+    _flash_reset.clear();
 }

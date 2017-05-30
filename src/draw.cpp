@@ -131,6 +131,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             TileID tile_id;
             MaterialID material_id;
             MapAction action;
+            Map::Flash flash;
             uint16_t sym;
             Color color;
             Color color_bg;
@@ -138,6 +139,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             under = 0;
             game.map.at(x, y, game.camera.z, tile_id, material_id);
             action = game.map.action_at(x, y, game.camera.z);
+            flash = game.map.flash({x, y, game.camera.z});
 
             while (tile_id == TileID::None)
             {
@@ -146,12 +148,19 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 under++;
                 game.map.at(x, y, game.camera.z - under, tile_id, material_id);
                 action = game.map.action_at(x, y, game.camera.z - under);
+                flash = game.map.flash({x, y, game.camera.z - under});
             }
 
             if (tile_id == TileID::None)
                 continue;
 
-            if (action != MapAction::None)
+            if (flash == Map::Flash::Action)
+            {
+                sym = "\\|/-"[game.tick_render % 4];
+                color = {0, 0, 0};
+                color_bg = {255, 255, 0};
+            }
+            else if (action != MapAction::None)
             {
                 sym = 'M';
                 color = {255, 255, 255};
@@ -167,6 +176,20 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                     sym = tile.sym;
                 color = material.color;
                 color_bg = material.color_bg;
+            }
+
+            if (flash == Map::Flash::Pending)
+            {
+                if ((game.tick_render / 2) % 2)
+                {
+                    color *= 0.75f;
+                    color_bg *= 0.75f;
+                }
+                else
+                {
+                    color *= 0.5f;
+                    color_bg *= 0.5f;
+                }
             }
 
             while (under--)

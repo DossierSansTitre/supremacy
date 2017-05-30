@@ -39,6 +39,10 @@ static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
 
     dst = src + delta;
 
+    if (delta.x == 0 && delta.y == 0 && delta.z == 0)
+        return true;
+    if (game.map.occupied(dst))
+        return false;
     if (delta.z < 0)
     {
         if (game.map.tile_at(dst.x, dst.y, dst.z) != TileID::Ramp)
@@ -65,13 +69,19 @@ static bool can_move(Game& game, int actor, Vec3 delta)
 
 static bool try_move(Game& game, int actor, Vec3 delta)
 {
+    Vec3 src;
     Vec3 dst;
     bool b;
 
-    dst = game.actors.pos(actor) + delta;
+    src = game.actors.pos(actor);
+    dst = src + delta;
     b = can_move(game, actor, delta);
     if (b)
+    {
         game.actors.set_pos(actor, dst);
+        game.map.set_occupied(src, false);
+        game.map.set_occupied(dst, true);
+    }
     return b;
 }
 
@@ -160,6 +170,8 @@ static bool move_with_path(Game& game, int actor)
 
     if (path.size() < 2)
         return false;
+    if (game.actors.action(actor) != ActionID::None)
+        game.map.set_flash(game.actors.path(actor).front(), Map::Flash::Pending);
     if (!game.actors.use_speed(actor, 100))
         return true;
     next_node = path.back();
@@ -183,9 +195,15 @@ static void ai_mine(Game& game, int actor)
 {
     Vec3 pos;
 
-    if (!game.actors.use_speed(actor, 1200))
-        return;
     pos = game.actors.path(actor).front();
+    if (manhattan(game.actors.pos(actor), pos) > 1)
+    {
+        game.actors.set_action(actor, ActionID::Wander);
+        return;
+    }
+    game.map.set_flash(pos, Map::Flash::Action);
+    if (!game.actors.use_speed(actor, 2000))
+        return;
     game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
     game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
     if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)

@@ -199,6 +199,7 @@ void game_update(Game& game)
     game.fps_counter_update.update();
     game.tick_render++;
     game.tick++;
+    game.map.tick();
     if (game.keyboard.key_pressed(SDLK_v))
         toggle_vsync(game);
     handle_motion(game);
