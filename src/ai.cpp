@@ -209,6 +209,7 @@ static void ai_mine(Game& game, int actor)
     if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)
         game.map.set_material(pos.x, pos.y, pos.z, MaterialID::Dirt);
     game.actors.set_action(actor, ActionID::Wander);
+    try_pathfind(game, actor);
 }
 
 static void ai_wander(Game& game, int actor)
