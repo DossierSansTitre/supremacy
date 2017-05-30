@@ -56,6 +56,11 @@ public:
         return tile_at(index(x, y, z));
     }
 
+    TileID tile_at(Vec3 pos) const
+    {
+        return tile_at(pos.x, pos.y, pos.z);
+    }
+
     MaterialID material_at(int i) const
     {
         if (i == -1)
@@ -125,6 +130,7 @@ public:
 
     void        set_tile(int index, TileID tile);
     void        set_tile(int x, int y, int z, TileID tile);
+    void        set_tile(Vec3 pos, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
     void        set_action(int x, int y, int z, MapAction action);
@@ -140,6 +146,9 @@ public:
     void        tick();
 
 private:
+    void        post_update(Vec3 pos);
+    void        neighbor_updated(Vec3 pos);
+
     int                     _width;
     int                     _height;
     int                     _depth;

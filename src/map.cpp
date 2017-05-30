@@ -65,6 +65,12 @@ void Map::set_tile(int index, TileID tile)
 void Map::set_tile(int x, int y, int z, TileID tile)
 {
     set_tile(index(x, y, z), tile);
+    post_update(Vec3(x, y, z));
+}
+
+void Map::set_tile(Vec3 pos, TileID tile)
+{
+    set_tile(pos.x, pos.y, pos.z, tile);
 }
 
 void Map::set_material(int index, MaterialID material)
@@ -90,7 +96,6 @@ void Map::set_action(int x, int y, int z, MapAction action)
     _map_actions[i] = action;
     _map_actions_array.push_back({x, y, z});
 }
-
 
 void Map::set_occupied(Vec3 pos, bool occupied)
 {
@@ -153,4 +158,41 @@ void Map::tick()
     for (int i : _flash_reset)
         _flash[i] = Flash::None;
     _flash_reset.clear();
+}
+
+void Map::post_update(Vec3 pos)
+{
+    neighbor_updated(pos + Vec3(1, 0, 0));
+    neighbor_updated(pos + Vec3(-1, 0, 0));
+    neighbor_updated(pos + Vec3(0, 1, 0));
+    neighbor_updated(pos + Vec3(0, -1, 0));
+    neighbor_updated(pos + Vec3(0, 0, 1));
+    neighbor_updated(pos + Vec3(0, 0, -1));
+}
+
+void Map::neighbor_updated(Vec3 pos)
+{
+    bool collapse;
+
+    static const Vec3 cardinal[] = {
+        {1, 0, 0},
+        {-1, 0, 0},
+        {0, 1, 0},
+        {0, -1, 0}
+    };
+
+    if (tile_at(pos) == TileID::Ramp)
+    {
+        collapse = true;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (tile_at(pos + cardinal[i]) == TileID::Block)
+            {
+                collapse = false;
+                break;
+            }
+        }
+        if (collapse)
+            set_tile(pos, TileID::Floor);
+    }
 }
