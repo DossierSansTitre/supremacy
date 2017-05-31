@@ -192,10 +192,11 @@ static bool move_with_path(Game& game, int actor)
     return true;
 }
 
-void drop_item_at(Game& game, MaterialID material_id, Vec3 pos)
+void drop_item_at(Game& game, Vec3 pos)
 {
-    if (rand() % 4 == 0)
-        game.items.add(Material::from_id(material_id).dropping_item, pos, 1);
+    int frequency = Tile::from_id(game.map.tile_at(pos.x, pos.y, pos.z)).dropping_frequency;
+    if (frequency != 0 && rand() % frequency == 0)
+        game.items.add(Material::from_id(game.map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
 }
 
 static void ai_mine(Game& game, int actor)
@@ -211,13 +212,12 @@ static void ai_mine(Game& game, int actor)
     game.map.set_flash(pos, Map::Flash::Action);
     if (!game.actors.use_speed(actor, 2000))
         return;
+    drop_item_at(game, pos);
     game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
     game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
-    MaterialID material_id = game.map.material_at(pos.x, pos.y, pos.z);
-    if (material_id == MaterialID::Grass)
+    if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)
         game.map.set_material(pos.x, pos.y, pos.z, MaterialID::Dirt);
     game.actors.set_action(actor, ActionID::Wander);
-    drop_item_at(game, material_id, pos);
     try_pathfind(game, actor);
 }
 
