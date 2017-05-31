@@ -9,6 +9,7 @@ struct Tile
     uint16_t    sym;
     uint16_t    dim_sym;
     bool        walkable;
+    int         dropping_frequency;
 
     static const Tile tiles[];
 
