@@ -3,6 +3,7 @@
 #include <tile.h>
 #include <path.h>
 #include <action_id.h>
+#include <material.h>
 
 uint32_t manhattan(Vec3 a, Vec3 b)
 {
@@ -193,22 +194,8 @@ static bool move_with_path(Game& game, int actor)
 
 void drop_item_at(Game& game, MaterialID material_id, Vec3 pos)
 {
-    switch (material_id) {
-    case MaterialID::Dirt:
-        game.items.add(ItemID::Dirt, pos, 1);
-        break;
-    case MaterialID::Grass:
-        game.items.add(ItemID::Dirt, pos, 1);
-        break;
-    case MaterialID::Rock:
-        game.items.add(ItemID::Rock, pos, 1);
-        break;
-    case MaterialID::Wood:
-        game.items.add(ItemID::Wood, pos, 1);
-        break;
-    default:
-        break;
-    }
+    if (rand() % 4 == 0)
+        game.items.add(Material::from_id(material_id).dropping_item, pos, 1);
 }
 
 static void ai_mine(Game& game, int actor)
