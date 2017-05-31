@@ -7,6 +7,8 @@ enum class ItemID : u8
 {
     None,
     Wood,
+    Rock,
+    Dirt,
 };
 
 #endif

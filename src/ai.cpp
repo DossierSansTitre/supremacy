@@ -191,6 +191,26 @@ static bool move_with_path(Game& game, int actor)
     return true;
 }
 
+void drop_item_at(Game& game, MaterialID material_id, Vec3 pos)
+{
+    switch (material_id) {
+    case MaterialID::Dirt:
+        game.items.add(ItemID::Dirt, pos, 1);
+        break;
+    case MaterialID::Grass:
+        game.items.add(ItemID::Dirt, pos, 1);
+        break;
+    case MaterialID::Rock:
+        game.items.add(ItemID::Rock, pos, 1);
+        break;
+    case MaterialID::Wood:
+        game.items.add(ItemID::Wood, pos, 1);
+        break;
+    default:
+        break;
+    }
+}
+
 static void ai_mine(Game& game, int actor)
 {
     Vec3 pos;
@@ -206,9 +226,11 @@ static void ai_mine(Game& game, int actor)
         return;
     game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
     game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
-    if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)
+    MaterialID material_id = game.map.material_at(pos.x, pos.y, pos.z);
+    if (material_id == MaterialID::Grass)
         game.map.set_material(pos.x, pos.y, pos.z, MaterialID::Dirt);
     game.actors.set_action(actor, ActionID::Wander);
+    drop_item_at(game, material_id, pos);
     try_pathfind(game, actor);
 }
 
