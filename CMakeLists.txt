@@ -39,7 +39,7 @@ find_package(SDL2)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE HEADERS "src/*.h")
 
-include_directories(src)
+include_directories(include)
 include_directories(${CMAKE_BINARY_DIR}/include)
 
 if (WIN32)
