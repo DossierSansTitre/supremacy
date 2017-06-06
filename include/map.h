@@ -7,7 +7,7 @@
 #include <tile_id.h>
 #include <material_id.h>
 #include <map_action.h>
-#include <vec3.h>
+#include <math/vector.h>
 
 class Map : private NonCopyable
 {
@@ -56,7 +56,7 @@ public:
         return tile_at(index(x, y, z));
     }
 
-    TileID tile_at(Vec3 pos) const
+    TileID tile_at(Vector3i pos) const
     {
         return tile_at(pos.x, pos.y, pos.z);
     }
@@ -97,7 +97,7 @@ public:
         return visible(index(x, y, z));
     }
 
-    bool occupied(Vec3 pos) const
+    bool occupied(Vector3i pos) const
     {
         int i = index(pos);
         if (i == -1)
@@ -105,7 +105,7 @@ public:
         return _occupied[i];
     }
 
-    Flash flash(Vec3 pos) const
+    Flash flash(Vector3i pos) const
     {
         int i = index(pos);
         if (i == -1)
@@ -113,7 +113,7 @@ public:
         return _flash[i];
     }
 
-    int index(Vec3 pos) const
+    int index(Vector3i pos) const
     {
         return index(pos.x, pos.y, pos.z);
     }
@@ -130,24 +130,24 @@ public:
 
     void        set_tile(int index, TileID tile);
     void        set_tile(int x, int y, int z, TileID tile);
-    void        set_tile(Vec3 pos, TileID tile);
+    void        set_tile(Vector3i pos, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
     void        set_action(int x, int y, int z, MapAction action);
-    void        set_occupied(Vec3 pos, bool occupied);
-    void        set_flash(Vec3 pos, Flash flash);
+    void        set_occupied(Vector3i pos, bool occupied);
+    void        set_flash(Vector3i pos, Flash flash);
 
     void        compute_visibility(int x, int y, int z);
     void        compute_visibility();
 
     size_t      action_count() const { return _map_actions_array.size(); }
-    Vec3        action_by_index(size_t index) { return _map_actions_array[index]; }
+    Vector3i        action_by_index(size_t index) { return _map_actions_array[index]; }
 
     void        tick();
 
 private:
-    void        post_update(Vec3 pos);
-    void        neighbor_updated(Vec3 pos);
+    void        post_update(Vector3i pos);
+    void        neighbor_updated(Vector3i pos);
 
     int                     _width;
     int                     _height;
@@ -155,7 +155,7 @@ private:
     TileID*                 _tiles;
     MaterialID*             _materials;
     MapAction*              _map_actions;
-    std::vector<Vec3>       _map_actions_array;
+    std::vector<Vector3i>       _map_actions_array;
     std::vector<bool>       _visible;
     std::vector<bool>       _occupied;
     std::vector<Flash>      _flash;

@@ -59,7 +59,7 @@ static void draw_rect_ingame(Game& game, Rect3 rect, int sym, Color color, Color
 
 static void draw_ui_state(Game& game)
 {
-    Vec3 cursor;
+    Vector3i cursor;
     Rect3 rect;
     char c;
 
@@ -260,7 +260,7 @@ static void draw_actors(Game& game, int delta_z)
     for (int i = 0; i < count; ++i)
     {
         ActorID actor_id;
-        Vec3 pos;
+        Vector3i pos;
 
         actor_id = game.actors.actor_id(i);
         if (actor_id == ActorID::None)
@@ -317,7 +317,7 @@ static void draw_items(Game& game)
     for (int i = 0; i < count; ++i)
     {
         ItemID item_id;
-        Vec3 pos;
+        Vector3i pos;
 
         item_id = game.items.item_id(i);
         if (item_id == ItemID::None)

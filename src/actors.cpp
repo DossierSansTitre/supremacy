@@ -13,7 +13,7 @@ Actors::~Actors()
 
 }
 
-int Actors::add(ActorID actor_id, Vec3 pos)
+int Actors::add(ActorID actor_id, Vector3i pos)
 {
     const ActorData actor_data = ActorData::from_id(actor_id);
 
@@ -62,7 +62,7 @@ void Actors::decrement(int id)
         remove(id);
 }
 
-void Actors::set_pos(int id, Vec3 pos)
+void Actors::set_pos(int id, Vector3i pos)
 {
     _pos[id] = pos;
 }

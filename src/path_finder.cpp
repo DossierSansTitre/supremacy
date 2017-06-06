@@ -10,13 +10,13 @@ PathFinder::~PathFinder()
 
 }
 
-void PathFinder::start(Vec3 start, int32_t cost)
+void PathFinder::start(Vector3i start, int32_t cost)
 {
     reset();
     explore(start, cost);
 }
 
-bool PathFinder::fetch(Vec3& node)
+bool PathFinder::fetch(Vector3i& node)
 {
     InternalNode internal_node;
 
@@ -45,7 +45,7 @@ void PathFinder::finish(Path& path)
     reset();
 }
 
-void PathFinder::finish_with(Path& path, Vec3 node)
+void PathFinder::finish_with(Path& path, Vector3i node)
 {
     _position.push_back(node);
     _parent.push_back(_current);
@@ -54,7 +54,7 @@ void PathFinder::finish_with(Path& path, Vec3 node)
     finish(path);
 }
 
-void PathFinder::explore(Vec3 node, int32_t cost)
+void PathFinder::explore(Vector3i node, int32_t cost)
 {
     if (_closed.count(node) == 0)
     {

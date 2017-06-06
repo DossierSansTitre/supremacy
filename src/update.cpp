@@ -17,7 +17,7 @@ static void toggle_vsync(Game& game)
     game.vsync = !game.vsync;
 }
 
-static Vec3 clamp_motion(Game& game, Vec3 origin, Vec3 delta)
+static Vector3i clamp_motion(Game& game, Vector3i origin, Vector3i delta)
 {
     if (origin.x + delta.x < 0)
         delta.x = -origin.x;
@@ -47,12 +47,12 @@ static void clamp_camera(Game& game)
         game.camera.y = game.map.height() - h;
 }
 
-static Vec3 keyboard_motion(Game& game)
+static Vector3i keyboard_motion(Game& game)
 {
     bool shift;
     int delta;
     int delta_z;
-    Vec3 motion = {0, 0, 0};
+    Vector3i motion = {0, 0, 0};
 
     shift = (game.keyboard.down(SDL_SCANCODE_LSHIFT) || game.keyboard.down(SDL_SCANCODE_RSHIFT));
 
@@ -82,7 +82,7 @@ static Vec3 keyboard_motion(Game& game)
     return motion;
 }
 
-static void move_camera(Game& game, Vec3 motion)
+static void move_camera(Game& game, Vector3i motion)
 {
     motion = clamp_motion(game, game.camera, motion);
     game.camera.x += motion.x;
@@ -92,7 +92,7 @@ static void move_camera(Game& game, Vec3 motion)
     clamp_camera(game);
 }
 
-void move_selection(Game& game, Vec3 motion)
+void move_selection(Game& game, Vector3i motion)
 {
     motion = clamp_motion(game, game.cursor, motion);
     game.cursor.x += motion.x;
@@ -102,7 +102,7 @@ void move_selection(Game& game, Vec3 motion)
 
 void handle_motion(Game& game)
 {
-    Vec3 motion;
+    Vector3i motion;
 
     motion = keyboard_motion(game);
     if (game.ui_state == UiStateID::None)

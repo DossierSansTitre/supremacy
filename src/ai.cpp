@@ -5,7 +5,7 @@
 #include <action_id.h>
 #include <material.h>
 
-uint32_t manhattan(Vec3 a, Vec3 b)
+uint32_t manhattan(Vector3i a, Vector3i b)
 {
     a -= b;
 
@@ -19,7 +19,7 @@ uint32_t manhattan(Vec3 a, Vec3 b)
     return a.x + a.y + a.z;
 }
 
-uint32_t manhattan(size_t count, Vec3* multi, Vec3 pos)
+uint32_t manhattan(size_t count, Vector3i* multi, Vector3i pos)
 {
     uint32_t value;
     uint32_t tmp;
@@ -34,9 +34,9 @@ uint32_t manhattan(size_t count, Vec3* multi, Vec3 pos)
     return value;
 }
 
-static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
+static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
 {
-    Vec3 dst;
+    Vector3i dst;
 
     dst = src + delta;
 
@@ -60,18 +60,18 @@ static bool can_move_from(Game& game, int actor, Vec3 src, Vec3 delta)
 
 }
 
-static bool can_move(Game& game, int actor, Vec3 delta)
+static bool can_move(Game& game, int actor, Vector3i delta)
 {
-    Vec3 src;
+    Vector3i src;
 
     src = game.actors.pos(actor);
     return can_move_from(game, actor, src, delta);
 }
 
-static bool try_move(Game& game, int actor, Vec3 delta)
+static bool try_move(Game& game, int actor, Vector3i delta)
 {
-    Vec3 src;
-    Vec3 dst;
+    Vector3i src;
+    Vector3i dst;
     bool b;
 
     src = game.actors.pos(actor);
@@ -86,9 +86,9 @@ static bool try_move(Game& game, int actor, Vec3 delta)
     return b;
 }
 
-static bool try_move_auto_slope(Game& game, int actor, Vec3 delta)
+static bool try_move_auto_slope(Game& game, int actor, Vector3i delta)
 {
-    static const Vec3 up = {0, 0, 1};
+    static const Vector3i up = {0, 0, 1};
 
     if (try_move(game, actor, delta))
         return true;
@@ -104,27 +104,27 @@ static void try_pathfind(Game& game, int actor)
     static const size_t nodes_max = 500;
     static const size_t sample_size_max = 25;
 
-    static const Vec3 dirs[4] = {
+    static const Vector3i dirs[4] = {
         {-1, 0, 0},
         {0, -1, 0},
         {1, 0, 0},
         {0, 1, 0}
     };
 
-    static const Vec3 deltas[3] = {
+    static const Vector3i deltas[3] = {
         {0, 0, 0},
         {0, 0, 1},
         {0, 0, -1}
     };
 
     size_t sample_size;
-    Vec3 samples[sample_size_max];
+    Vector3i samples[sample_size_max];
 
     PathFinder& path_finder = game.actors.path_finder(actor);
-    Vec3 pos = game.actors.pos(actor);
-    Vec3 node;
-    Vec3 delta;
-    Vec3 tmp;
+    Vector3i pos = game.actors.pos(actor);
+    Vector3i node;
+    Vector3i delta;
+    Vector3i tmp;
 
     sample_size = game.map.action_count();
     if (sample_size == 0)
@@ -175,9 +175,9 @@ static void try_pathfind(Game& game, int actor)
 static bool move_with_path(Game& game, int actor)
 {
     Path& path = game.actors.path(actor);
-    Vec3 next_node;
-    Vec3 pos;
-    Vec3 delta;
+    Vector3i next_node;
+    Vector3i pos;
+    Vector3i delta;
 
     if (path.size() < 2)
         return false;
@@ -202,7 +202,7 @@ static bool move_with_path(Game& game, int actor)
     return true;
 }
 
-void drop_item_at(Game& game, Vec3 pos)
+void drop_item_at(Game& game, Vector3i pos)
 {
     int frequency = Tile::from_id(game.map.tile_at(pos.x, pos.y, pos.z)).dropping_frequency;
     if (frequency != 0 && rand() % frequency == 0)
@@ -211,7 +211,7 @@ void drop_item_at(Game& game, Vec3 pos)
 
 static void ai_action(Game& game, int actor, ActionID action)
 {
-    Vec3 pos;
+    Vector3i pos;
 
     pos = game.actors.path(actor).front();
     if (manhattan(game.actors.pos(actor), pos) > 1)
@@ -234,7 +234,7 @@ static void ai_action(Game& game, int actor, ActionID action)
 static void ai_wander(Game& game, int actor)
 {
     Actors& actors = game.actors;
-    Vec3 delta = {0, 0, 0};
+    Vector3i delta = {0, 0, 0};
     int r;
 
     if ((actor + game.tick) % 16 == 0)

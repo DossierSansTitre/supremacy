@@ -2,8 +2,8 @@
 #define PATH_H
 
 #include <vector>
-#include <vec3.h>
+#include <math/vector.h>
 
-using Path = std::vector<Vec3>;
+using Path = std::vector<Vector3i>;
 
 #endif

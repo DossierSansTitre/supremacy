@@ -66,10 +66,10 @@ void Map::set_tile(int index, TileID tile)
 void Map::set_tile(int x, int y, int z, TileID tile)
 {
     set_tile(index(x, y, z), tile);
-    post_update(Vec3(x, y, z));
+    post_update(Vector3i(x, y, z));
 }
 
-void Map::set_tile(Vec3 pos, TileID tile)
+void Map::set_tile(Vector3i pos, TileID tile)
 {
     set_tile(pos.x, pos.y, pos.z, tile);
 }
@@ -98,7 +98,7 @@ void Map::set_action(int x, int y, int z, MapAction action)
     _map_actions_array.push_back({x, y, z});
 }
 
-void Map::set_occupied(Vec3 pos, bool occupied)
+void Map::set_occupied(Vector3i pos, bool occupied)
 {
     int i = index(pos);
 
@@ -108,7 +108,7 @@ void Map::set_occupied(Vec3 pos, bool occupied)
     _occupied[i] = occupied;
 }
 
-void Map::set_flash(Vec3 pos, Flash flash)
+void Map::set_flash(Vector3i pos, Flash flash)
 {
     int i = index(pos);
 
@@ -174,22 +174,22 @@ void Map::tick()
     _flash_reset.clear();
 }
 
-void Map::post_update(Vec3 pos)
+void Map::post_update(Vector3i pos)
 {
     neighbor_updated(pos);
-    neighbor_updated(pos + Vec3(1, 0, 0));
-    neighbor_updated(pos + Vec3(-1, 0, 0));
-    neighbor_updated(pos + Vec3(0, 1, 0));
-    neighbor_updated(pos + Vec3(0, -1, 0));
-    neighbor_updated(pos + Vec3(0, 0, 1));
-    neighbor_updated(pos + Vec3(0, 0, -1));
+    neighbor_updated(pos + Vector3i(1, 0, 0));
+    neighbor_updated(pos + Vector3i(-1, 0, 0));
+    neighbor_updated(pos + Vector3i(0, 1, 0));
+    neighbor_updated(pos + Vector3i(0, -1, 0));
+    neighbor_updated(pos + Vector3i(0, 0, 1));
+    neighbor_updated(pos + Vector3i(0, 0, -1));
 }
 
-void Map::neighbor_updated(Vec3 pos)
+void Map::neighbor_updated(Vector3i pos)
 {
     bool collapse;
 
-    static const Vec3 cardinal[] = {
+    static const Vector3i cardinal[] = {
         {1, 0, 0},
         {-1, 0, 0},
         {0, 1, 0},

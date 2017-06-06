@@ -1,15 +1,15 @@
 #ifndef RECT3_H
 #define RECT3_H
 
-#include <vec3.h>
+#include <math/vector.h>
 
 struct Rect3
 {
-    Vec3    origin;
-    Vec3    size;
+    Vector3i    origin;
+    Vector3i    size;
 };
 
-inline Rect3 rect_from_points(Vec3 a, Vec3 b)
+inline Rect3 rect_from_points(Vector3i a, Vector3i b)
 {
     Rect3 r;
 

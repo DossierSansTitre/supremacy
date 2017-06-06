@@ -10,7 +10,7 @@ Items::~Items()
 {
 }
 
-int Items::add(ItemID item_id, Vec3 pos, u16 item_count)
+int Items::add(ItemID item_id, Vector3i pos, u16 item_count)
 {
     const ItemData item_data = ItemData::from_id(item_id);
 
@@ -38,7 +38,7 @@ void Items::remove(int id)
     _free.push_back(id);
 }
 
-void Items::set_pos(int id, Vec3 pos)
+void Items::set_pos(int id, Vector3i pos)
 {
     _pos[id] = pos;
 }

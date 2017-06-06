@@ -253,6 +253,35 @@ inline bool operator!=(Vector<T, N> lhs, Vector<T, N> rhs)
 }
 
 template <typename T, size_t N>
+inline bool operator<(Vector<T, N> lhs, Vector<T, N> rhs)
+{
+    for (size_t i = 0; i < N; ++i)
+    {
+        if (lhs[i] != rhs[i])
+            return lhs[i] < rhs[i];
+    }
+    return false;
+}
+
+template <typename T, size_t N>
+inline bool operator<=(Vector<T, N> lhs, Vector<T, N> rhs)
+{
+    return (lhs == rhs) || (lhs < rhs);
+}
+
+template <typename T, size_t N>
+inline bool operator>(Vector<T, N> lhs, Vector<T, N> rhs)
+{
+    return !(lhs <= rhs);
+}
+
+template <typename T, size_t N>
+inline bool operator>=(Vector<T, N> lhs, Vector<T, N> rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename T, size_t N>
 inline bool operator+(Vector<T, N> src)
 {
     Vector<T, N> v(src);
@@ -273,67 +302,67 @@ inline bool operator-(Vector<T, N> src)
 }
 
 template <typename T, size_t N>
-inline bool operator+(Vector<T, N> lhs, Vector<T, N> rhs)
+inline Vector<T, N> operator+(Vector<T, N> lhs, Vector<T, N> rhs)
 {
     return (lhs += rhs);
 }
 
 template <typename T, size_t N>
-inline bool operator-(Vector<T, N> lhs, Vector<T, N> rhs)
+inline Vector<T, N> operator-(Vector<T, N> lhs, Vector<T, N> rhs)
 {
     return (lhs -= rhs);
 }
 
 template <typename T, size_t N>
-inline bool operator*(Vector<T, N> lhs, Vector<T, N> rhs)
+inline Vector<T, N> operator*(Vector<T, N> lhs, Vector<T, N> rhs)
 {
     return (lhs *= rhs);
 }
 
 template <typename T, size_t N>
-inline bool operator/(Vector<T, N> lhs, Vector<T, N> rhs)
+inline Vector<T, N> operator/(Vector<T, N> lhs, Vector<T, N> rhs)
 {
     return (lhs /= rhs);
 }
 
 template <typename T, size_t N>
-inline bool operator%(Vector<T, N> lhs, Vector<T, N> rhs)
+inline Vector<T, N> operator%(Vector<T, N> lhs, Vector<T, N> rhs)
 {
     return (lhs %= rhs);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator+(Vector<T, N> lhs, TT scalar)
+inline Vector<T, N> operator+(Vector<T, N> lhs, TT scalar)
 {
     return (lhs += scalar);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator-(Vector<T, N> lhs, TT scalar)
+inline Vector<T, N> operator-(Vector<T, N> lhs, TT scalar)
 {
     return (lhs -= scalar);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator*(Vector<T, N> lhs, TT scalar)
+inline Vector<T, N> operator*(Vector<T, N> lhs, TT scalar)
 {
     return (lhs *= scalar);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator/(Vector<T, N> lhs, TT scalar)
+inline Vector<T, N> operator/(Vector<T, N> lhs, TT scalar)
 {
     return (lhs /= scalar);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator%(Vector<T, N> lhs, TT scalar)
+inline Vector<T, N> operator%(Vector<T, N> lhs, TT scalar)
 {
     return (lhs %= scalar);
 }
 
 template <typename T, size_t N, typename TT>
-inline bool operator*(TT scalar, Vector<T, N> rhs)
+inline Vector<T, N> operator*(TT scalar, Vector<T, N> rhs)
 {
     Vector<T, N> tmp;
 

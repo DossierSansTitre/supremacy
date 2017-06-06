@@ -12,6 +12,7 @@
 #include <keyboard.h>
 #include <renderer.h>
 #include <ui_state.h>
+#include <math/vector.h>
 
 struct Game : private NonCopyable
 {
@@ -28,9 +29,9 @@ struct Game : private NonCopyable
     uint64_t    tick;
     uint64_t    tick_render;
     UiStateID   ui_state;
-    Vec3        camera;
-    Vec3        cursor;
-    Vec3        selection[2];
+    Vector3i    camera;
+    Vector3i        cursor;
+    Vector3i        selection[2];
     bool        selected_first;
     uint32_t    seed;
     Actors      actors;

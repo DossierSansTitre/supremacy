@@ -20,11 +20,11 @@ public:
     PathFinder();
     ~PathFinder();
 
-    void    start(Vec3 start, int32_t cost);
-    bool    fetch(Vec3& node);
+    void    start(Vector3i start, int32_t cost);
+    bool    fetch(Vector3i& node);
     void    finish(Path& path);
-    void    finish_with(Path& path, Vec3 node);
-    void    explore(Vec3 node, int32_t cost);
+    void    finish_with(Path& path, Vector3i node);
+    void    explore(Vector3i node, int32_t cost);
     void    reset();
 
 private:
@@ -40,8 +40,8 @@ private:
     uint32_t                    _current;
     uint32_t                    _size;
     OpenQueue                   _open;
-    std::set<Vec3>              _closed;
-    std::vector<Vec3>           _position;
+    std::set<Vector3i>              _closed;
+    std::vector<Vector3i>           _position;
     std::vector<uint32_t>       _parent;
 };
 
