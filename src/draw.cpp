@@ -3,14 +3,15 @@
 #include <material.h>
 #include <actor_data.h>
 #include <item_data.h>
-#include <rect3.h>
+#include <math/rect.h>
+#include <math/linear.h>
 
-static void draw_rect_ingame(Game& game, Rect3 rect, int sym, Color color, Color color_bg)
+static void draw_rect_ingame(Game& game, Rect3i rect, int sym, Color color, Color color_bg)
 {
     int view_w;
     int view_h;
 
-    if (game.camera.z < rect.origin.z || game.camera.z >= rect.origin.z + rect.size.z)
+    if (game.camera.z < rect.origin.z || game.camera.z > rect.origin.z + rect.size.z)
         return;
 
     view_w = game.renderer.width() - 2;
@@ -48,9 +49,9 @@ static void draw_rect_ingame(Game& game, Rect3 rect, int sym, Color color, Color
         rect.size.y = view_h - rect.origin.y;
     }
 
-    for (int j = 0; j < rect.size.y; ++j)
+    for (int j = 0; j <= rect.size.y; ++j)
     {
-        for (int i = 0; i < rect.size.x; ++i)
+        for (int i = 0; i <= rect.size.x; ++i)
         {
             game.renderer.putchar_fast(i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
         }
@@ -60,7 +61,7 @@ static void draw_rect_ingame(Game& game, Rect3 rect, int sym, Color color, Color
 static void draw_ui_state(Game& game)
 {
     Vector3i cursor;
-    Rect3 rect;
+    Rect3i rect;
     char c;
 
     if (game.tick_render / 4 % 2)

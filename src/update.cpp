@@ -1,5 +1,6 @@
 #include <game.h>
-#include <rect3.h>
+#include <math/rect.h>
+#include <math/linear.h>
 
 static MapAction selection_action;
 
@@ -115,17 +116,17 @@ void handle_motion(Game& game)
     }
 }
 
-static void set_action_rect(Game& game, Rect3 rect, MapAction action)
+static void set_action_rect(Game& game, Rect3i rect, MapAction action)
 {
     int x;
     int y;
     int z;
 
-    for (int k = 0; k < rect.size.z; ++k)
+    for (int k = 0; k <= rect.size.z; ++k)
     {
-        for (int j = 0; j < rect.size.y; ++j)
+        for (int j = 0; j <= rect.size.y; ++j)
         {
-            for (int i = 0; i < rect.size.x; ++i)
+            for (int i = 0; i <= rect.size.x; ++i)
             {
                 x = rect.origin.x + i;
                 y = rect.origin.y + j;
