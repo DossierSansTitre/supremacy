@@ -4,34 +4,25 @@
 #include <path.h>
 #include <action_id.h>
 #include <material.h>
+#include <std/fixed_array.h>
+#include <math/linear.h>
 
-uint32_t manhattan(Vector3i a, Vector3i b)
+template <typename Container>
+uint32_t distance_heuristic(Vector3i pos, const Container& container)
 {
-    a -= b;
-
-    if (a.x < 0)
-        a.x = -a.x;
-    if (a.y < 0)
-        a.y = -a.y;
-    if (a.z < 0)
-        a.z = -a.z;
-
-    return a.x + a.y + a.z;
-}
-
-uint32_t manhattan(size_t count, Vector3i* multi, Vector3i pos)
-{
-    uint32_t value;
+    uint32_t min;
     uint32_t tmp;
+    auto end = container.end();
 
-    value = manhattan(pos, multi[0]);
-    for (size_t i = 1; i < count; ++i)
+    min = manhattan_distance(pos, container.front());
+
+    for (auto it = container.begin() + 1; it != end; ++it)
     {
-        tmp = manhattan(pos, multi[i]);
-        if (tmp < value)
-            value = tmp;
+        tmp = manhattan_distance(pos, *it);
+        if (tmp < min)
+            min = tmp;
     }
-    return value;
+    return min;
 }
 
 static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
@@ -117,8 +108,8 @@ static void try_pathfind(Game& game, int actor)
         {0, 0, -1}
     };
 
+    FixedArray<Vector3i, sample_size_max> samples;
     size_t sample_size;
-    Vector3i samples[sample_size_max];
 
     PathFinder& path_finder = game.actors.path_finder(actor);
     Vector3i pos = game.actors.pos(actor);
@@ -126,16 +117,12 @@ static void try_pathfind(Game& game, int actor)
     Vector3i delta;
     Vector3i tmp;
 
-    sample_size = game.map.action_count();
+    sample_size = min(game.map.action_count(), sample_size_max);
     if (sample_size == 0)
         return;
-    else if (sample_size > sample_size_max)
-        sample_size = sample_size_max;
-
     for (size_t i = 0; i < sample_size; ++i)
-        samples[i] = game.map.action_by_index(rand() % game.map.action_count());
-
-    path_finder.start(pos, manhattan(sample_size, samples, pos));
+        samples.push_back(game.map.action_by_index(rand() % game.map.action_count()));
+    path_finder.start(pos, distance_heuristic(pos, samples));
     for (size_t count = 0; count < nodes_max; ++count)
     {
         if (!path_finder.fetch(node))
@@ -164,7 +151,7 @@ static void try_pathfind(Game& game, int actor)
                 delta = dirs[i] + deltas[j];
                 if (can_move_from(game, actor, node, delta))
                 {
-                    path_finder.explore(node + delta, manhattan(sample_size, samples, node + delta));
+                    path_finder.explore(node + delta, distance_heuristic(node + delta, samples));
                     break;
                 }
             }
@@ -214,7 +201,7 @@ static void ai_action(Game& game, int actor, ActionID action)
     Vector3i pos;
 
     pos = game.actors.path(actor).front();
-    if (manhattan(game.actors.pos(actor), pos) > 1)
+    if (manhattan_distance(game.actors.pos(actor), pos) > 1)
     {
         game.actors.set_action(actor, ActionID::Wander);
         return;

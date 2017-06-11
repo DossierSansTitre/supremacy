@@ -86,8 +86,8 @@ template <typename T, size_t N>
 class Vector : public priv::VectorStorage<T, N>
 {
 public:
-    using type = T;
-    static const size_t size = N;
+    using Type = T;
+    static const size_t Size = N;
 
     static_assert(N > 0, "Must have non-zero size");
 
