@@ -7,6 +7,7 @@
 #include <math/vector.h>
 #include <path_finder.h>
 #include <path.h>
+#include <std/array.h>
 
 class Actors
 {
@@ -37,16 +38,16 @@ public:
     Path&       path(int id) { return _path[id]; }
 
 private:
-    std::vector<ActorID>    _actor_id;
-    std::vector<Vector3i>       _pos;
-    std::vector<int>        _health;
-    std::vector<int>        _speed;
-    std::vector<ActionID>   _action;
-    std::vector<PathFinder> _path_finder;
-    std::vector<Path>       _path;
-    std::vector<int>        _counter;
-    std::vector<int>        _free;
-    int                     _count;
+    Array<ActorID>      _actor_id;
+    Array<Vector3i>     _pos;
+    Array<int>          _health;
+    Array<int>          _speed;
+    Array<ActionID>     _action;
+    Array<PathFinder>   _path_finder;
+    Array<Path>         _path;
+    Array<int>          _counter;
+    Array<int>          _free;
+    int                 _count;
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef STD_ARRAY_H
-#define STD_ARRAY_H
+#ifndef STD_BASE_ARRAY_H
+#define STD_BASE_ARRAY_H
 
 #include <std/array_iterator.h>
 #include <std/reverse_iterator.h>

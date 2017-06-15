@@ -8,10 +8,10 @@ class Allocator
 {
 public:
     Allocator() {}
-    Allocator(const Allocator& rhs) {}
+    Allocator(const Allocator&) {}
     ~Allocator() {}
 
-    Allocator<T>& operator=(const Allocator& rhs) { return *this; }
+    Allocator<T>& operator=(const Allocator&) { return *this; }
 
     T* allocate()
     {

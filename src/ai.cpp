@@ -27,6 +27,8 @@ uint32_t distance_heuristic(Vector3i pos, const Container& container)
 
 static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
 {
+    (void)actor;
+
     Vector3i dst;
 
     dst = src + delta;
