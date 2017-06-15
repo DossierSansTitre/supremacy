@@ -1,11 +1,10 @@
 #ifndef STD_STATIC_ARRAY_H
 #define STD_STATIC_ARRAY_H
 
-#include <std/array_iterator.h>
-#include <std/reverse_iterator.h>
+#include <std/base_array.h>
 
 template <typename T, size_t N>
-class StaticArray
+class StaticArray : public BaseArray<T, StaticArray<T, N>>
 {
 public:
     using Iterator = ArrayIterator<T>;
@@ -60,76 +59,6 @@ public:
     T* data()
     {
         return _data;
-    }
-
-    const T& operator[](size_t i) const
-    {
-        return _data[i];
-    }
-
-    T& operator[](size_t i)
-    {
-        return _data[i];
-    }
-
-    Iterator begin()
-    {
-        return Iterator(_data);
-    }
-
-    ConstIterator begin() const
-    {
-        return ConstIterator(_data);
-    }
-
-    ConstIterator cbegin() const
-    {
-        return begin();
-    }
-
-    ReverseIterator rbegin()
-    {
-        return reverse_iterator(begin());
-    }
-
-    ConstReverseIterator rbegin() const
-    {
-        return reverse_iterator(begin());
-    }
-
-    ConstReverseIterator crbegin() const
-    {
-        return rbegin();
-    }
-
-    Iterator end()
-    {
-        return Iterator(_data + N);
-    }
-
-    ConstIterator end() const
-    {
-        return ConstIterator(_data + N);
-    }
-
-    ConstIterator cend() const
-    {
-        return end();
-    }
-
-    ReverseIterator rend()
-    {
-        return reverse_iterator(end());
-    }
-
-    ConstReverseIterator rend() const
-    {
-        return reverse_iterator(end());
-    }
-
-    ConstReverseIterator crend() const
-    {
-        return rend();
     }
 
 private:

@@ -2,11 +2,10 @@
 #define STD_FIXED_ARRAY_H
 
 #include <math/algebra.h>
-#include <std/array_iterator.h>
-#include <std/reverse_iterator.h>
+#include <std/base_array.h>
 
 template <typename T, size_t N>
-class FixedArray
+class FixedArray : public BaseArray<T, FixedArray<T, N>>
 {
 public:
     using Iterator = ArrayIterator<T>;
@@ -69,16 +68,6 @@ public:
             reinterpret_cast<T*>(_data + i * sizeof(T))->~T();
     }
 
-    bool empty() const
-    {
-        return _size == 0;
-    }
-
-    bool full() const
-    {
-        return _size == N;
-    }
-
     size_t size() const
     {
         return _size;
@@ -97,36 +86,6 @@ public:
     T* data()
     {
         return reinterpret_cast<T*>(_data);
-    }
-
-    const T& operator[](size_t i) const
-    {
-        return data()[i];
-    }
-
-    T& operator[](size_t i)
-    {
-        return data()[i];
-    }
-
-    const T& front() const
-    {
-        return data()[0];
-    }
-
-    T& front()
-    {
-        return data()[0];
-    }
-
-    const T& back() const
-    {
-        return data()[_size - 1];
-    }
-
-    T& back()
-    {
-        return data()[_size - 1];
     }
 
     void push_front(const T& value)
@@ -170,66 +129,6 @@ public:
                 new (data() + i) T;
         }
         _size = size;
-    }
-
-    Iterator begin()
-    {
-        return Iterator(data());
-    }
-
-    ConstIterator begin() const
-    {
-        return ConstIterator(data());
-    }
-
-    ConstIterator cbegin() const
-    {
-        return begin();
-    }
-
-    ReverseIterator rbegin()
-    {
-        return reverse_iterator(begin());
-    }
-
-    ConstReverseIterator rbegin() const
-    {
-        return reverse_iterator(begin());
-    }
-
-    ConstReverseIterator crbegin() const
-    {
-        return rbegin();
-    }
-
-    Iterator end()
-    {
-        return Iterator(data() + _size);
-    }
-
-    ConstIterator end() const
-    {
-        return ConstIterator(data() + _size);
-    }
-
-    ConstIterator cend() const
-    {
-        return end();
-    }
-
-    ReverseIterator rend()
-    {
-        return reverse_iterator(end());
-    }
-
-    ConstReverseIterator rend() const
-    {
-        return reverse_iterator(end());
-    }
-
-    ConstReverseIterator crend() const
-    {
-        return rend();
     }
 
 private:
