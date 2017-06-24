@@ -53,8 +53,8 @@ public:
 
 private:
     struct Vertex {
-        float       x;
-        float       y;
+        int16_t     x;
+        int16_t     y;
         float       texture_x;
         float       texture_y;
         uint8_t     color_r;

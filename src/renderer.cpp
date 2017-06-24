@@ -128,7 +128,7 @@ void Renderer::render()
     glEnableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
-    glVertexPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, x));
+    glVertexPointer(2, GL_SHORT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, x));
     glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_bg_r));
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
     glEnable(GL_TEXTURE_2D);
@@ -165,8 +165,8 @@ void Renderer::render_lines(uint32_t base, uint32_t count)
             tx = (symbol % 32) * texture_size;
             ty = (symbol / 32) * texture_size;
 
-            data[index * 4 + 0].x = static_cast<float>(x * _tile_width);
-            data[index * 4 + 0].y = static_cast<float>(y * _tile_height);
+            data[index * 4 + 0].x = x * _tile_width;
+            data[index * 4 + 0].y = y * _tile_height;
             data[index * 4 + 0].texture_x = tx;
             data[index * 4 + 0].texture_y = ty;
             data[index * 4 + 0].color_r = color.r;
@@ -176,8 +176,8 @@ void Renderer::render_lines(uint32_t base, uint32_t count)
             data[index * 4 + 0].color_bg_g = color_bg.g;
             data[index * 4 + 0].color_bg_b = color_bg.b;
 
-            data[index * 4 + 1].x = static_cast<float>((x + 1) * _tile_width);
-            data[index * 4 + 1].y = static_cast<float>(y * _tile_height);
+            data[index * 4 + 1].x = (x + 1) * _tile_width;
+            data[index * 4 + 1].y = y * _tile_height;
             data[index * 4 + 1].texture_x = tx + texture_size;
             data[index * 4 + 1].texture_y = ty;
             data[index * 4 + 1].color_r = color.r;
@@ -187,8 +187,8 @@ void Renderer::render_lines(uint32_t base, uint32_t count)
             data[index * 4 + 1].color_bg_g = color_bg.g;
             data[index * 4 + 1].color_bg_b = color_bg.b;
 
-            data[index * 4 + 2].x = static_cast<float>((x + 1) * _tile_width);
-            data[index * 4 + 2].y = static_cast<float>((y + 1) * _tile_height);
+            data[index * 4 + 2].x = (x + 1) * _tile_width;
+            data[index * 4 + 2].y = (y + 1) * _tile_height;
             data[index * 4 + 2].texture_x = tx + texture_size;
             data[index * 4 + 2].texture_y = ty + texture_size;
             data[index * 4 + 2].color_r = color.r;
@@ -198,8 +198,8 @@ void Renderer::render_lines(uint32_t base, uint32_t count)
             data[index * 4 + 2].color_bg_g = color_bg.g;
             data[index * 4 + 2].color_bg_b = color_bg.b;
 
-            data[index * 4 + 3].x = static_cast<float>(x * _tile_width);
-            data[index * 4 + 3].y = static_cast<float>((y + 1) * _tile_height);
+            data[index * 4 + 3].x = x * _tile_width;
+            data[index * 4 + 3].y = (y + 1) * _tile_height;
             data[index * 4 + 3].texture_x = tx;
             data[index * 4 + 3].texture_y = ty + texture_size;
             data[index * 4 + 3].color_r = color.r;
