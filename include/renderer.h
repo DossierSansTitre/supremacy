@@ -6,6 +6,8 @@
 #include <opengl.h>
 #include <color.h>
 #include <thread_pool.h>
+#include <draw_buffer.h>
+#include <math/vector.h>
 
 class Renderer : private NonCopyable
 {
@@ -13,50 +15,18 @@ public:
     Renderer(ThreadPool& thread_pool);
     ~Renderer();
 
-    uint32_t width() const { return _tiles_x; }
-    uint32_t height() const { return _tiles_y; }
-
-    void init(uint32_t width, uint32_t height);
-    void resize(uint32_t width, uint32_t height);
-    void clear();
-    void destroy();
-
-    void putchar(int i, uint16_t symbol, Color color, Color color_bg)
-    {
-        if (i == -1)
-            return;
-        putchar_fast(i, symbol, color, color_bg);
-    }
-
-    void putchar(int x, int y, uint16_t symbol, Color color, Color color_bg)
-    {
-        putchar(index(x, y), symbol, color, color_bg);
-    }
-
-    void putchar_fast(int i, uint16_t symbol, Color color, Color color_bg)
-    {
-        _symbols[i] = symbol;
-        _colors[i] = color;
-        _colors_bg[i] = color_bg;
-    }
-
-    void putchar_fast(int x, int y, uint16_t symbol, Color color, Color color_bg)
-    {
-        putchar_fast(index_fast(x, y), symbol, color, color_bg);
-    }
-
-    void print(int x, int y, const char* str, Color color, Color color_bg);
-    void printf(int x, int y, const char* format, Color color, Color color_bg, ...);
-
-    void render();
-    void render_lines(uint32_t base, uint32_t count);
+    void render(const DrawBuffer& draw_buffer);
 
 private:
+    void render_lines(const DrawBuffer& db, uint32_t base, uint32_t count);
+    void render_tile(const DrawBuffer& db, uint32_t x, uint32_t y);
+    void render_vertex(size_t index, size_t sub_index, uint32_t x, uint32_t y, float tx, float ty, Color color, Color color_bg);
+
     struct Vertex {
         int16_t     x;
         int16_t     y;
-        float       texture_x;
-        float       texture_y;
+        uint16_t    texture_x;
+        uint16_t    texture_y;
         uint8_t     color_r;
         uint8_t     color_g;
         uint8_t     color_b;
@@ -79,27 +49,25 @@ private:
         return x + y * _tiles_x;
     }
 
-    void                    build_indices();
-    void                    build_vertices();
+    void build_indices();
+    void build_vertices();
+    void resize(Vector2u size);
 
-    ThreadPool&             _thread_pool;
+    ThreadPool& _thread_pool;
 
-    GLuint                  _texture;
-    GLuint                  _vbo;
-    GLuint                  _ibo;
+    GLuint _texture;
+    GLuint _vbo;
+    GLuint _ibo;
 
-    uint32_t                _texture_width;
-    uint32_t                _texture_height;
-    uint32_t                _tile_width;
-    uint32_t                _tile_height;
-    uint32_t                _tiles_x;
-    uint32_t                _tiles_y;
+    Vector2u    _size;
+    uint32_t    _texture_width;
+    uint32_t    _texture_height;
+    uint32_t    _tile_width;
+    uint32_t    _tile_height;
+    uint32_t    _tiles_x;
+    uint32_t    _tiles_y;
 
-    std::vector<uint16_t>   _symbols;
-    std::vector<Color>      _colors;
-    std::vector<Color>      _colors_bg;
-
-    std::vector<Vertex>     _vertices;
+    std::vector<Vertex> _vertices;
 };
 
 #endif

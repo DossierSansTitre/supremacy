@@ -2,21 +2,22 @@
 #include <config.h>
 #include <renderer.h>
 
+static uint16_t float16(float in)
+{
+    uint32_t inu = *((uint32_t*)&in);
+    uint16_t e;
+    uint16_t m;
+
+    e = (uint16_t)((inu & 0x7f800000) >> 23);
+    if (e == 0u)
+        return 0;
+    e -= 112;
+    m = (uint16_t)((inu & 0x7fffff) >> 13);
+    return ((e << 10) | m);
+}
+
 Renderer::Renderer(ThreadPool& thread_pool)
 : _thread_pool(thread_pool)
-, _texture(0)
-, _vbo(0)
-, _ibo(0)
-{
-
-}
-
-Renderer::~Renderer()
-{
-
-}
-
-void Renderer::init(uint32_t width, uint32_t height)
 {
     _texture = load_texture(SUPREMACY_DATA_PATH "/tileset.bmp", _texture_width, _texture_height);
     _tile_width = _texture_width / 32;
@@ -24,76 +25,29 @@ void Renderer::init(uint32_t width, uint32_t height)
 
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
-    resize(width, height);
 }
 
-void Renderer::resize(uint32_t width, uint32_t height)
+Renderer::~Renderer()
 {
-    size_t size;
 
-    _tiles_x = width / _tile_width;
-    _tiles_y = height / _tile_height;
+}
 
-    size = _tiles_x * _tiles_y;
+void Renderer::resize(Vector2u size)
+{
+    _size = size;
+    _tiles_x = size.x;
+    _tiles_y = size.y;
 
-    _symbols.resize(size);
-    _colors.resize(size);
-    _colors_bg.resize(size);
-
-    clear();
     build_indices();
     build_vertices();
 }
 
-void Renderer::clear()
-{
-    Color black{0, 0, 0};
-    std::fill(_symbols.begin(), _symbols.end(), 0);
-    std::fill(_colors_bg.begin(), _colors_bg.end(), black);
-}
-
-void Renderer::destroy()
-{
-
-}
-
-void Renderer::print(int x, int y, const char* str, Color color, Color color_bg)
-{
-    int len;
-
-    len = static_cast<int>(strlen(str));
-    for (int i = 0; i < len; ++i)
-    {
-        putchar(x + i, y, str[i], color, color_bg);
-    }
-}
-
-void Renderer::printf(int x, int y, const char* str, Color color, Color color_bg, ...)
-{
-    static char buffer[4096];
-    va_list ap;
-
-    va_start(ap, color_bg);
-    vsnprintf(buffer, 4096, str, ap);
-    va_end(ap);
-    print(x, y, buffer, color, color_bg);
-}
-
-/*
- * We use a (somewhat) complex arch to speed up rendering.
- * Everything is batched into one VBO.
- * A vertex is defined by:
- * Position: 2 floats (8 bytes)
- * Texture: 2 floats(8 bytes)
- * Color:   3 u8 and padding (4 bytes)
- * Color2:  3 u8 and padding (4 bytes)
- *
- * Each vertex takes 24 bytes, for a total of 96 bytes per quad.
- */
-void Renderer::render()
+void Renderer::render(const DrawBuffer& db)
 {
     int render_task;
 
+    if (db.size() != _size)
+        resize(db.size());
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
@@ -110,11 +64,11 @@ void Renderer::render()
     {
         base = i * lines_per_thread;
         count = lines_per_thread;
-        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, base, count));
+        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), base, count));
     }
     base = (thread_count - 1) * lines_per_thread;
     count = _tiles_y - base;
-    _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, base, count));
+    _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), base, count));
 
     _thread_pool.task_wait(render_task);
 
@@ -133,83 +87,64 @@ void Renderer::render()
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
+    glTexCoordPointer(2, GL_HALF_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
     glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_r));
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
-void Renderer::render_lines(uint32_t base, uint32_t count)
+void Renderer::render_lines(const DrawBuffer& db, uint32_t base, uint32_t count)
 {
-    static const float texture_size = 1.f / 32.f;
+    uint32_t y;
 
-    uint32_t    y;
-    uint16_t    symbol;
-    Color       color;
-    Color       color_bg;
-    size_t      index;
-    float       tx;
-    float       ty;
-    Vertex*     data;
-
-    data = _vertices.data();
     for (uint32_t j = 0; j < count; ++j)
     {
         y = base + j;
         for (uint32_t x = 0; x < _tiles_x; ++x)
         {
-            index = x + y * _tiles_x;
-            symbol = _symbols[index];
-            color = _colors[index];
-            color_bg = _colors_bg[index];
-
-            tx = (symbol % 32) * texture_size;
-            ty = (symbol / 32) * texture_size;
-
-            data[index * 4 + 0].x = x * _tile_width;
-            data[index * 4 + 0].y = y * _tile_height;
-            data[index * 4 + 0].texture_x = tx;
-            data[index * 4 + 0].texture_y = ty;
-            data[index * 4 + 0].color_r = color.r;
-            data[index * 4 + 0].color_g = color.g;
-            data[index * 4 + 0].color_b = color.b;
-            data[index * 4 + 0].color_bg_r = color_bg.r;
-            data[index * 4 + 0].color_bg_g = color_bg.g;
-            data[index * 4 + 0].color_bg_b = color_bg.b;
-
-            data[index * 4 + 1].x = (x + 1) * _tile_width;
-            data[index * 4 + 1].y = y * _tile_height;
-            data[index * 4 + 1].texture_x = tx + texture_size;
-            data[index * 4 + 1].texture_y = ty;
-            data[index * 4 + 1].color_r = color.r;
-            data[index * 4 + 1].color_g = color.g;
-            data[index * 4 + 1].color_b = color.b;
-            data[index * 4 + 1].color_bg_r = color_bg.r;
-            data[index * 4 + 1].color_bg_g = color_bg.g;
-            data[index * 4 + 1].color_bg_b = color_bg.b;
-
-            data[index * 4 + 2].x = (x + 1) * _tile_width;
-            data[index * 4 + 2].y = (y + 1) * _tile_height;
-            data[index * 4 + 2].texture_x = tx + texture_size;
-            data[index * 4 + 2].texture_y = ty + texture_size;
-            data[index * 4 + 2].color_r = color.r;
-            data[index * 4 + 2].color_g = color.g;
-            data[index * 4 + 2].color_b = color.b;
-            data[index * 4 + 2].color_bg_r = color_bg.r;
-            data[index * 4 + 2].color_bg_g = color_bg.g;
-            data[index * 4 + 2].color_bg_b = color_bg.b;
-
-            data[index * 4 + 3].x = x * _tile_width;
-            data[index * 4 + 3].y = (y + 1) * _tile_height;
-            data[index * 4 + 3].texture_x = tx;
-            data[index * 4 + 3].texture_y = ty + texture_size;
-            data[index * 4 + 3].color_r = color.r;
-            data[index * 4 + 3].color_g = color.g;
-            data[index * 4 + 3].color_b = color.b;
-            data[index * 4 + 3].color_bg_r = color_bg.r;
-            data[index * 4 + 3].color_bg_g = color_bg.g;
-            data[index * 4 + 3].color_bg_b = color_bg.b;
+            render_tile(db, x, y);
         }
     }
+}
+
+void Renderer::render_tile(const DrawBuffer& db, uint32_t x, uint32_t y)
+{
+    static const float texture_size = 1.f / 32.f;
+
+    Glyph       glyph;
+    size_t      index;
+    float       tx0;
+    float       tx1;
+    float       ty0;
+    float       ty1;
+
+    index = x + y * _tiles_x;
+    glyph = db.at(x, y);
+
+    tx0 = (glyph.symbol % 32) * texture_size;
+    ty0 = (glyph.symbol / 32) * texture_size;
+    tx1 = tx0 + texture_size;
+    ty1 = ty0 + texture_size;
+
+    render_vertex(index, 0, x, y, tx0, ty0, glyph.color, glyph.color_bg);
+    render_vertex(index, 1, x + 1, y, tx1, ty0, glyph.color, glyph.color_bg);
+    render_vertex(index, 2, x + 1, y + 1, tx1, ty1, glyph.color, glyph.color_bg);
+    render_vertex(index, 3, x, y + 1, tx0, ty1, glyph.color, glyph.color_bg);
+}
+
+void Renderer::render_vertex(size_t index, size_t sub_index, uint32_t x, uint32_t y, float tx, float ty, Color color, Color color_bg)
+{
+    Vertex& v = _vertices[index * 4 + sub_index];
+
+    v.x = x * _tile_width;
+    v.y = y * _tile_height;
+    v.texture_x = float16(tx);
+    v.texture_y = float16(ty);
+    v.color_r = color.r;
+    v.color_g = color.g;
+    v.color_b = color.b;
+    v.color_bg_r = color_bg.r;
+    v.color_bg_g = color_bg.g;
+    v.color_bg_b = color_bg.b;
 }
 
 void Renderer::build_indices()

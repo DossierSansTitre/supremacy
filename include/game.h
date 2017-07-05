@@ -13,6 +13,7 @@
 #include <renderer.h>
 #include <ui_state.h>
 #include <math/vector.h>
+#include <draw_buffer.h>
 
 struct Game : private NonCopyable
 {
@@ -22,7 +23,8 @@ struct Game : private NonCopyable
     ThreadPool  thread_pool;
     Window      window;
     Keyboard    keyboard;
-    Renderer    renderer;
+    Renderer*   renderer;
+    DrawBuffer  draw_buffer;
     Map         map;
     FpsCounter  fps_counter_update;
     FpsCounter  fps_counter_render;
@@ -30,8 +32,8 @@ struct Game : private NonCopyable
     uint64_t    tick_render;
     UiStateID   ui_state;
     Vector3i    camera;
-    Vector3i        cursor;
-    Vector3i        selection[2];
+    Vector3i    cursor;
+    Vector3i    selection[2];
     bool        selected_first;
     uint32_t    seed;
     Actors      actors;

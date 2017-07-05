@@ -40,8 +40,8 @@ static void clamp_camera(Game& game)
     int w;
     int h;
 
-    w = game.renderer.width() - 2;
-    h = game.renderer.height() - 2;
+    w = game.draw_buffer.width() - 2;
+    h = game.draw_buffer.height() - 2;
     if (game.camera.x + w >= game.map.width())
         game.camera.x = game.map.width() - w;
     if (game.camera.y + h >= game.map.height())
@@ -175,8 +175,8 @@ static void handle_ui_state_selection(Game& game)
 static void start_selection(Game& game)
 {
     game.cursor = game.camera;
-    game.cursor.x += (game.renderer.width() - 2) / 2;
-    game.cursor.y += (game.renderer.height() - 2) / 2;
+    game.cursor.x += (game.draw_buffer.width() - 2) / 2;
+    game.cursor.y += (game.draw_buffer.height() - 2) / 2;
     game.ui_state = UiStateID::Selection;
     game.selected_first = false;
 }

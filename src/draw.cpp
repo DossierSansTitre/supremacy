@@ -14,8 +14,8 @@ static void draw_rect_ingame(Game& game, Rect3i rect, int sym, Color color, Colo
     if (game.camera.z < rect.origin.z || game.camera.z > rect.origin.z + rect.size.z)
         return;
 
-    view_w = game.renderer.width() - 2;
-    view_h = game.renderer.height() - 2;
+    view_w = game.draw_buffer.width() - 2;
+    view_h = game.draw_buffer.height() - 2;
 
     rect.origin.x -= game.camera.x;
     rect.origin.y -= game.camera.y;
@@ -53,7 +53,7 @@ static void draw_rect_ingame(Game& game, Rect3i rect, int sym, Color color, Colo
     {
         for (int i = 0; i <= rect.size.x; ++i)
         {
-            game.renderer.putchar_fast(i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
+            putchar_fast(game.draw_buffer, i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
         }
     }
 }
@@ -76,7 +76,7 @@ static void draw_ui_state(Game& game)
             rect = rect_from_points(cursor, game.selection[0]);
             draw_rect_ingame(game, rect, c, {200, 127, 127}, {180, 180, 180});
         }
-        game.renderer.putchar(cursor.x - game.camera.x + 1, cursor.y - game.camera.y + 1, c, {255, 127, 127}, {200, 200, 200});
+        putchar(game.draw_buffer, cursor.x - game.camera.x + 1, cursor.y - game.camera.y + 1, c, {255, 127, 127}, {200, 200, 200});
     }
 }
 
@@ -87,28 +87,28 @@ static void draw_bars(Game& game)
     int view_w;
     int view_h;
 
-    view_w = game.renderer.width();
-    view_h = game.renderer.height();
+    view_w = game.draw_buffer.width();
+    view_h = game.draw_buffer.height();
 
     fps_render = game.fps_counter_render.get();
     fps_update = game.fps_counter_update.get();
 
     for (int i = 0; i < view_w; ++i)
     {
-        game.renderer.putchar(i, 0, ' ', {0, 0, 0}, {255, 255, 255});
-        game.renderer.putchar(i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(game.draw_buffer, i, 0, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(game.draw_buffer, i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
     }
     for (int i = 1; i < view_h - 1; ++i)
     {
-        game.renderer.putchar(0, i, ' ', {0, 0, 0}, {255, 255, 255});
-        game.renderer.putchar(view_w - 1, i, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(game.draw_buffer, 0, i, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(game.draw_buffer, view_w - 1, i, ' ', {0, 0, 0}, {255, 255, 255});
     }
     /* Top */
-    game.renderer.printf(0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
-    game.renderer.print(view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
+    printf(game.draw_buffer, 0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
+    print(game.draw_buffer, view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
 
     /* Bottom */
-    game.renderer.printf(0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
+    printf(game.draw_buffer, 0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
 }
 
 static void draw_map_lines(Game& game, size_t base, size_t count)
@@ -121,7 +121,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
 
     int limit = static_cast<int>(base + count);
 
-    view_w = game.renderer.width();
+    view_w = game.draw_buffer.width();
 
     for (int j = base; j < limit; ++j)
     {
@@ -210,7 +210,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 color *= 0.5f;
                 color_bg *= 0.5f;
             }
-            game.renderer.putchar_fast(i + 1, j + 1, sym, color, color_bg);
+            putchar_fast(game.draw_buffer, i + 1, j + 1, sym, color, color_bg);
         }
     }
 }
@@ -225,7 +225,7 @@ static void draw_map(Game& game)
     int view_h;
     size_t job_count;
 
-    view_h = game.renderer.height() - 2;
+    view_h = game.draw_buffer.height() - 2;
 
     job_count = ceil((float)view_h / lines_per_job);
 
@@ -252,8 +252,8 @@ static void draw_actors(Game& game, int delta_z)
     int anim;
     static const char anim_str[] = "-\\|/";
 
-    view_w = game.renderer.width();
-    view_h = game.renderer.height();
+    view_w = game.draw_buffer.width();
+    view_h = game.draw_buffer.height();
 
     z = game.camera.z - delta_z;
     count = game.actors.count();
@@ -288,7 +288,7 @@ static void draw_actors(Game& game, int delta_z)
         }
         for (int j = 0; j < delta_z; ++j)
             color *= 0.5;
-        game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
+        putchar(game.draw_buffer, x + 1, y + 1, sym, color, color_bg);
     }
 }
 
@@ -309,8 +309,8 @@ static void draw_items(Game& game)
     Color color;
     Color color_bg;
 
-    view_w = game.renderer.width();
-    view_h = game.renderer.height();
+    view_w = game.draw_buffer.width();
+    view_h = game.draw_buffer.height();
 
     color_bg = {0, 0, 0};
 
@@ -336,7 +336,7 @@ static void draw_items(Game& game)
         const ItemData& item_data = ItemData::from_id(item_id);
         sym = item_data.sym;
         color = item_data.color;
-        game.renderer.putchar(x + 1, y + 1, sym, color, color_bg);
+        putchar(game.draw_buffer, x + 1, y + 1, sym, color, color_bg);
     }
 }
 
@@ -344,12 +344,12 @@ static void draw_items(Game& game)
 void game_draw(Game& game)
 {
     game.fps_counter_render.update();
-    game.renderer.clear();
+    game.draw_buffer.clear();
     draw_map(game);
     draw_items(game);
     draw_actors(game);
     draw_ui_state(game);
     draw_bars(game);
-    game.renderer.render();
+    game.renderer->render(game.draw_buffer);
     game.window.swap();
 }

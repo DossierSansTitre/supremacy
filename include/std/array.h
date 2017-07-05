@@ -1,6 +1,7 @@
 #ifndef STD_ARRAY_H
 #define STD_ARRAY_H
 
+#include <new>
 #include <alloc/allocator.h>
 #include <std/base_array.h>
 
@@ -8,6 +9,11 @@ template <typename T, typename Alloc = Allocator<T>>
 class Array : public BaseArray<T, Array<T, Alloc>>
 {
 public:
+    using Iterator = ArrayIterator<T>;
+    using ConstIterator = ArrayIterator<const T>;
+    using ReverseIterator = ::ReverseIterator<Iterator>;
+    using ConstReverseIterator = ::ReverseIterator<ConstIterator>;
+
     Array()
     : _size(0)
     , _capacity(0)

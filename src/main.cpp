@@ -36,8 +36,8 @@ static void generate_dwarfs(Game& game)
         game.actors.add(ActorID::Dwarf, {x, y, z});
         spawn_count++;
     }
-    game.camera.x = x - game.renderer.width() / 2;
-    game.camera.y = y - game.renderer.height() / 2;
+    game.camera.x = x - game.draw_buffer.width() / 2;
+    game.camera.y = y - game.draw_buffer.height() / 2;
     game.camera.z = z;
 }
 
@@ -51,7 +51,8 @@ int main(int argc, char** argv)
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     game.window.init();
-    game.renderer.init(game.window.width(), game.window.height());
+    game.renderer = new Renderer(game.thread_pool);
+    game.draw_buffer.resize(game.window.width() / 8, game.window.height() / 12);
 
     // KLUDGE
     game.seed = static_cast<uint32_t>(time(nullptr));
