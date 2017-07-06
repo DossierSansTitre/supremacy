@@ -6,7 +6,8 @@
 enum class MapAction : uint8_t
 {
     None,
-    Mine
+    Mine,
+    Chop,
 };
 
 #endif

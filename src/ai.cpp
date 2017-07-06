@@ -143,11 +143,21 @@ static void try_pathfind(Game& game, int actor)
         for (int i = 0; i < 4; ++i)
         {
             tmp = node + dirs[i];
-            if (game.map.action_at(tmp.x, tmp.y, tmp.z) != MapAction::None)
+            MapAction action = game.map.action_at(tmp.x, tmp.y, tmp.z);
+            if (action != MapAction::None)
             {
                 path_finder.finish_with(game.actors.path(actor), tmp);
-                game.actors.set_action(actor, ActionID::Mine);
-                return;
+                switch (action)
+                {
+                    case MapAction::Mine:
+                        game.actors.set_action(actor, ActionID::Mine);
+                        return;
+                    case MapAction::Chop:
+                        game.actors.set_action(actor, ActionID::Chop);
+                        return;
+                    default:
+                        break;
+                }
             }
             for (int j = 0; j < 3; ++j)
             {
@@ -199,7 +209,7 @@ void drop_item_at(Game& game, Vec3 pos)
         game.items.add(Material::from_id(game.map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
 }
 
-static void ai_mine(Game& game, int actor)
+static void ai_action(Game& game, int actor, ActionID action)
 {
     Vec3 pos;
 
@@ -266,7 +276,10 @@ void game_ai(Game& game)
                 ai_wander(game, i);
                 break;
             case ActionID::Mine:
-                ai_mine(game, i);
+                ai_action(game, i, ActionID::Mine);
+                break;
+            case ActionID::Chop:
+                ai_action(game, i, ActionID::Chop);
                 break;
             default:
                 break;

@@ -1,6 +1,8 @@
 #include <game.h>
 #include <rect3.h>
 
+static MapAction selection_action;
+
 static void toggle_vsync(Game& game)
 {
     if (game.vsync)
@@ -113,7 +115,7 @@ void handle_motion(Game& game)
     }
 }
 
-static void mine(Game& game, Rect3 rect)
+static void set_action_rect(Game& game, Rect3 rect, MapAction action)
 {
     int x;
     int y;
@@ -129,8 +131,16 @@ static void mine(Game& game, Rect3 rect)
                 y = rect.origin.y + j;
                 z = rect.origin.z + k;
 
-                if (game.map.tile_at(x, y, z) == TileID::Block)
-                    game.map.set_action(x, y, z, MapAction::Mine);
+                switch (action) {
+                    case MapAction::Mine:
+                        if (game.map.tile_at(x, y, z) == TileID::Block)
+                            game.map.set_action(x, y, z, MapAction::Mine);
+                        break;
+                    case MapAction::Chop:
+                        if (game.map.tile_at(x, y, z) == TileID::Tree)
+                            game.map.set_action(x, y, z, MapAction::Chop);
+                        break;
+                }
             }
         }
     }
@@ -156,7 +166,7 @@ static void handle_ui_state_selection(Game& game)
         {
             game.selection[1] = game.cursor;
             game.ui_state = UiStateID::None;
-            mine(game, rect_from_points(game.selection[0], game.selection[1]));
+            set_action_rect(game, rect_from_points(game.selection[0], game.selection[1]), selection_action);
         }
     }
 }
@@ -174,6 +184,13 @@ static void handle_ui_state_none(Game& game)
 {
     if (game.keyboard.key_pressed(SDLK_m))
     {
+        selection_action = MapAction::Mine;
+        start_selection(game);
+        return;
+    }
+    else if (game.keyboard.key_pressed(SDLK_t))
+    {
+        selection_action = MapAction::Chop;
         start_selection(game);
         return;
     }
