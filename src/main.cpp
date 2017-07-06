@@ -41,6 +41,13 @@ static void generate_dwarfs(Game& game)
     game.camera.z = z;
 }
 
+#include <cstdio>
+
+void printn(int i)
+{
+    printf("%d\n", i);
+}
+
 int main(int argc, char** argv)
 {
     (void)argc;
@@ -66,6 +73,7 @@ int main(int argc, char** argv)
     game.vsync = 1;
 
     game_loop(game);
-
+    
+    SDL_Quit();
     return 0;
 }

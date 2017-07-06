@@ -53,23 +53,11 @@ void Renderer::render(const DrawBuffer& db)
 
     glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
 
-    size_t thread_count = _thread_pool.pool_size();
-    size_t lines_per_thread = ceil((float)_tiles_y / thread_count);
-    size_t base;
-    size_t count;
-
     render_task = _thread_pool.task_create();
-
-    for (size_t i = 0; i < thread_count - 1; ++i)
+    for (size_t i = 0; i < _tiles_y; ++i)
     {
-        base = i * lines_per_thread;
-        count = lines_per_thread;
-        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), base, count));
+        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), i, 1));
     }
-    base = (thread_count - 1) * lines_per_thread;
-    count = _tiles_y - base;
-    _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), base, count));
-
     _thread_pool.task_wait(render_task);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
