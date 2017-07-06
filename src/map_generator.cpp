@@ -25,7 +25,12 @@ static void ramp_pass(Map& map, int x, int y, int z)
     }
     else
     {
-        map.set_tile(x, y, z, TileID::Floor);
+        if (rand() % 5 == 0) {
+            map.set_material(x, y, z, MaterialID::Wood);
+            map.set_tile(x, y, z, TileID::Tree);
+        }
+        else
+            map.set_tile(x, y, z, TileID::Floor);
     }
 }
 

@@ -8,7 +8,8 @@ enum class TileID : uint8_t {
     Block,
     Stairs,
     Ramp,
-    Floor
+    Floor,
+    Tree,
 };
 
 #endif
