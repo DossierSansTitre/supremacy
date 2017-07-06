@@ -162,9 +162,21 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             }
             else if (action != MapAction::None)
             {
-                sym = 'M';
-                color = {255, 255, 255};
-                color_bg = {255, 0, 0};
+                switch (action)
+                {
+                    case MapAction::Mine:
+                        sym = 'M';
+                        color = {255, 255, 255};
+                        color_bg = {255, 0, 0};
+                        break;
+                    case MapAction::Chop:
+                        sym = 'T';
+                        color = {255, 255, 255};
+                        color_bg = {255, 0, 0};
+                        break;
+                    default:
+                        break;
+                }
             }
             else
             {
