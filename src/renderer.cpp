@@ -44,6 +44,8 @@ void Renderer::resize(Vector2u size)
 
 void Renderer::render(const DrawBuffer& db)
 {
+    static const int factor = 12;
+
     int render_task;
 
     if (db.size() != _size)
@@ -54,9 +56,9 @@ void Renderer::render(const DrawBuffer& db)
     glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
 
     render_task = _thread_pool.task_create();
-    for (size_t i = 0; i < _tiles_y; ++i)
+    for (size_t i = 0; i < _tiles_y / factor; ++i)
     {
-        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), i, 1));
+        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), i * factor, factor));
     }
     _thread_pool.task_wait(render_task);
 
