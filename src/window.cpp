@@ -25,13 +25,13 @@ void Window::init()
     sdl_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     _window = SDL_CreateWindow(
-            "Supremacy",
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            dm.w,
-            dm.h,
-            sdl_flags
-            );
+        "Supremacy",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        dm.w,
+        dm.h,
+        sdl_flags
+    );
 
     _opengl = SDL_GL_CreateContext(_window);
 #if defined(_WIN32)

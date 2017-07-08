@@ -47,6 +47,7 @@ void Renderer::render(const DrawBuffer& db)
     static const int factor = 12;
 
     int render_task;
+    int remain;
 
     if (db.size() != _size)
         resize(db.size());
@@ -60,6 +61,9 @@ void Renderer::render(const DrawBuffer& db)
     {
         _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), i * factor, factor));
     }
+    remain = _tiles_y % factor;
+    if (remain)
+        _thread_pool.task_perform(render_task, std::bind(&Renderer::render_lines, this, std::ref(db), _tiles_y - remain, remain));
     _thread_pool.task_wait(render_task);
 
     glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());

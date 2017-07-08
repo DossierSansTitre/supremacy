@@ -340,7 +340,6 @@ static void draw_items(Game& game)
     }
 }
 
-
 void game_draw(Game& game)
 {
     game.fps_counter_render.update();
