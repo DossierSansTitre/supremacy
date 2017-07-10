@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.expand_path(File.dirname(__FILE__)), 'lib')
+require 'serializer'
+require 'archiver'
+require 'fileutils'
+
+COPY_FILES = [
+  'tileset.bmp'
+]
+
+unless ARGV.size == 2
+  puts "usage: mkdata <data dir> <out dir>"
+  exit
+end
+
+data_dir = ARGV.shift
+binary_dir = ARGV.shift
+FileUtils.mkpath(File.join(binary_dir, 'data_unpacked'))
+
+COPY_FILES.each do |f|
+  FileUtils.cp(File.join(data_dir, f), File.join(binary_dir, 'data_unpacked'))
+end
+
+Serializer.serialize_all(data_dir, binary_dir)
+Archiver.run(binary_dir)

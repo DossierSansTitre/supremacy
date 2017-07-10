@@ -185,7 +185,7 @@ public:
         _data = new_data;
     }
 
-private: 
+private:
     size_t  _size;
     size_t  _capacity;
     T*      _data;
