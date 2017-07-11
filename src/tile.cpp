@@ -1,10 +1,27 @@
 #include <tile.h>
+#include <sup_file.h>
+#include <memory_file.h>
 
-const Tile Tile::tiles[] = {
-    {' ', 0, false, 0},
-    {' ', 0, false, 3},
-    {'>', 0, true, 1},
-    {128, 129, true, 1},
-    {130, ' ', true, 0},
-    {'T', ' ', false, 1},
-};
+Array<Tile> Tile::data;
+
+void Tile::load(Archive& archive)
+{
+    SupFile sup;
+    MemoryFile file;
+
+    sup.open(archive, "tile.bin");
+    while (sup.read(file))
+    {
+        uint16_t id;
+        uint8_t tmp;
+
+        file.read(&id);
+        data.resize(id + 1);
+        Tile& tile = data.back();
+        file.read(&tile.sym);
+        file.read(&tile.dim_sym);
+        file.read(&tile.dropping_frequency);
+        file.read(&tmp);
+        tile.walkable = tmp;
+    }
+}

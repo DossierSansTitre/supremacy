@@ -28,7 +28,7 @@ class Serializer
         file.write([sup_files[type].size].pack("L<"))
         offset = 0
         sup_files[type].each_with_index do |sup, i|
-          file.write([sup.id, offset, data[i].size].pack('L<L<L<'))
+          file.write([offset, data[i].size].pack('L<L<'))
           offset += data[i].size
         end
         file.write(file_data)

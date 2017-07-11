@@ -1,6 +1,9 @@
 #include <ctime>
 #include <game.h>
+#include <archive.h>
 #include <thread_pool.h>
+#include <config.h>
+#include <tile.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -41,11 +44,12 @@ static void generate_dwarfs(Game& game)
     game.camera.z = z;
 }
 
-#include <cstdio>
-
-void printn(int i)
+void load_game_data()
 {
-    printf("%d\n", i);
+    Archive archive;
+
+    archive.open(SUPREMACY_DATA_PATH "/supremacy.bin");
+    Tile::load(archive);
 }
 
 int main(int argc, char** argv)
@@ -54,6 +58,8 @@ int main(int argc, char** argv)
     (void)argv;
 
     Game game;
+
+    load_game_data();
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -73,7 +79,7 @@ int main(int argc, char** argv)
     game.vsync = 1;
 
     game_loop(game);
-    
+
     SDL_Quit();
     return 0;
 }

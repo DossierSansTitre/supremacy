@@ -53,10 +53,11 @@ if (WIN32)
 endif()
 
 file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
+file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")
 
 add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/supremacy.bin"
-    DEPENDS ${SUP_DATA}
+    DEPENDS ${SUP_DATA} ${SUP_TOOLS}
     COMMAND "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}"
     COMMENT "Generating supremacy.bin"
     VERBATIM
