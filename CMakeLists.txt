@@ -20,11 +20,11 @@ endif()
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 if (WIN32)
-    set(RUNTIME_DEST ".")
-    set(DATA_DEST "data")
+    set(RUNTIME_DIR ".")
+    set(DATA_DIR "data")
 else()
-    set(RUNTIME_DEST "bin")
-    set(DATA_DEST "share/supremacy")
+    set(RUNTIME_DIR "bin")
+    set(DATA_DIR "share/supremacy")
 endif()
 
 configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/include/config.h")
@@ -56,9 +56,10 @@ file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
 file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")
 
 add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/supremacy.bin"
+    OUTPUT "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
     DEPENDS ${SUP_DATA} ${SUP_TOOLS}
-    COMMAND "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}"
+    COMMAND "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
+    COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/data/tileset.bmp" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
     COMMENT "Generating supremacy.bin"
     VERBATIM
     )
@@ -66,12 +67,12 @@ add_custom_command(
 add_custom_target(
     data
     ALL
-    DEPENDS "${CMAKE_BINARY_DIR}/supremacy.bin"
+    DEPENDS "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
     VERBATIM
 )
 
 file(GLOB_RECURSE INSTALL_DATA "${CMAKE_SOURCE_DIR}/data/*.bmp")
 
-install(TARGETS supremacy DESTINATION ${RUNTIME_DEST})
-install(FILES ${INSTALL_DATA} DESTINATION ${DATA_DEST})
-install(FILES "${CMAKE_BINARY_DIR}/supremacy.bin" DESTINATION ${DATA_DEST})
+install(TARGETS supremacy DESTINATION ${RUNTIME_DIR})
+install(FILES ${INSTALL_DATA} DESTINATION ${DATA_DIR})
+install(FILES "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" DESTINATION ${DATA_DIR})

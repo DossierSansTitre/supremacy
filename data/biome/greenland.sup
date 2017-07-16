@@ -1,7 +1,7 @@
 ID = 1
 Name = Greenland
 Layers = ---
-OCTAVE 2.0 6 2.2 20 15 Block:Rock
+OCTAVE 2.0 7 2.2 20 15 Block:Rock
 FILL 10 Block:Dirt
 FILL 1 Block:Grass
 SMOOTH Block Slope

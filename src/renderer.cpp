@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <config.h>
 #include <renderer.h>
+#include <util/file_path.h>
 
 static uint16_t float16(float in)
 {
@@ -19,7 +20,7 @@ static uint16_t float16(float in)
 Renderer::Renderer(ThreadPool& thread_pool)
 : _thread_pool(thread_pool)
 {
-    _texture = load_texture(SUPREMACY_DATA_PATH "/tileset.bmp", _texture_width, _texture_height);
+    _texture = load_texture(data_path("/tileset.bmp"), _texture_width, _texture_height);
     _tile_width = _texture_width / 32;
     _tile_height = _texture_height / 32;
 

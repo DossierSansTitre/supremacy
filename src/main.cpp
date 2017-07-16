@@ -2,11 +2,11 @@
 #include <game.h>
 #include <archive.h>
 #include <thread_pool.h>
-#include <config.h>
 #include <tile.h>
 #include <material.h>
 #include <item_data.h>
 #include <biome.h>
+#include <util/file_path.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -51,7 +51,7 @@ void load_game_data()
 {
     Archive archive;
 
-    archive.open(SUPREMACY_DATA_PATH "/supremacy.bin");
+    archive.open(data_path("/supremacy.bin"));
     Tile::load(archive);
     Material::load(archive);
     ItemData::load(archive);
