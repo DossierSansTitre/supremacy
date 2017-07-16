@@ -38,7 +38,7 @@ class SupFile
 
   def register
     @@registry[@type] ||= {}
-    @@registry[@type][@name] = @id
+    @@registry[@type][@name.downcase] = @id
     nil
   end
 
@@ -55,7 +55,7 @@ class SupFile
           value = true
         elsif value[0] == '"' || value[0] == "'"
           value = value[1..-2]
-        elsif value =~ /[0-9]+/
+        elsif value =~ /\A[0-9]+\z/
           value = value.to_i
         end
         sup[key] = value

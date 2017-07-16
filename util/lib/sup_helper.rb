@@ -35,4 +35,16 @@ module SupHelper
   def boolean(key)
     !!fetch(key)
   end
+
+  def ref(type, key, default = nil)
+    ref_key = fetch(key)
+    if ref_key.nil?
+      if default.is_a?(String)
+        ref_key = default
+      else
+        return default
+      end
+    end
+    SupFile.reference(type, ref_key)
+  end
 end

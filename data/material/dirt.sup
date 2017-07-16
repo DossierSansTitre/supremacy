@@ -1,0 +1,6 @@
+ID = 1
+Name = Dirt
+Color = #ad6b35
+BackgroundColor = #633a19
+DropItem = Dirt
+Minable

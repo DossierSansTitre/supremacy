@@ -37,4 +37,4 @@ class Serializer
   end
 end
 
-require 'serializers/tile_serializer'
+Dir[File.join(File.dirname(__FILE__), 'serializers', '**.rb')].each {|f| require f}
