@@ -7,7 +7,10 @@ class TileSeriaslizer < Serializer
     symbol = tile.symbol('Symbol', ' ')
     symbol_dim = tile.symbol('SymbolDim', 0)
     drop_frequency = tile.integer('DropFrequency', 0)
-    walkable = tile.boolean('Walkable') ? 1 : 0
-    [tile.id, symbol, symbol_dim, drop_frequency, walkable].pack('S<S<S<S<C')
+    flags = 0
+    flags |= (tile.boolean('Walkable') ? 0x01 : 0)
+    flags |= (tile.boolean('Block') ? 0x02 : 0)
+    flags |= (tile.boolean('Support') ? 0x04 : 0)
+    [tile.id, symbol, symbol_dim, drop_frequency, flags].pack('S<S<S<S<C')
   end
 end

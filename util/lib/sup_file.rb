@@ -45,13 +45,22 @@ class SupFile
   def self.parse(type, path)
     sup = self.new(type)
     File.open(path, "r") do |file|
-      file.each do |line|
+      loop do
+        line = file.gets
+        break if line.nil?
         line.chomp!
         line.strip!
         next if line[0] == '#'
         next if line == ''
         key, value = line.split('=', 2).map(&:strip)
-        if value.nil?
+        if value == '---'
+          value = []
+          loop do
+            l = file.gets.chomp
+            break if l == '---'
+            value << l
+          end
+        elsif value.nil?
           value = true
         elsif value[0] == '"' || value[0] == "'"
           value = value[1..-2]

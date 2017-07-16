@@ -13,7 +13,7 @@ void Tile::load(Archive& archive)
     while (sup.read(file))
     {
         uint16_t id;
-        uint8_t tmp;
+        uint8_t flags;
 
         file.read(&id);
         data.resize(id + 1);
@@ -21,7 +21,9 @@ void Tile::load(Archive& archive)
         file.read(&tile.sym);
         file.read(&tile.dim_sym);
         file.read(&tile.dropping_frequency);
-        file.read(&tmp);
-        tile.walkable = tmp;
+        file.read(&flags);
+        tile.walkable = (flags & 0x01);
+        tile.block = (flags & 0x02);
+        tile.support = (flags & 0x04);
     }
 }

@@ -11,7 +11,9 @@ struct Tile
     uint16_t    sym;
     uint16_t    dim_sym;
     uint16_t    dropping_frequency;
-    bool        walkable;
+    bool        walkable:1;
+    bool        block:1;
+    bool        support:1;
 
     static Array<Tile> data;
 
