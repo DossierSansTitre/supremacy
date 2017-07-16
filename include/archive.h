@@ -4,6 +4,8 @@
 #include <fstream>
 #include <non_copyable.h>
 #include <std/array.h>
+#include <memory_file.h>
+#include <sup_file.h>
 
 class Archive : private NonCopyable
 {

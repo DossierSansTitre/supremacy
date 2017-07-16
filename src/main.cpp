@@ -4,6 +4,8 @@
 #include <thread_pool.h>
 #include <config.h>
 #include <tile.h>
+#include <material.h>
+#include <item_data.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -50,6 +52,8 @@ void load_game_data()
 
     archive.open(SUPREMACY_DATA_PATH "/supremacy.bin");
     Tile::load(archive);
+    Material::load(archive);
+    ItemData::load(archive);
 }
 
 int main(int argc, char** argv)
