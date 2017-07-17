@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define SUPREMACY_DATA_DIR  "@DATA_DIR@"
+#define         SUPREMACY_DATA_DIR  "@DATA_DIR@"
+#cmakedefine01  APP_BUNDLE
 
 #endif

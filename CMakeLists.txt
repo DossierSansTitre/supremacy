@@ -5,9 +5,15 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+if (APPLE)
+    option(APP_BUNDLE "Build a macOS bundle application")
+endif()
+
+if (APP_BUNDLE)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endif()
 
 if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++14 -fno-exceptions -fno-rtti -fstrict-aliasing -fno-stack-protector")
@@ -46,7 +52,14 @@ if (WIN32)
     include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
 endif()
 
-add_executable(supremacy ${SOURCES} ${HEADERS})
+if(APP_BUNDLE)
+    set(MACOSX_BUNDLE_ICON_FILE Supremacy.icns)
+    set(SUPREMACY_ICON "${CMAKE_SOURCE_DIR}/data/Supremacy.icns")
+    set_source_files_properties(${SUPREMACY_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    add_executable(supremacy MACOSX_BUNDLE ${SOURCES} ${HEADERS} "${SUPREMACY_ICON}")
+else()
+    add_executable(supremacy ${SOURCES} ${HEADERS})
+endif()
 target_link_libraries(supremacy sdl2 ${OPENGL_LIBRARIES})
 if (WIN32)
     target_link_libraries(supremacy ${GLEW_LIBRARY})
@@ -71,8 +84,38 @@ add_custom_target(
     VERBATIM
 )
 
-file(GLOB_RECURSE INSTALL_DATA "${CMAKE_SOURCE_DIR}/data/*.bmp")
+if (APP_BUNDLE)
+    include(BundleUtilities)
 
-install(TARGETS supremacy DESTINATION ${RUNTIME_DIR})
-install(FILES ${INSTALL_DATA} DESTINATION ${DATA_DIR})
-install(FILES "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" DESTINATION ${DATA_DIR})
+    set_target_properties(supremacy PROPERTIES OUTPUT_NAME "Supremacy")
+
+    add_custom_command(
+        OUTPUT  "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/supremacy.bin"
+        DEPENDS "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
+        supremacy
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_BINARY_DIR}/${DATA_DIR}/tileset.bmp" "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
+        COMMENT "Copying supremacy.bin into bundle"
+        VERBATIM
+    )
+
+    add_custom_target(
+        data-bundle
+        ALL
+        DEPENDS "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/supremacy.bin"
+        VERBATIM
+    )
+
+    fixup_bundle("${CMAKE_BINARY_DIR}/Supremacy.app" "" "")
+endif()
+
+if (APP_BUNDLE)
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/Supremacy.app" DESTINATION "/Applications" USE_SOURCE_PERMISSIONS)
+else()
+    file(GLOB_RECURSE INSTALL_DATA "${CMAKE_SOURCE_DIR}/data/*.bmp")
+
+    install(TARGETS supremacy DESTINATION ${RUNTIME_DIR})
+    install(FILES ${INSTALL_DATA} DESTINATION ${DATA_DIR})
+    install(FILES "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" DESTINATION ${DATA_DIR})
+endif()

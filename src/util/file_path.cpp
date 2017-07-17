@@ -43,7 +43,11 @@ const char* data_path(const char* rel_path)
 
     strcpy(tmp, root_path());
     strcat(tmp, "/");
+#if APP_BUNDLE
+    strcat(tmp, "Resources");
+#else
     strcat(tmp, SUPREMACY_DATA_DIR);
+#endif
     strcat(tmp, "/");
     strcat(tmp, rel_path);
     realpath(tmp, buffer);
