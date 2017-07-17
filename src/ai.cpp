@@ -25,6 +25,8 @@ uint32_t distance_heuristic(Vector3i pos, const Container& container)
     return min;
 }
 
+#include <iostream>
+
 static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
 {
     (void)actor;
@@ -39,12 +41,12 @@ static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
         return false;
     if (delta.z < 0)
     {
-        if (game.map.tile_at(dst.x, dst.y, dst.z) != TileID::Ramp)
+        if (!Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).move_up && !Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).move_down)
             return false;
     }
     else if (delta.z > 0)
     {
-        if (game.map.tile_at(src.x, src.y, src.z) != TileID::Ramp)
+        if (!Tile::from_id(game.map.tile_at(src.x, src.y, src.z)).move_up)
             return false;
     }
     if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)

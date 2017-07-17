@@ -25,5 +25,7 @@ void Tile::load(Archive& archive)
         tile.walkable = (flags & 0x01);
         tile.block = (flags & 0x02);
         tile.support = (flags & 0x04);
+        tile.move_up = (flags & 0x08);
+        tile.move_down = (flags & 0x10);
     }
 }

@@ -202,7 +202,7 @@ void Map::neighbor_updated(Vector3i pos)
         collapse = true;
         for (int i = 0; i < 4; ++i)
         {
-            if (tile_at(pos + cardinal[i]) == TileID::Block)
+            if (Tile::from_id(tile_at(pos + cardinal[i])).block)
             {
                 collapse = false;
                 break;

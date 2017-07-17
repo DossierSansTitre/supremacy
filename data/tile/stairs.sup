@@ -3,3 +3,5 @@ Name = Stairs
 Symbol = '>'
 DropFrequency = 1
 Walkable
+MoveUp
+MoveDown

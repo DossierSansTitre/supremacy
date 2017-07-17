@@ -14,6 +14,8 @@ struct Tile
     bool        walkable:1;
     bool        block:1;
     bool        support:1;
+    bool        move_up:1;
+    bool        move_down:1;
 
     static Array<Tile> data;
 

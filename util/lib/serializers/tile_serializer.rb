@@ -11,6 +11,8 @@ class TileSeriaslizer < Serializer
     flags |= (tile.boolean('Walkable') ? 0x01 : 0)
     flags |= (tile.boolean('Block') ? 0x02 : 0)
     flags |= (tile.boolean('Support') ? 0x04 : 0)
+    flags |= (tile.boolean('MoveUp') ? 0x08 : 0)
+    flags |= (tile.boolean('MoveDown') ? 0x10 : 0)
     [tile.id, symbol, symbol_dim, drop_frequency, flags].pack('S<S<S<S<C')
   end
 end
