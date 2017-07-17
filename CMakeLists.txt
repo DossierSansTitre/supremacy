@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
+
 project(supremacy)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -85,7 +88,7 @@ add_custom_target(
 )
 
 if (APP_BUNDLE)
-    set_target_properties(supremacy PROPERTIES OUTPUT_NAME "Supremacy")
+    set_target_properties(supremacy PROPERTIES OUTPUT_NAME "Supremacy" MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/data/Info.plist")
 
     add_custom_command(
         OUTPUT  "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/supremacy.bin"
