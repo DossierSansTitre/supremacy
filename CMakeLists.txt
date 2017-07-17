@@ -85,8 +85,6 @@ add_custom_target(
 )
 
 if (APP_BUNDLE)
-    include(BundleUtilities)
-
     set_target_properties(supremacy PROPERTIES OUTPUT_NAME "Supremacy")
 
     add_custom_command(
@@ -106,11 +104,13 @@ if (APP_BUNDLE)
         DEPENDS "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/supremacy.bin"
         VERBATIM
     )
-
-    fixup_bundle("${CMAKE_BINARY_DIR}/Supremacy.app" "" "")
 endif()
 
 if (APP_BUNDLE)
+    install(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"${CMAKE_BINARY_DIR}/Supremacy.app\" \"\" \"\")
+    ")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/Supremacy.app" DESTINATION "/Applications" USE_SOURCE_PERMISSIONS)
 else()
     file(GLOB_RECURSE INSTALL_DATA "${CMAKE_SOURCE_DIR}/data/*.bmp")
