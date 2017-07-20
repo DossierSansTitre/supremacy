@@ -5,6 +5,4 @@ OCTAVE 2.0 7 2.2 20 15 Block:Rock
 FILL 10 Block:Dirt
 FILL 1 Block:Grass
 SMOOTH Block Slope
-FILL 1 Ground:Grass
-REPLACE Ground:Grass Tree:Wood 100
 ---

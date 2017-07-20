@@ -131,6 +131,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             x = game.camera.x + i;
             TileID tile_id;
             MaterialID material_id;
+            MaterialID floor_material_id;
             MapAction action;
             Map::Flash flash;
             uint16_t sym;
@@ -139,20 +140,22 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
 
             under = 0;
             game.map.at(x, y, game.camera.z, tile_id, material_id);
+            floor_material_id = game.map.floor({x, y, game.camera.z});
             action = game.map.action_at(x, y, game.camera.z);
             flash = game.map.flash({x, y, game.camera.z});
 
-            while (tile_id == TileID::None)
+            while (material_id == MaterialID::None && floor_material_id == MaterialID::None)
             {
                 if (under >= 3)
                     break;
                 under++;
                 game.map.at(x, y, game.camera.z - under, tile_id, material_id);
+                floor_material_id = game.map.floor({x, y, game.camera.z - under});
                 action = game.map.action_at(x, y, game.camera.z - under);
                 flash = game.map.flash({x, y, game.camera.z - under});
             }
 
-            if (tile_id == TileID::None || (!game.map.visible(x, y, game.camera.z) && action == MapAction::None))
+            if ((material_id == MaterialID::None && floor_material_id == MaterialID::None) || ((!game.map.visible(x, y, game.camera.z) && action == MapAction::None) && 1))
                 continue;
 
             if (flash == Map::Flash::Action)
@@ -181,14 +184,25 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             }
             else
             {
-                const Tile& tile = Tile::from_id(tile_id);
-                const Material& material = Material::from_id(material_id);
-                if (under && tile.dim_sym)
-                    sym = tile.dim_sym;
+                /* There is no material, a.k.a. we have to render some floor */
+                if (material_id == MaterialID::None)
+                {
+                    const Material& material = Material::from_id(floor_material_id);
+                    sym = under ? ' ' : 130;
+                    color = material.color;
+                    color_bg = material.color_bg;
+                }
                 else
-                    sym = tile.sym;
-                color = material.color;
-                color_bg = material.color_bg;
+                {
+                    const Tile& tile = Tile::from_id(tile_id);
+                    const Material& material = Material::from_id(material_id);
+                    if (under && tile.dim_sym)
+                        sym = tile.dim_sym;
+                    else
+                        sym = tile.sym;
+                    color = material.color;
+                    color_bg = material.color_bg;
+                }
             }
 
             if (flash == Map::Flash::Pending)

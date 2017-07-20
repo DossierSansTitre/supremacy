@@ -3,4 +3,5 @@ Name = Grass
 Color = #90d15c
 BackgroundColor = #508426
 DropItem = Dirt
+FloorSymbol = 130
 Minable

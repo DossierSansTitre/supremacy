@@ -76,10 +76,13 @@ static void replace_pass(Map& map, uint16_t from_tile, uint16_t from_material, u
 
 static void fill_height(Map& map, int x, int y, int base, int length, TileID tile, MaterialID material)
 {
+    if (base == 0 && length)
+        map.set_floor({x, y, 0}, material);
     for (int z = 0; z < length; ++z)
     {
         map.set_tile(x, y, base + z, tile);
         map.set_material(x, y, base + z, material);
+        map.set_floor({x, y, base + z + 1}, material);
     }
 }
 

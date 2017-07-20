@@ -25,8 +25,6 @@ uint32_t distance_heuristic(Vector3i pos, const Container& container)
     return min;
 }
 
-#include <iostream>
-
 static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
 {
     (void)actor;
@@ -49,6 +47,8 @@ static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
         if (!Tile::from_id(game.map.tile_at(src.x, src.y, src.z)).move_up)
             return false;
     }
+    if (game.map.tile_at(dst.x, dst.y, dst.z) == TileID::None && game.map.floor(dst) != MaterialID::None)
+        return true;
     if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)
         return true;
     return false;
@@ -215,9 +215,8 @@ static void ai_action(Game& game, int actor, ActionID action)
         return;
     drop_item_at(game, pos);
     game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
-    game.map.set_tile(pos.x, pos.y, pos.z, TileID::Floor);
-    if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::Grass)
-        game.map.set_material(pos.x, pos.y, pos.z, MaterialID::Dirt);
+    game.map.set_tile(pos.x, pos.y, pos.z, TileID::None);
+    game.map.set_material(pos.x, pos.y, pos.z, MaterialID::None);
     game.actors.set_action(actor, ActionID::Wander);
     try_pathfind(game, actor);
 }

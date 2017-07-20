@@ -8,6 +8,7 @@
 #include <material_id.h>
 #include <map_action.h>
 #include <math/vector.h>
+#include <std/array.h>
 
 class Map : private NonCopyable
 {
@@ -85,6 +86,22 @@ public:
         return action_at(index(x, y, z));
     }
 
+    MaterialID floor(Vector3i position) const
+    {
+        int i = index(position);
+        if (i == -1)
+            return MaterialID::None;
+        return _floors[i];
+    }
+
+    void set_floor(Vector3i position, MaterialID material)
+    {
+        int i = index(position);
+        if (i == -1)
+            return;
+        _floors[i] = material;
+    }
+
     bool visible(int i) const
     {
         if (i == -1)
@@ -141,7 +158,7 @@ public:
     void        compute_visibility();
 
     size_t      action_count() const { return _map_actions_array.size(); }
-    Vector3i        action_by_index(size_t index) { return _map_actions_array[index]; }
+    Vector3i    action_by_index(size_t index) { return _map_actions_array[index]; }
 
     void        tick();
 
@@ -154,8 +171,9 @@ private:
     int                     _depth;
     TileID*                 _tiles;
     MaterialID*             _materials;
+    Array<MaterialID>       _floors;
     MapAction*              _map_actions;
-    std::vector<Vector3i>       _map_actions_array;
+    std::vector<Vector3i>   _map_actions_array;
     std::vector<bool>       _visible;
     std::vector<bool>       _occupied;
     std::vector<Flash>      _flash;

@@ -3,4 +3,5 @@ Name = Rock
 Color = #d8d8d8
 BackgroundColor = #a5a5a5
 DropItem = Rock
+FloorSymbol = 130
 Minable

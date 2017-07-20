@@ -31,6 +31,7 @@ void Map::create(int width, int height, int depth)
     _tiles = new TileID[size];
     _materials = new MaterialID[size];
     _map_actions = new MapAction[size];
+    _floors.resize(size);
     _visible.resize(size);
     _occupied.resize(size);
     _flash.resize(size);
@@ -39,6 +40,7 @@ void Map::create(int width, int height, int depth)
     std::fill(_materials, _materials + size, MaterialID::None);
     std::fill(_map_actions, _map_actions + size, MapAction::None);
     std::fill(_flash.data(), _flash.data() + size, Flash::None);
+    std::fill(_floors.data(), _floors.data() + size, MaterialID::None);
 }
 
 void Map::destroy()
