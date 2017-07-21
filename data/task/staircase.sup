@@ -1,0 +1,5 @@
+ID = 3
+Name = Staircase
+Match = Block None
+Into = Stairs
+KeyShortcut = 'x'
