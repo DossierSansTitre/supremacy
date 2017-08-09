@@ -6,6 +6,7 @@
 #include <material.h>
 #include <item_data.h>
 #include <biome.h>
+#include <task.h>
 #include <util/file_path.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
@@ -60,6 +61,7 @@ void load_game_data()
     Material::load(archive);
     ItemData::load(archive);
     Biome::load(archive);
+    Task::load(archive);
 }
 
 int main(int argc, char** argv)

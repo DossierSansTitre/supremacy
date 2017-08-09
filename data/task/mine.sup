@@ -1,5 +1,5 @@
 ID = 1
 Name = Mine
 Match = Block Slope
-Into = Air
+Into = Nothing
 KeyShortcut = 'm'
