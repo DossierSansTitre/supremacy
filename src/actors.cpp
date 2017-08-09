@@ -24,7 +24,7 @@ int Actors::add(ActorID actor_id, Vector3i pos)
         _actor_id[id] = actor_id;
         _pos[id] = pos;
         _health[id] = actor_data.max_health;
-        _action[id] = ActionID::Wander;
+        _task[id] = 0;
         _speed[id] = rand() % (10 * actor_data.speed + 1);
         _counter[id] = 1;
         _path_finder[id].reset();
@@ -35,7 +35,7 @@ int Actors::add(ActorID actor_id, Vector3i pos)
     {
         _actor_id.push_back(actor_id);
         _pos.push_back(pos);
-        _action.push_back(ActionID::Wander);
+        _task.push_back(0);
         _health.push_back(actor_data.max_health);
         _speed.push_back(rand() % (10 * actor_data.speed + 1));
         _counter.push_back(1);
@@ -93,7 +93,7 @@ bool Actors::use_speed(int id, int speed)
     return false;
 }
 
-void Actors::set_action(int id, ActionID action)
+void Actors::set_task(int id, uint16_t task)
 {
-    _action[id] = action;
+    _task[id] = task;
 }

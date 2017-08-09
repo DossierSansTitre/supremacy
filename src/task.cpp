@@ -18,7 +18,7 @@ static void load_task(Task& task, MemoryFile& file)
     {
         uint16_t tile;
         file.read(&tile);
-        task.match.push_back(tile);
+        task.match[i] = tile;
     }
     file.read(&task.into);
 }

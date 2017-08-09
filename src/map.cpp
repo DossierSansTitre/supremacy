@@ -8,7 +8,6 @@ Map::Map()
 , _depth(0)
 , _tiles(nullptr)
 , _materials(nullptr)
-, _map_actions(nullptr)
 {
 
 }
@@ -30,15 +29,15 @@ void Map::create(int width, int height, int depth)
 
     _tiles = new TileID[size];
     _materials = new MaterialID[size];
-    _map_actions = new MapAction[size];
     _floors.resize(size);
     _visible.resize(size);
     _occupied.resize(size);
     _flash.resize(size);
+    _tasks.resize(size);
 
     std::fill(_tiles, _tiles + size, TileID::None);
     std::fill(_materials, _materials + size, MaterialID::None);
-    std::fill(_map_actions, _map_actions + size, MapAction::None);
+    std::fill(_tasks.data(), _tasks.data() + size, 0);
     std::fill(_flash.data(), _flash.data() + size, Flash::None);
     std::fill(_floors.data(), _floors.data() + size, MaterialID::None);
 }
@@ -47,15 +46,14 @@ void Map::destroy()
 {
     delete [] _tiles;
     delete [] _materials;
-    delete [] _map_actions;
     _width = 0;
     _height = 0;
     _depth = 0;
     _tiles = nullptr;
     _materials = nullptr;
-    _map_actions = nullptr;
     _visible.resize(0);
     _occupied.resize(0);
+    _tasks.resize(0);
 }
 
 void Map::set_tile(int index, TileID tile)
@@ -88,7 +86,7 @@ void Map::set_material(int x, int y, int z, MaterialID material)
     set_material(index(x, y, z), material);
 }
 
-void Map::set_action(int x, int y, int z, MapAction action)
+void Map::set_task(int x, int y, int z, uint16_t task)
 {
     int i;
 
@@ -96,8 +94,8 @@ void Map::set_action(int x, int y, int z, MapAction action)
 
     if (i == -1)
         return;
-    _map_actions[i] = action;
-    _map_actions_array.push_back({x, y, z});
+    _tasks[i] = task;
+    _task_positions.push_back({x, y, z});
 }
 
 void Map::set_occupied(Vector3i pos, bool occupied)

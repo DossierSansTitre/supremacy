@@ -132,7 +132,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             TileID tile_id;
             MaterialID material_id;
             MaterialID floor_material_id;
-            MapAction action;
+            uint16_t task;
             Map::Flash flash;
             uint16_t sym;
             Color color;
@@ -141,7 +141,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             under = 0;
             game.map.at(x, y, game.camera.z, tile_id, material_id);
             floor_material_id = game.map.floor({x, y, game.camera.z});
-            action = game.map.action_at(x, y, game.camera.z);
+            task = game.map.task_at(x, y, game.camera.z);
             flash = game.map.flash({x, y, game.camera.z});
 
             while (material_id == MaterialID::None && floor_material_id == MaterialID::None)
@@ -151,11 +151,11 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 under++;
                 game.map.at(x, y, game.camera.z - under, tile_id, material_id);
                 floor_material_id = game.map.floor({x, y, game.camera.z - under});
-                action = game.map.action_at(x, y, game.camera.z - under);
+                task = game.map.task_at(x, y, game.camera.z - under);
                 flash = game.map.flash({x, y, game.camera.z - under});
             }
 
-            if ((material_id == MaterialID::None && floor_material_id == MaterialID::None) || ((!game.map.visible(x, y, game.camera.z) && action == MapAction::None) && 1))
+            if ((material_id == MaterialID::None && floor_material_id == MaterialID::None) || ((!game.map.visible(x, y, game.camera.z) && task == 0) && 1))
                 continue;
 
             if (flash == Map::Flash::Action)
@@ -164,23 +164,11 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 color = {0, 0, 0};
                 color_bg = {255, 255, 0};
             }
-            else if (action != MapAction::None)
+            else if (task)
             {
-                switch (action)
-                {
-                    case MapAction::Mine:
-                        sym = 'M';
-                        color = {255, 255, 255};
-                        color_bg = {255, 0, 0};
-                        break;
-                    case MapAction::Chop:
-                        sym = 'T';
-                        color = {255, 255, 255};
-                        color_bg = {255, 0, 0};
-                        break;
-                    default:
-                        break;
-                }
+                sym = '!';
+                color = {255, 255, 255};
+                color_bg = {255, 0, 0};
             }
             else
             {

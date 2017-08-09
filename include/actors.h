@@ -21,10 +21,10 @@ public:
     void        decrement(int id);
 
     ActorID     actor_id(int id) const { return _actor_id[id]; }
-    Vector3i        pos(int id) const { return _pos[id]; }
+    Vector3i    pos(int id) const { return _pos[id]; }
     int         health(int id) const { return _health[id]; }
     int         speed(int id) const { return _speed[id]; }
-    ActionID    action(int id) const { return _action[id]; }
+    uint16_t    task(int id) const { return _task[id]; }
     int         count() const { return _count; }
 
     void        set_pos(int id, Vector3i pos);
@@ -32,7 +32,7 @@ public:
     void        set_speed(int id, int speed);
     void        speed_tick(int id);
     bool        use_speed(int id, int speed);
-    void        set_action(int id, ActionID action);
+    void        set_task(int id, uint16_t task);
 
     PathFinder& path_finder(int id) { return _path_finder[id]; }
     Path&       path(int id) { return _path[id]; }
@@ -42,7 +42,7 @@ private:
     Array<Vector3i>     _pos;
     Array<int>          _health;
     Array<int>          _speed;
-    Array<ActionID>     _action;
+    Array<uint16_t>     _task;
     Array<PathFinder>   _path_finder;
     Array<Path>         _path;
     Array<int>          _counter;

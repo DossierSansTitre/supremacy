@@ -3,6 +3,7 @@
 #include <tile.h>
 #include <path.h>
 #include <action_id.h>
+#include <task.h>
 #include <material.h>
 #include <std/fixed_array.h>
 #include <math/linear.h>
@@ -121,11 +122,11 @@ static void try_pathfind(Game& game, int actor)
     Vector3i delta;
     Vector3i tmp;
 
-    sample_size = min(game.map.action_count(), sample_size_max);
+    sample_size = min(game.map.task_count(), sample_size_max);
     if (sample_size == 0)
         return;
     for (size_t i = 0; i < sample_size; ++i)
-        samples.push_back(game.map.action_by_index(rand() % game.map.action_count()));
+        samples.push_back(game.map.task_by_index(rand() % game.map.task_count()));
     path_finder.start(pos, distance_heuristic(pos, samples));
     for (size_t count = 0; count < nodes_max; ++count)
     {
@@ -134,21 +135,12 @@ static void try_pathfind(Game& game, int actor)
         for (int i = 0; i < 4; ++i)
         {
             tmp = node + dirs[i];
-            MapAction action = game.map.action_at(tmp.x, tmp.y, tmp.z);
-            if (action != MapAction::None)
+            uint16_t task = game.map.task_at(tmp.x, tmp.y, tmp.z);
+            if (task)
             {
                 path_finder.finish_with(game.actors.path(actor), tmp);
-                switch (action)
-                {
-                    case MapAction::Mine:
-                        game.actors.set_action(actor, ActionID::Mine);
-                        return;
-                    case MapAction::Chop:
-                        game.actors.set_action(actor, ActionID::Chop);
-                        return;
-                    default:
-                        break;
-                }
+                game.actors.set_task(actor, task);
+                return;
             }
             for (int j = 0; j < 3; ++j)
             {
@@ -172,7 +164,7 @@ static bool move_with_path(Game& game, int actor)
 
     if (path.size() < 2)
         return false;
-    if (game.actors.action(actor) != ActionID::None)
+    if (game.actors.task(actor))
         game.map.set_flash(game.actors.path(actor).front(), Map::Flash::Pending);
     if (!game.actors.use_speed(actor, 100))
         return true;
@@ -200,24 +192,32 @@ void drop_item_at(Game& game, Vector3i pos)
         game.items.add(Material::from_id(game.map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
 }
 
-static void ai_action(Game& game, int actor, ActionID action)
+static void ai_task(Game& game, int actor, uint16_t task)
 {
     Vector3i pos;
 
     pos = game.actors.path(actor).front();
     if (manhattan_distance(game.actors.pos(actor), pos) > 1)
     {
-        game.actors.set_action(actor, ActionID::Wander);
+        game.actors.set_task(actor, 0);
         return;
     }
     game.map.set_flash(pos, Map::Flash::Action);
     if (!game.actors.use_speed(actor, 2000))
         return;
-    drop_item_at(game, pos);
-    game.map.set_action(pos.x, pos.y, pos.z, MapAction::None);
-    game.map.set_tile(pos.x, pos.y, pos.z, TileID::None);
-    game.map.set_material(pos.x, pos.y, pos.z, MaterialID::None);
-    game.actors.set_action(actor, ActionID::Wander);
+    const Task& task_data = Task::from_id(task);
+    if (task_data.into == 0)
+    {
+        drop_item_at(game, pos);
+        game.map.set_tile(pos.x, pos.y, pos.z, TileID::None);
+        game.map.set_material(pos.x, pos.y, pos.z, MaterialID::None);
+    }
+    else
+    {
+        game.map.set_tile(pos.x, pos.y, pos.z, TileID(task_data.into));
+    }
+    game.map.set_task(pos.x, pos.y, pos.z, 0);
+    game.actors.set_task(actor, 0);
     try_pathfind(game, actor);
 }
 
@@ -251,6 +251,7 @@ static void ai_wander(Game& game, int actor)
 void game_ai(Game& game)
 {
     int count;
+    uint16_t task;
     Actors& actors = game.actors;
 
     count = actors.count();
@@ -260,19 +261,10 @@ void game_ai(Game& game)
         actors.speed_tick(i);
         if (move_with_path(game, i))
             continue;
-        switch (actors.action(i))
-        {
-            case ActionID::Wander:
-                ai_wander(game, i);
-                break;
-            case ActionID::Mine:
-                ai_action(game, i, ActionID::Mine);
-                break;
-            case ActionID::Chop:
-                ai_action(game, i, ActionID::Chop);
-                break;
-            default:
-                break;
-        }
+        task = actors.task(i);
+        if (task)
+            ai_task(game, i, task);
+        else
+            ai_wander(game, i);
     }
 }

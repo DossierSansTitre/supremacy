@@ -1,8 +1,10 @@
 #include <game.h>
+#include <task.h>
 #include <math/rect.h>
 #include <math/linear.h>
 
-static MapAction selection_action;
+// TODO: Remove this
+static uint16_t selection_task;
 
 static void toggle_vsync(Game& game)
 {
@@ -116,7 +118,7 @@ void handle_motion(Game& game)
     }
 }
 
-static void set_action_rect(Game& game, Rect3i rect, MapAction action)
+static void set_action_rect(Game& game, Rect3i rect, uint16_t task)
 {
     int x;
     int y;
@@ -132,15 +134,15 @@ static void set_action_rect(Game& game, Rect3i rect, MapAction action)
                 y = rect.origin.y + j;
                 z = rect.origin.z + k;
 
-                switch (action) {
-                    case MapAction::Mine:
-                        if (game.map.tile_at(x, y, z) == TileID::Block)
-                            game.map.set_action(x, y, z, MapAction::Mine);
+                const Task& task_data = Task::from_id(task);
+
+                for (uint16_t tile : task_data.match)
+                {
+                    if (game.map.tile_at(x, y, z) == TileID(tile))
+                    {
+                        game.map.set_task(x, y, z, task);
                         break;
-                    case MapAction::Chop:
-                        if (game.map.tile_at(x, y, z) == TileID::Tree)
-                            game.map.set_action(x, y, z, MapAction::Chop);
-                        break;
+                    }
                 }
             }
         }
@@ -167,7 +169,7 @@ static void handle_ui_state_selection(Game& game)
         {
             game.selection[1] = game.cursor;
             game.ui_state = UiStateID::None;
-            set_action_rect(game, rect_from_points(game.selection[0], game.selection[1]), selection_action);
+            set_action_rect(game, rect_from_points(game.selection[0], game.selection[1]), selection_task);
         }
     }
 }
@@ -185,13 +187,19 @@ static void handle_ui_state_none(Game& game)
 {
     if (game.keyboard.key_pressed(SDLK_m))
     {
-        selection_action = MapAction::Mine;
+        selection_task = 1;
         start_selection(game);
         return;
     }
-    else if (game.keyboard.key_pressed(SDLK_t))
+    else if (game.keyboard.key_pressed(SDLK_n))
     {
-        selection_action = MapAction::Chop;
+        selection_task = 2;
+        start_selection(game);
+        return;
+    }
+    else if (game.keyboard.key_pressed(SDLK_x))
+    {
+        selection_task = 3;
         start_selection(game);
         return;
     }

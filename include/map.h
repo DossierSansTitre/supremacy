@@ -74,16 +74,16 @@ public:
         return material_at(index(x, y, z));
     }
 
-    MapAction action_at(int i) const
+    uint16_t task_at(int i) const
     {
         if (i == -1)
-            return MapAction::None;
-        return _map_actions[i];
+            return 0;
+        return _tasks[i];
     }
 
-    MapAction action_at(int x, int y, int z) const
+    uint16_t task_at(int x, int y, int z) const
     {
-        return action_at(index(x, y, z));
+        return task_at(index(x, y, z));
     }
 
     MaterialID floor(Vector3i position) const
@@ -150,15 +150,15 @@ public:
     void        set_tile(Vector3i pos, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
-    void        set_action(int x, int y, int z, MapAction action);
+    void        set_task(int x, int y, int z, uint16_t task);
     void        set_occupied(Vector3i pos, bool occupied);
     void        set_flash(Vector3i pos, Flash flash);
 
     void        compute_visibility(int x, int y, int z);
     void        compute_visibility();
 
-    size_t      action_count() const { return _map_actions_array.size(); }
-    Vector3i    action_by_index(size_t index) { return _map_actions_array[index]; }
+    size_t      task_count() const { return _task_positions.size(); }
+    Vector3i    task_by_index(size_t index) { return _task_positions[index]; }
 
     void        tick();
 
@@ -172,8 +172,8 @@ private:
     TileID*                 _tiles;
     MaterialID*             _materials;
     Array<MaterialID>       _floors;
-    MapAction*              _map_actions;
-    std::vector<Vector3i>   _map_actions_array;
+    Array<uint16_t>         _tasks;
+    Array<Vector3i>         _task_positions;
     std::vector<bool>       _visible;
     std::vector<bool>       _occupied;
     std::vector<Flash>      _flash;
