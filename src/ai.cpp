@@ -100,7 +100,8 @@ static void try_pathfind(Game& game, int actor)
     static const size_t nodes_max = 500;
     static const size_t sample_size_max = 25;
 
-    static const Vector3i dirs[4] = {
+    static const Vector3i dirs[5] = {
+        {0, 0, 0},
         {-1, 0, 0},
         {0, -1, 0},
         {1, 0, 0},
@@ -132,18 +133,20 @@ static void try_pathfind(Game& game, int actor)
     {
         if (!path_finder.fetch(node))
             break;
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < 5; ++i)
         {
-            tmp = node + dirs[i];
-            uint16_t task = game.map.task_at(tmp.x, tmp.y, tmp.z);
-            if (task)
-            {
-                path_finder.finish_with(game.actors.path(actor), tmp);
-                game.actors.set_task(actor, task);
-                return;
-            }
             for (int j = 0; j < 3; ++j)
             {
+                if (i == 0 && j == 0)
+                    continue;
+                tmp = node + dirs[i] + deltas[j];
+                uint16_t task = game.map.task_at(tmp.x, tmp.y, tmp.z);
+                if (task)
+                {
+                    path_finder.finish_with(game.actors.path(actor), tmp);
+                    game.actors.set_task(actor, task);
+                    return;
+                }
                 delta = dirs[i] + deltas[j];
                 if (can_move_from(game, actor, node, delta))
                 {
@@ -195,9 +198,11 @@ void drop_item_at(Game& game, Vector3i pos)
 static void ai_task(Game& game, int actor, uint16_t task)
 {
     Vector3i pos;
+    Vector3i delta;
 
     pos = game.actors.path(actor).front();
-    if (manhattan_distance(game.actors.pos(actor), pos) > 1)
+    delta = pos - game.actors.pos(actor);
+    if (delta.x * delta.x + delta.y * delta.y > 1 || delta.z * delta.z > 1)
     {
         game.actors.set_task(actor, 0);
         return;
@@ -214,7 +219,15 @@ static void ai_task(Game& game, int actor, uint16_t task)
     }
     else
     {
+        const Tile& tile_data = Tile::from_id(TileID(task_data.into));
+
+        if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::None)
+            game.map.set_material(pos.x, pos.y, pos.z, game.map.floor(pos));
         game.map.set_tile(pos.x, pos.y, pos.z, TileID(task_data.into));
+        if (tile_data.move_up)
+            game.map.set_floor(pos + Vector3i(0, 0, 1), MaterialID(0));
+        if (tile_data.move_down)
+            game.map.set_floor(pos, MaterialID(0));
     }
     game.map.set_task(pos.x, pos.y, pos.z, 0);
     game.actors.set_task(actor, 0);
