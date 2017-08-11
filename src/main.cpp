@@ -16,7 +16,7 @@ static int find_suitable_height(const Map& map, int x, int y)
 
     for (int k = depth - 1; k >= 0; --k)
     {
-        if (map.tile_at(x, y, k) != TileID::None)
+        if (map.tile_at(x, y, k))
         {
             if (!Tile::from_id(map.tile_at(x, y, k)).walkable)
                 k++;

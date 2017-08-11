@@ -4,7 +4,6 @@
 #include <vector>
 #include <types.h>
 #include <non_copyable.h>
-#include <tile_id.h>
 #include <map_action.h>
 #include <math/vector.h>
 #include <std/array.h>
@@ -47,7 +46,7 @@ public:
     TileID tile_at(int i) const
     {
         if (i == -1)
-            return TileID::None;
+            return 0;
         return _tiles[i];
     }
 

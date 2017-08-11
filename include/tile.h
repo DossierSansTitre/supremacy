@@ -1,9 +1,8 @@
 #ifndef TILE_H
 #define TILE_H
 
-#include <cstdint>
+#include <types.h>
 #include <std/array.h>
-#include <tile_id.h>
 #include <archive.h>
 
 struct Tile

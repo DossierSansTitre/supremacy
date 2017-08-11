@@ -117,7 +117,7 @@ void Map::set_flash(Vector3i pos, Flash flash)
 
 static bool transparent(TileID tile)
 {
-    if (tile == TileID::None)
+    if (!tile)
         return true;
     if (Tile::from_id(tile).walkable)
         return true;
@@ -191,7 +191,7 @@ void Map::neighbor_updated(Vector3i pos)
     };
 
     compute_visibility(pos.x, pos.y, pos.z);
-    if (tile_at(pos) == TileID::Ramp)
+    if (Tile::from_id(tile_at(pos)).support)
     {
         collapse = true;
         for (int i = 0; i < 4; ++i)
@@ -203,6 +203,6 @@ void Map::neighbor_updated(Vector3i pos)
             }
         }
         if (collapse)
-            set_tile(pos, TileID::Floor);
+            set_tile(pos, 0);
     }
 }
