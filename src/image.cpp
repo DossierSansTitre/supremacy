@@ -1,14 +1,20 @@
-#include <iostream>
 #include <cstdlib>
 #include <SDL2/SDL.h>
+#include <archive.h>
 #include <image.h>
+#include <log.h>
+#include <util/file_path.h>
 
 char* load_image(const char* name, uint32_t& width, uint32_t& height)
 {
+    Archive archive;
     SDL_Surface* img;
     SDL_Surface* img_rgba;
     char* pixels;
+    char* file_buffer;
+    uint32_t file_size;
     Uint32 rmask, gmask, bmask, amask;
+    SDL_RWops* rw;
 
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
     rmask = 0xff000000;
@@ -22,10 +28,18 @@ char* load_image(const char* name, uint32_t& width, uint32_t& height)
     amask = 0xff000000;
 #endif
 
-    img = SDL_LoadBMP(name);
+    archive.open(data_path("supremacy.bin"));
+    archive.read(&file_buffer, &file_size, "tileset.bmp");
+    archive.close();
+
+    rw = SDL_RWFromMem(file_buffer, file_size);
+    img = SDL_LoadBMP_RW(rw, 1);
+
+    delete [] file_buffer;
+
     if (!img)
     {
-        std::cerr << "Could not load image: " << name << std::endl;
+        log_line(LogLevel::Fatal, "Could not load image: '%s'", name);
         exit(1);
     }
     width = img->w;

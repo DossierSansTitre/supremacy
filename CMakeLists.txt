@@ -75,7 +75,6 @@ add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
     DEPENDS ${SUP_DATA} ${SUP_TOOLS}
     COMMAND "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
-    COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_SOURCE_DIR}/data/tileset.bmp" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
     COMMENT "Generating supremacy.bin"
     VERBATIM
     )
@@ -96,7 +95,6 @@ if (APP_BUNDLE)
         supremacy
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
         COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
-        COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_BINARY_DIR}/${DATA_DIR}/tileset.bmp" "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
         COMMENT "Copying supremacy.bin into bundle"
         VERBATIM
     )
@@ -116,9 +114,6 @@ if (APP_BUNDLE)
     ")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/Supremacy.app" DESTINATION "/Applications" USE_SOURCE_PERMISSIONS)
 else()
-    file(GLOB_RECURSE INSTALL_DATA "${CMAKE_SOURCE_DIR}/data/*.bmp")
-
     install(TARGETS supremacy DESTINATION ${RUNTIME_DIR})
-    install(FILES ${INSTALL_DATA} DESTINATION ${DATA_DIR})
     install(FILES "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" DESTINATION ${DATA_DIR})
 endif()
