@@ -1,8 +1,9 @@
 #include <biome.h>
+#include <serialize.h>
 
 Array<Biome> Biome::data;
 
-void load_layer_fill(Biome::Layer& layer, MemoryFile& file)
+static void load_layer_fill(Biome::Layer& layer, MemoryFile& file)
 {
     layer.type = Biome::LayerType::Fill;
     auto& fill = layer.fill;
@@ -11,7 +12,7 @@ void load_layer_fill(Biome::Layer& layer, MemoryFile& file)
     file.read(&fill.material);
 }
 
-void load_layer_octave(Biome::Layer& layer, MemoryFile& file)
+static void load_layer_octave(Biome::Layer& layer, MemoryFile& file)
 {
     layer.type = Biome::LayerType::Octave;
     auto& octave = layer.octave;
@@ -24,7 +25,7 @@ void load_layer_octave(Biome::Layer& layer, MemoryFile& file)
     file.read(&octave.material);
 }
 
-void load_layer_smooth(Biome::Layer& layer, MemoryFile& file)
+static void load_layer_smooth(Biome::Layer& layer, MemoryFile& file)
 {
     layer.type = Biome::LayerType::Smooth;
     auto& smooth = layer.smooth;
@@ -32,7 +33,7 @@ void load_layer_smooth(Biome::Layer& layer, MemoryFile& file)
     file.read(&smooth.to);
 }
 
-void load_layer_replace(Biome::Layer& layer, MemoryFile& file)
+static void load_layer_replace(Biome::Layer& layer, MemoryFile& file)
 {
     layer.type = Biome::LayerType::Replace;
     auto& replace = layer.replace;
@@ -43,42 +44,35 @@ void load_layer_replace(Biome::Layer& layer, MemoryFile& file)
     file.read(&replace.frequency);
 }
 
-void Biome::load(Archive& archive)
+static void load_biome(Biome& biome, MemoryFile& file)
 {
-    SupFile sup;
-    MemoryFile file;
-
-    sup.open(archive, "biome.bin");
-    while (sup.read(file))
+    uint16_t layer_count;
+    file.read(&layer_count);
+    biome.layers.resize(layer_count);
+    for (uint16_t i = 0; i < layer_count; ++i)
     {
-        uint16_t id;
-        file.read(&id);
-        data.resize(id + 1);
-        Biome& biome = data.back();
-
-        uint16_t layer_count;
-        file.read(&layer_count);
-        biome.layers.resize(layer_count);
-        for (uint16_t i = 0; i < layer_count; ++i)
+        auto& layer = biome.layers[i];
+        uint16_t type;
+        file.read(&type);
+        switch(type)
         {
-            auto& layer = biome.layers[i];
-            uint16_t type;
-            file.read(&type);
-            switch(type)
-            {
-                case 0x01:
-                    load_layer_fill(layer, file);
-                    break;
-                case 0x02:
-                    load_layer_octave(layer, file);
-                    break;
-                case 0x03:
-                    load_layer_smooth(layer, file);
-                    break;
-                case 0x04:
-                    load_layer_replace(layer, file);
-                    break;
-            }
+            case 0x01:
+                load_layer_fill(layer, file);
+                break;
+            case 0x02:
+                load_layer_octave(layer, file);
+                break;
+            case 0x03:
+                load_layer_smooth(layer, file);
+                break;
+            case 0x04:
+                load_layer_replace(layer, file);
+                break;
         }
     }
+}
+
+void Biome::load(Archive& archive)
+{
+    unserialize_resource_array(Biome::data, archive, "biome.bin", load_biome);
 }

@@ -15,12 +15,12 @@ public:
 
     const T* data() const
     {
-        return static_cast<const Derived*>(this)->data(); 
+        return static_cast<const Derived*>(this)->data();
     }
 
     T* data()
     {
-        return static_cast<Derived*>(this)->data(); 
+        return static_cast<Derived*>(this)->data();
     }
 
     bool empty() const

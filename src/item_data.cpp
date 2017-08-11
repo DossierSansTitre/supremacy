@@ -1,23 +1,17 @@
 #include <item_data.h>
+#include <serialize.h>
 
 Array<ItemData> ItemData::data;
 
+static void load_item(ItemData& item, MemoryFile& file)
+{
+    file.read(&item.sym);
+    file.read(&item.color.r);
+    file.read(&item.color.g);
+    file.read(&item.color.b);
+}
+
 void ItemData::load(Archive& archive)
 {
-    SupFile sup;
-    MemoryFile file;
-
-    sup.open(archive, "item.bin");
-    while (sup.read(file))
-    {
-        uint16_t id;
-
-        file.read(&id);
-        data.resize(id + 1);
-        ItemData& item = data.back();
-        file.read(&item.sym);
-        file.read(&item.color.r);
-        file.read(&item.color.g);
-        file.read(&item.color.b);
-    }
+    unserialize_resource_array(ItemData::data, archive, "item.bin", load_item);
 }
