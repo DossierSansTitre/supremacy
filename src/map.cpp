@@ -34,12 +34,6 @@ void Map::create(int width, int height, int depth)
     _occupied.resize(size);
     _flash.resize(size);
     _tasks.resize(size);
-
-    std::fill(_tiles, _tiles + size, TileID::None);
-    std::fill(_materials, _materials + size, MaterialID::None);
-    std::fill(_tasks.data(), _tasks.data() + size, 0);
-    std::fill(_flash.data(), _flash.data() + size, Flash::None);
-    std::fill(_floors.data(), _floors.data() + size, MaterialID::None);
 }
 
 void Map::destroy()

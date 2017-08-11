@@ -48,7 +48,7 @@ static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
         if (!Tile::from_id(game.map.tile_at(src.x, src.y, src.z)).move_up)
             return false;
     }
-    if (game.map.tile_at(dst.x, dst.y, dst.z) == TileID::None && game.map.floor(dst) != MaterialID::None)
+    if (game.map.tile_at(dst.x, dst.y, dst.z) == TileID::None && game.map.floor(dst) != 0)
         return true;
     if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)
         return true;
@@ -215,13 +215,13 @@ static void ai_task(Game& game, int actor, uint16_t task)
     {
         drop_item_at(game, pos);
         game.map.set_tile(pos.x, pos.y, pos.z, TileID::None);
-        game.map.set_material(pos.x, pos.y, pos.z, MaterialID::None);
+        game.map.set_material(pos.x, pos.y, pos.z, 0);
     }
     else
     {
         const Tile& tile_data = Tile::from_id(TileID(task_data.into));
 
-        if (game.map.material_at(pos.x, pos.y, pos.z) == MaterialID::None)
+        if (game.map.material_at(pos.x, pos.y, pos.z) == 0)
             game.map.set_material(pos.x, pos.y, pos.z, game.map.floor(pos));
         game.map.set_tile(pos.x, pos.y, pos.z, TileID(task_data.into));
         if (tile_data.move_up)

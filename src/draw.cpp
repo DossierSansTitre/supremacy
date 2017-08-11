@@ -144,7 +144,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             task = game.map.task_at(x, y, game.camera.z);
             flash = game.map.flash({x, y, game.camera.z});
 
-            while (material_id == MaterialID::None && floor_material_id == MaterialID::None)
+            while (!material_id && !floor_material_id)
             {
                 if (under >= 3)
                     break;
@@ -155,7 +155,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
                 flash = game.map.flash({x, y, game.camera.z - under});
             }
 
-            if ((material_id == MaterialID::None && floor_material_id == MaterialID::None) || ((!game.map.visible(x, y, game.camera.z) && task == 0) && 1))
+            if ((!material_id && !floor_material_id) || ((!game.map.visible(x, y, game.camera.z) && task == 0) && 1))
                 continue;
 
             if (flash == Map::Flash::Action)
@@ -173,7 +173,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
             else
             {
                 /* There is no material, a.k.a. we have to render some floor */
-                if (material_id == MaterialID::None)
+                if (!material_id)
                 {
                     const Material& material = Material::from_id(floor_material_id);
                     sym = under ? ' ' : 130;

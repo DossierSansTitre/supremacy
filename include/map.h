@@ -2,10 +2,9 @@
 #define MAP_H
 
 #include <vector>
-#include <cstdint>
+#include <types.h>
 #include <non_copyable.h>
 #include <tile_id.h>
-#include <material_id.h>
 #include <map_action.h>
 #include <math/vector.h>
 #include <std/array.h>
@@ -65,7 +64,7 @@ public:
     MaterialID material_at(int i) const
     {
         if (i == -1)
-            return MaterialID::None;
+            return 0;
         return _materials[i];
     }
 
@@ -90,7 +89,7 @@ public:
     {
         int i = index(position);
         if (i == -1)
-            return MaterialID::None;
+            return 0;
         return _floors[i];
     }
 
