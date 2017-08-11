@@ -203,6 +203,9 @@ void Map::neighbor_updated(Vector3i pos)
             }
         }
         if (collapse)
+        {
             set_tile(pos, 0);
+            set_material(pos.x, pos.y, pos.z, 0);
+        }
     }
 }

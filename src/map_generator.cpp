@@ -24,7 +24,9 @@ static bool smooth_pass(Map& map, uint16_t from, uint16_t to, int x, int y, int 
         && !exposed_block(map, from, x, y + 1, z - 1)
         && !exposed_block(map, from, x, y - 1, z - 1))
         return false;
-    map.set_material(x, y, z, map.material_at(x, y, z - 1));
+    MaterialID mat = map.material_at(x, y, z - 1);
+    map.set_material(x, y, z, mat);
+    map.set_floor({x, y, z}, mat);
     map.set_tile(x, y, z, TileID(to));
     return true;
 }
