@@ -3,8 +3,7 @@
 #include <map.h>
 #include <biome.h>
 #include <tile.h>
-
-#include <iostream>
+#include <log.h>
 
 static bool exposed_block(const Map& map, uint16_t tile, int x, int y, int z)
 {
@@ -97,7 +96,10 @@ void generate_map(Map& map, uint32_t seed)
     for (int i = 0; i < width * height; ++i)
         height_map[i] = 0;
 
-    const Biome& biome = Biome::from_id(0x01);
+    size_t biome_id = rand() % (Biome::count() - 1) + 1;
+    const Biome& biome = Biome::from_id(biome_id);
+
+    log_line(LogLevel::Info, "Generating map with biome 0x%02x", (int)biome_id);
 
     map.create(width, height, depth);
 

@@ -65,8 +65,9 @@ struct Biome
 
     static Array<Biome> data;
 
-    static const Biome& from_id(uint16_t id) { return data[id]; }
-    static void load(Archive& archive);
+    static const Biome&     from_id(uint16_t id) { return data[id]; }
+    static size_t           count() { return data.size(); }
+    static void             load(Archive& archive);
 };
 
 #endif
