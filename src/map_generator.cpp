@@ -96,7 +96,7 @@ void generate_map(Map& map, uint32_t seed)
     for (int i = 0; i < width * height; ++i)
         height_map[i] = 0;
 
-    size_t biome_id = rand() % (Biome::count() - 1) + 1;
+    size_t biome_id = (rand() % (Biome::count() - 1)) + 1;
     const Biome& biome = Biome::from_id(biome_id);
 
     log_line(LogLevel::Info, "Generating map with biome 0x%02x", (int)biome_id);

@@ -8,6 +8,7 @@
 #include <biome.h>
 #include <task.h>
 #include <util/file_path.h>
+#include <ctime>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -72,6 +73,8 @@ int main(int argc, char** argv)
     Game game;
 
     load_game_data();
+
+    srand(time(nullptr));
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
