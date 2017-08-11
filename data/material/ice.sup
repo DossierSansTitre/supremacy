@@ -1,0 +1,7 @@
+ID = 5
+Name = Ice
+Color = #b3ffff
+BackgroundColor = #e6ffff
+DropItem = Ice
+FloorSymbol = 130
+Minable
