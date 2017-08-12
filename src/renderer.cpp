@@ -2,6 +2,7 @@
 #include <config.h>
 #include <renderer.h>
 #include <util/file_path.h>
+#include <window.h>
 
 static uint16_t float16(float in)
 {
@@ -41,6 +42,11 @@ void Renderer::resize(Vector2u size)
 
     build_indices();
     build_vertices();
+}
+
+void Renderer::clear(DrawBuffer& draw_buffer, const Window& window)
+{
+    draw_buffer.resize(window.width() / _tile_width, window.height() / _tile_height);
 }
 
 void Renderer::render(const DrawBuffer& db)

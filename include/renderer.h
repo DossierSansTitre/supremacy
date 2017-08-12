@@ -9,12 +9,14 @@
 #include <draw_buffer.h>
 #include <math/vector.h>
 
+class Window;
 class Renderer : private NonCopyable
 {
 public:
     Renderer(ThreadPool& thread_pool);
     ~Renderer();
 
+    void clear(DrawBuffer& draw_buffer, const Window& window);
     void render(const DrawBuffer& draw_buffer);
 
 private:

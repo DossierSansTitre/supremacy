@@ -26,7 +26,7 @@ void GameScene::update()
 
 }
 
-void GameScene::render()
+void GameScene::render(DrawBuffer& draw_buffer)
 {
-
+    (void)draw_buffer;
 }

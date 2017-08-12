@@ -2,6 +2,7 @@
 #define ENGINE_GAME_SCENE_H
 
 #include <non_copyable.h>
+#include <draw_buffer.h>
 
 class Game;
 class GameScene : NonCopyable
@@ -16,7 +17,7 @@ public:
     virtual void setup();
     virtual void teardown();
     virtual void update();
-    virtual void render();
+    virtual void render(DrawBuffer& draw_buffer);
 
 private:
     Game*   _game;
