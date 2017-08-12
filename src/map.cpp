@@ -33,7 +33,6 @@ void Map::create(int width, int height, int depth)
     _visible.resize(size);
     _occupied.resize(size);
     _flash.resize(size);
-    _tasks.resize(size);
 }
 
 void Map::destroy()
@@ -47,7 +46,6 @@ void Map::destroy()
     _materials = nullptr;
     _visible.resize(0);
     _occupied.resize(0);
-    _tasks.resize(0);
 }
 
 void Map::set_tile(int index, TileID tile)
@@ -88,8 +86,10 @@ void Map::set_task(int x, int y, int z, uint16_t task)
 
     if (i == -1)
         return;
-    _tasks[i] = task;
-    _task_positions.push_back({x, y, z});
+    if (task)
+        _tasks.append(i, task);
+    else
+        _tasks.remove(i);
 }
 
 void Map::set_occupied(Vector3i pos, bool occupied)

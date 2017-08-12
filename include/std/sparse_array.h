@@ -111,6 +111,7 @@ public:
         }
         _data.pop_back();
         _reverse.pop_back();
+        _external[i] = 0;
     }
 
     uint32_t key(size_t i) const

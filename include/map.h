@@ -7,6 +7,7 @@
 #include <map_action.h>
 #include <math/vector.h>
 #include <std/array.h>
+#include <std/sparse_array.h>
 
 class Map : private NonCopyable
 {
@@ -75,6 +76,8 @@ public:
     uint16_t task_at(int i) const
     {
         if (i == -1)
+            return 0;
+        if (_tasks.index_size() <= (size_t)i || !_tasks.has(i))
             return 0;
         return _tasks[i];
     }
@@ -155,8 +158,18 @@ public:
     void        compute_visibility(int x, int y, int z);
     void        compute_visibility();
 
-    size_t      task_count() const { return _task_positions.size(); }
-    Vector3i    task_by_index(size_t index) { return _task_positions[index]; }
+    size_t      task_count() const { return _tasks.size(); }
+    Vector3i    task_by_index(size_t index) const
+    {
+        size_t key;
+        Vector3i pos;
+
+        key = _tasks.key(index);
+        pos.x = key % _width;
+        pos.y = (key / _width) % _height;
+        pos.z = key / (_width * _height);
+        return pos;
+    }
 
     void        tick();
 
@@ -170,8 +183,7 @@ private:
     TileID*                 _tiles;
     MaterialID*             _materials;
     Array<MaterialID>       _floors;
-    Array<uint16_t>         _tasks;
-    Array<Vector3i>         _task_positions;
+    SparseArray<uint16_t>   _tasks;
     std::vector<bool>       _visible;
     std::vector<bool>       _occupied;
     std::vector<Flash>      _flash;

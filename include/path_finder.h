@@ -40,8 +40,8 @@ private:
     uint32_t                    _current;
     uint32_t                    _size;
     OpenQueue                   _open;
-    std::set<Vector3i>              _closed;
-    std::vector<Vector3i>           _position;
+    std::set<Vector3i>          _closed;
+    std::vector<Vector3i>       _position;
     std::vector<uint32_t>       _parent;
 };
 
@@ -49,6 +49,5 @@ inline bool operator<(PathFinder::InternalNode lhs, PathFinder::InternalNode rhs
 {
     return lhs.cost > rhs.cost;
 }
-
 
 #endif

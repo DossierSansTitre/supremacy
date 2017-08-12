@@ -53,7 +53,6 @@ static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
     if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)
         return true;
     return false;
-
 }
 
 static bool can_move(Game& game, int actor, Vector3i delta)
@@ -100,18 +99,21 @@ static void try_pathfind(Game& game, int actor)
     static const size_t nodes_max = 500;
     static const size_t sample_size_max = 25;
 
-    static const Vector3i dirs[5] = {
-        {0, 0, 0},
+    static const Vector3i deltas[14] = {
         {-1, 0, 0},
         {0, -1, 0},
         {1, 0, 0},
-        {0, 1, 0}
-    };
-
-    static const Vector3i deltas[3] = {
-        {0, 0, 0},
+        {0, 1, 0},
+        {0, 0, -1},
+        {-1, 0, -1},
+        {0, -1, -1},
+        {1, 0, -1},
+        {0, 1, -1},
         {0, 0, 1},
-        {0, 0, -1}
+        {-1, 0, 1},
+        {0, -1, 1},
+        {1, 0, 1},
+        {0, 1, 1},
     };
 
     FixedArray<Vector3i, sample_size_max> samples;
@@ -121,7 +123,7 @@ static void try_pathfind(Game& game, int actor)
     Vector3i pos = game.actors.pos(actor);
     Vector3i node;
     Vector3i delta;
-    Vector3i tmp;
+    Vector3i dst;
 
     sample_size = min(game.map.task_count(), sample_size_max);
     if (sample_size == 0)
@@ -133,26 +135,20 @@ static void try_pathfind(Game& game, int actor)
     {
         if (!path_finder.fetch(node))
             break;
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 14; ++i)
         {
-            for (int j = 0; j < 3; ++j)
+            delta = deltas[i];
+            dst = node + delta;
+            uint16_t task = game.map.task_at(dst.x, dst.y, dst.z);
+            if (task)
             {
-                if (i == 0 && j == 0)
-                    continue;
-                tmp = node + dirs[i] + deltas[j];
-                uint16_t task = game.map.task_at(tmp.x, tmp.y, tmp.z);
-                if (task)
-                {
-                    path_finder.finish_with(game.actors.path(actor), tmp);
-                    game.actors.set_task(actor, task);
-                    return;
-                }
-                delta = dirs[i] + deltas[j];
-                if (can_move_from(game, actor, node, delta))
-                {
-                    path_finder.explore(node + delta, distance_heuristic(node + delta, samples));
-                    break;
-                }
+                path_finder.finish_with(game.actors.path(actor), dst);
+                game.actors.set_task(actor, task);
+                return;
+            }
+            if (can_move_from(game, actor, node, delta))
+            {
+                path_finder.explore(dst, distance_heuristic(dst, samples));
             }
         }
     }

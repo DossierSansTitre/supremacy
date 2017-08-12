@@ -32,7 +32,7 @@ void DrawBuffer::clear()
 
 void putchar(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color, Color color_bg)
 {
-    if (x < 0 || x >= draw_buffer.width() || y < 0 || y >= draw_buffer.height())
+    if (x < 0 || x >= (int)draw_buffer.width() || y < 0 || y >= (int)draw_buffer.height())
         return;
     putchar_fast(draw_buffer, x, y, symbol, color, color_bg);
 }
