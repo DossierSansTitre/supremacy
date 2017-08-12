@@ -6,6 +6,7 @@
 #include <math/rect.h>
 #include <math/linear.h>
 #include <world.h>
+#include <engine/game.h>
 
 static void draw_rect_ingame(GameState& game, Rect3i rect, int sym, Color color, Color color_bg)
 {
@@ -81,35 +82,37 @@ static void draw_ui_state(GameState& game)
     }
 }
 
-static void draw_bars(GameState& game)
+static void draw_bars(DrawBuffer& draw_buffer, World& world, Game& game)
 {
     int fps_render;
     int fps_update;
     int view_w;
     int view_h;
 
-    view_w = game.draw_buffer.width();
-    view_h = game.draw_buffer.height();
+    Vector3i camera = world.camera;
 
-    fps_render = game.fps_counter_render.get();
-    fps_update = game.fps_counter_update.get();
+    view_w = draw_buffer.width();
+    view_h = draw_buffer.height();
+
+    fps_render = game.fps_counter_render().get();
+    fps_update = game.fps_counter_update().get();
 
     for (int i = 0; i < view_w; ++i)
     {
-        putchar(game.draw_buffer, i, 0, ' ', {0, 0, 0}, {255, 255, 255});
-        putchar(game.draw_buffer, i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(draw_buffer, i, 0, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(draw_buffer, i, view_h - 1, ' ', {0, 0, 0}, {255, 255, 255});
     }
     for (int i = 1; i < view_h - 1; ++i)
     {
-        putchar(game.draw_buffer, 0, i, ' ', {0, 0, 0}, {255, 255, 255});
-        putchar(game.draw_buffer, view_w - 1, i, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(draw_buffer, 0, i, ' ', {0, 0, 0}, {255, 255, 255});
+        putchar(draw_buffer, view_w - 1, i, ' ', {0, 0, 0}, {255, 255, 255});
     }
     /* Top */
-    printf(game.draw_buffer, 0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
-    print(game.draw_buffer, view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
+    printf(draw_buffer, 0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
+    print(draw_buffer, view_w / 2 - 5, 0, "SUPREMACY", {200, 10, 10}, {255, 255, 255});
 
     /* Bottom */
-    printf(game.draw_buffer, 0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
+    printf(draw_buffer, 0, view_h - 1, "X:%-4d Y:%-4d Z:%-4d", {0, 0, 0}, {255, 255, 255}, camera.x, camera.y, camera.z);
 }
 
 static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, size_t count)
@@ -222,9 +225,11 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, s
     }
 }
 
-static void draw_map(DrawBuffer& draw_buffer, World& world, ThreadPool& thread_pool)
+static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game)
 {
     static const size_t lines_per_job = 8;
+
+    auto& thread_pool = game.thread_pool();
 
     int task;
     int view_h;
@@ -243,7 +248,7 @@ static void draw_map(DrawBuffer& draw_buffer, World& world, ThreadPool& thread_p
     thread_pool.task_wait(task);
 }
 
-static void draw_actors(GameState& game, int delta_z)
+static void draw_actors(DrawBuffer& draw_buffer, World& world, int delta_z)
 {
     int count;
     int x;
@@ -257,26 +262,28 @@ static void draw_actors(GameState& game, int delta_z)
     int anim;
     static const char anim_str[] = "-\\|/";
 
-    view_w = game.draw_buffer.width();
-    view_h = game.draw_buffer.height();
+    view_w = draw_buffer.width();
+    view_h = draw_buffer.height();
+    Vector3i camera = world.camera;
+    auto& actors = world.actors;
 
-    z = game.camera.z - delta_z;
-    count = game.actors.count();
+    z = camera.z - delta_z;
+    count = actors.count();
     color_bg = {0, 0, 0};
     for (int i = 0; i < count; ++i)
     {
         ActorID actor_id;
         Vector3i pos;
 
-        actor_id = game.actors.actor_id(i);
+        actor_id = actors.actor_id(i);
         if (actor_id == ActorID::None)
             continue;
-        pos = game.actors.pos(i);
+        pos = actors.pos(i);
         if (pos.z != z)
             continue;
 
-        x = pos.x - game.camera.x;
-        y = pos.y - game.camera.y;
+        x = pos.x - camera.x;
+        y = pos.y - camera.y;
 
         if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
             continue;
@@ -285,25 +292,25 @@ static void draw_actors(GameState& game, int delta_z)
         sym = actor_data.sym;
         color = actor_data.color;
         /* Useless animation to test the system */
-        anim = game.tick_render % 40;
+        /* anim = game.tick_render % 40;
         if (anim < 4)
         {
             color = {255, 255, 255};
             sym = anim_str[anim];
-        }
+        }*/
         for (int j = 0; j < delta_z; ++j)
             color *= 0.5;
-        putchar(game.draw_buffer, x + 1, y + 1, sym, color, color_bg);
+        putchar(draw_buffer, x + 1, y + 1, sym, color, color_bg);
     }
 }
 
-static void draw_actors(GameState& game)
+static void draw_actors(DrawBuffer& draw_buffer, World& world)
 {
     for (int i = 0; i < 4; ++i)
-        draw_actors(game, 3 - i);
+        draw_actors(draw_buffer, world, 3 - i);
 }
 
-static void draw_items(GameState& game)
+static void draw_items(DrawBuffer& draw_buffer, World& world)
 {
     int count;
     int x;
@@ -314,26 +321,29 @@ static void draw_items(GameState& game)
     Color color;
     Color color_bg;
 
-    view_w = game.draw_buffer.width();
-    view_h = game.draw_buffer.height();
+    view_w = draw_buffer.width();
+    view_h = draw_buffer.height();
 
     color_bg = {0, 0, 0};
 
-    count = game.items.count();
+    auto& items = world.items;
+    Vector3i camera = world.camera;
+
+    count = items.count();
     for (int i = 0; i < count; ++i)
     {
         ItemID item_id;
         Vector3i pos;
 
-        item_id = game.items.item_id(i);
+        item_id = items.item_id(i);
         if (!item_id)
             continue;
-        pos = game.items.pos(i);
-        if (pos.z != game.camera.z)
+        pos = items.pos(i);
+        if (pos.z != camera.z)
             continue;
 
-        x = pos.x - game.camera.x;
-        y = pos.y - game.camera.y;
+        x = pos.x - camera.x;
+        y = pos.y - camera.y;
 
         if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
             continue;
@@ -341,26 +351,25 @@ static void draw_items(GameState& game)
         const ItemData& item_data = ItemData::from_id(item_id);
         sym = item_data.sym;
         color = item_data.color;
-        putchar(game.draw_buffer, x + 1, y + 1, sym, color, color_bg);
+        putchar(draw_buffer, x + 1, y + 1, sym, color, color_bg);
     }
 }
 
 void game_draw(GameState& game)
 {
     /*
-    game.fps_counter_render.update();
-    game.draw_buffer.clear();
-    draw_map(game);
-    draw_items(game);
+    x draw_map(game);
+    x draw_items(game);
     draw_actors(game);
     draw_ui_state(game);
-    draw_bars(game);
-    game.renderer->render(game.draw_buffer);
-    game.window.swap();
+    x draw_bars(game);
     */
 }
 
-void draw_world(DrawBuffer& buffer, World& world, ThreadPool& thread_pool)
+void draw_world(DrawBuffer& buffer, World& world, Game& game)
 {
-    draw_map(buffer, world, thread_pool);
+    draw_map(buffer, world, game);
+    draw_items(buffer, world);
+    draw_actors(buffer, world);
+    draw_bars(buffer, world, game);
 }

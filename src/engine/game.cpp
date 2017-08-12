@@ -81,6 +81,7 @@ void Game::stop()
 void Game::update()
 {
     _scene->update();
+    _fps_counter_update.update();
 }
 
 void Game::render()
@@ -89,6 +90,7 @@ void Game::render()
     _scene->render(_draw_buffer);
     _renderer.render(_draw_buffer);
     _window.swap();
+    _fps_counter_render.update();
 }
 
 void Game::handle_events()

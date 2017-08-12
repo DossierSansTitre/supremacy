@@ -3,8 +3,10 @@
 
 #include <math/vector.h>
 #include <map.h>
+#include <items.h>
+#include <actors.h>
 
-class ThreadPool;
+class Game;
 
 struct World
 {
@@ -15,8 +17,10 @@ struct World
 
     Vector3i    camera;
     Map         map;
+    Items       items;
+    Actors      actors;
 };
 
-void draw_world(DrawBuffer& draw_buffer, World& world, ThreadPool& thread_pool);
+void draw_world(DrawBuffer& draw_buffer, World& world, Game& thread_pool);
 
 #endif

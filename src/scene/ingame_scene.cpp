@@ -24,6 +24,5 @@ void IngameScene::update()
 
 void IngameScene::render(DrawBuffer& draw_buffer)
 {
-    print(draw_buffer, 0, 0, "In Game!", {0, 255, 0}, {0, 0, 0});
-    draw_world(draw_buffer, *_world, game().thread_pool());
+    draw_world(draw_buffer, *_world, game());
 }

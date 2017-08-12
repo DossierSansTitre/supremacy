@@ -7,6 +7,7 @@
 #include <thread_pool.h>
 #include <renderer.h>
 #include <draw_buffer.h>
+#include <fps_counter.h>
 
 class Window;
 class GameScene;
@@ -21,6 +22,8 @@ public:
     ThreadPool& thread_pool() { return _thread_pool; }
     Renderer&   renderer() { return _renderer; }
     DrawBuffer& draw_buffer() { return _draw_buffer; }
+    FpsCounter& fps_counter_update() { return _fps_counter_update; }
+    FpsCounter& fps_counter_render() { return _fps_counter_render; }
 
     template <typename T, typename... Ts>
     T* set_scene(Ts... args)
@@ -50,6 +53,8 @@ private:
     DrawBuffer  _draw_buffer;
     GameScene*  _scene;
     GameScene*  _next_scene;
+    FpsCounter  _fps_counter_update;
+    FpsCounter  _fps_counter_render;
     bool        _running;
 };
 
