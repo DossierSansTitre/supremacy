@@ -14,5 +14,6 @@ using u64   = uint64_t;
 
 using MaterialID = u8;
 using TileID = u8;
+using ItemID = u8;
 
 #endif

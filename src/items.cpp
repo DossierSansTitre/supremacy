@@ -12,8 +12,6 @@ Items::~Items()
 
 int Items::add(ItemID item_id, Vector3i pos, u16 item_count)
 {
-    const ItemData item_data = ItemData::from_id(item_id);
-
     if (_free.size() > 0)
     {
         int id = _free.back();
@@ -34,7 +32,7 @@ int Items::add(ItemID item_id, Vector3i pos, u16 item_count)
 
 void Items::remove(int id)
 {
-    _item_id[id] = ItemID::None;
+    _item_id[id] = 0;
     _free.push_back(id);
 }
 

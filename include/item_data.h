@@ -1,9 +1,8 @@
 #ifndef ITEM_DATA_H
 #define ITEM_DATA_H
 
-#include <cstdint>
+#include <types.h>
 #include <std/array.h>
-#include <item_id.h>
 #include <color.h>
 #include <archive.h>
 

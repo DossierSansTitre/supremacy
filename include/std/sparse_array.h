@@ -34,7 +34,12 @@ public:
         return !(*this == rhs);
     }
 
-
+    SparseArrayIterator<T>& operator+=(ptrdiff_t delta)
+    {
+        _key += delta;
+        _value += delta;
+        return *this;
+    }
 
 private:
     uint32_t*   _key;

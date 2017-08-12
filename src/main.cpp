@@ -90,7 +90,6 @@ int main(int argc, char** argv)
     generate_map(game.map, game.seed);
     generate_dwarfs(game);
 
-    game.items.add(ItemID::Wood, {0, 1, 0}, 30);
     game.vsync = 1;
 
     game_loop(game);

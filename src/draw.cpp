@@ -323,7 +323,7 @@ static void draw_items(Game& game)
         Vector3i pos;
 
         item_id = game.items.item_id(i);
-        if (item_id == ItemID::None)
+        if (!item_id)
             continue;
         pos = game.items.pos(i);
         if (pos.z != game.camera.z)

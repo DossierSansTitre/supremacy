@@ -4,7 +4,6 @@
 #include <std/array.h>
 #include <types.h>
 #include <color.h>
-#include <item_id.h>
 #include <archive.h>
 
 struct Material

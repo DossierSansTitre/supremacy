@@ -1,5 +1,4 @@
 #include <material.h>
-#include <item_id.h>
 #include <serialize.h>
 
 Array<Material> Material::data;

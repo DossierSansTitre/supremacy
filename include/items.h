@@ -1,9 +1,8 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
-#include <item_id.h>
-#include <types.h>
 #include <vector>
+#include <types.h>
 #include <math/vector.h>
 
 class Items
