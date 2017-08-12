@@ -2,7 +2,7 @@
 #define BIOME_H
 
 #include <cstdint>
-#include <std/array.h>
+#include <std/sparse_array.h>
 #include <archive.h>
 
 struct Biome
@@ -63,10 +63,10 @@ struct Biome
 
     Array<Layer> layers;
 
-    static Array<Biome> data;
+    static SparseArray<Biome> _data;
 
-    static const Biome&     from_id(uint16_t id) { return data[id]; }
-    static size_t           count() { return data.size(); }
+    static const Biome&     from_id(uint16_t id) { return _data[id]; }
+    static size_t           count() { return _data.size(); }
     static void             load(Archive& archive);
 };
 

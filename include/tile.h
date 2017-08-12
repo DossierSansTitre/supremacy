@@ -2,7 +2,7 @@
 #define TILE_H
 
 #include <types.h>
-#include <std/array.h>
+#include <std/sparse_array.h>
 #include <archive.h>
 
 struct Tile
@@ -16,9 +16,9 @@ struct Tile
     bool        move_up:1;
     bool        move_down:1;
 
-    static Array<Tile> data;
+    static SparseArray<Tile> _data;
 
-    static const Tile& from_id(TileID id) { return data[static_cast<int>(id)]; }
+    static const Tile& from_id(TileID id) { return _data[id]; }
     static void load(Archive& archive);
 };
 

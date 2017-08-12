@@ -1,7 +1,7 @@
 #include <task.h>
 #include <serialize.h>
 
-Array<Task> Task::_data;
+SparseArray<Task> Task::_data;
 
 static void load_task(Task& task, MemoryFile& file)
 {
@@ -25,5 +25,5 @@ static void load_task(Task& task, MemoryFile& file)
 
 void Task::load(Archive& archive)
 {
-    unserialize_resource_array(_data, archive, "task.bin", load_task);
+    unserialize_resource_array(Task::_data, archive, "task.bin", load_task);
 }

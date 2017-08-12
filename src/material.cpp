@@ -1,7 +1,7 @@
 #include <material.h>
 #include <serialize.h>
 
-Array<Material> Material::data;
+SparseArray<Material> Material::_data;
 
 static void load_material(Material& mat, MemoryFile& file)
 {
@@ -25,5 +25,5 @@ static void load_material(Material& mat, MemoryFile& file)
 
 void Material::load(Archive& archive)
 {
-    unserialize_resource_array(Material::data, archive, "material.bin", load_material);
+    unserialize_resource_array(Material::_data, archive, "material.bin", load_material);
 }

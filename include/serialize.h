@@ -2,10 +2,11 @@
 #define SERIALIZE_H
 
 #include <archive.h>
+#include <std/sparse_array.h>
 #include <log.h>
 
 template <typename T, typename Func>
-void unserialize_resource_array(Array<T>& array, Archive& archive, const char* filename, Func func)
+void unserialize_resource_array(SparseArray<T>& array, Archive& archive, const char* filename, Func func)
 {
     SupFile sup;
     MemoryFile file;
@@ -17,10 +18,7 @@ void unserialize_resource_array(Array<T>& array, Archive& archive, const char* f
         uint16_t id;
 
         file.read(&id);
-        if (id >= array.size())
-            array.resize(id + 1);
-        T& data = array[id];
-        func(data, file);
+        func(array.fetch_or_create(id), file);
         count++;
     }
     log_line(LogLevel::Info, "Loaded %-20s (%d elements)", filename, count);

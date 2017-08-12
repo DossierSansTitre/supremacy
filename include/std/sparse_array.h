@@ -3,7 +3,7 @@
 
 #include <std/array.h>
 
-template <typename T, typename Alloc = Allocator<T>, typename IndiceAlloc = Allocator<uint32_t>>
+template <typename T, typename Alloc, typename IndiceAlloc>
 class SparseArray;
 
 template <typename T>
@@ -26,7 +26,7 @@ public:
 
     bool operator==(const SparseArrayIterator<T>& rhs) const
     {
-        return (_key == other._key);
+        return (_key == rhs._key);
     }
 
     bool operator!=(const SparseArrayIterator<T>& rhs) const
@@ -44,7 +44,7 @@ public:
 private:
     uint32_t*   _key;
     T*          _value;
-}
+};
 
 template <typename T, typename Alloc = Allocator<T>, typename IndiceAlloc = Allocator<uint32_t>>
 class SparseArray

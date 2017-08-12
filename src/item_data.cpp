@@ -1,7 +1,7 @@
 #include <item_data.h>
 #include <serialize.h>
 
-Array<ItemData> ItemData::data;
+SparseArray<ItemData> ItemData::_data;
 
 static void load_item(ItemData& item, MemoryFile& file)
 {
@@ -13,5 +13,5 @@ static void load_item(ItemData& item, MemoryFile& file)
 
 void ItemData::load(Archive& archive)
 {
-    unserialize_resource_array(ItemData::data, archive, "item.bin", load_item);
+    unserialize_resource_array(ItemData::_data, archive, "item.bin", load_item);
 }

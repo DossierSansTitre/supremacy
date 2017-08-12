@@ -1,7 +1,7 @@
 #include <biome.h>
 #include <serialize.h>
 
-Array<Biome> Biome::data;
+SparseArray<Biome> Biome::_data;
 
 static void load_layer_fill(Biome::Layer& layer, MemoryFile& file)
 {
@@ -74,5 +74,5 @@ static void load_biome(Biome& biome, MemoryFile& file)
 
 void Biome::load(Archive& archive)
 {
-    unserialize_resource_array(Biome::data, archive, "biome.bin", load_biome);
+    unserialize_resource_array(Biome::_data, archive, "biome.bin", load_biome);
 }

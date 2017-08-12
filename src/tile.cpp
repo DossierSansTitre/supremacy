@@ -1,9 +1,7 @@
 #include <tile.h>
-#include <sup_file.h>
-#include <memory_file.h>
 #include <serialize.h>
 
-Array<Tile> Tile::data;
+SparseArray<Tile> Tile::_data;
 
 static void load_tile(Tile& tile, MemoryFile& file)
 {
@@ -22,5 +20,5 @@ static void load_tile(Tile& tile, MemoryFile& file)
 
 void Tile::load(Archive& archive)
 {
-    unserialize_resource_array(Tile::data, archive, "tile.bin", load_tile);
+    unserialize_resource_array(Tile::_data, archive, "tile.bin", load_tile);
 }
