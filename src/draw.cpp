@@ -7,20 +7,22 @@
 #include <math/linear.h>
 #include <world.h>
 #include <engine/game.h>
+#include <selection.h>
 
-static void draw_rect_ingame(GameState& game, Rect3i rect, int sym, Color color, Color color_bg)
+static void draw_rect_ingame(DrawBuffer& draw_buffer, World& world, Rect3i rect, int sym, Color color, Color color_bg)
 {
     int view_w;
     int view_h;
+    Vector3i camera = world.camera;
 
-    if (game.camera.z < rect.origin.z || game.camera.z > rect.origin.z + rect.size.z)
+    if (camera.z < rect.origin.z || camera.z > rect.origin.z + rect.size.z)
         return;
 
-    view_w = game.draw_buffer.width() - 2;
-    view_h = game.draw_buffer.height() - 2;
+    view_w = draw_buffer.width() - 2;
+    view_h = draw_buffer.height() - 2;
 
-    rect.origin.x -= game.camera.x;
-    rect.origin.y -= game.camera.y;
+    rect.origin.x -= camera.x;
+    rect.origin.y -= camera.y;
 
     if (rect.origin.x >= view_w)
         return;
@@ -55,30 +57,29 @@ static void draw_rect_ingame(GameState& game, Rect3i rect, int sym, Color color,
     {
         for (int i = 0; i <= rect.size.x; ++i)
         {
-            putchar_fast(game.draw_buffer, i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
+            putchar_fast(draw_buffer, i + rect.origin.x + 1, j + rect.origin.y + 1, sym, color, color_bg);
         }
     }
 }
 
-static void draw_ui_state(GameState& game)
+void draw_selection(DrawBuffer& draw_buffer, World& world, Selection& selection, u32 render_tick)
 {
     Vector3i cursor;
     Rect3i rect;
     char c;
 
-    if (game.tick_render / 4 % 2)
+    if (render_tick / 4 % 2)
         c = 'X';
     else
         c = ' ';
-    if (game.ui_state == UiStateID::Selection)
+    if (selection.state() != Selection::State::Inactive)
     {
-        cursor = game.cursor;
-        if (game.selected_first)
+        cursor = selection.cursor();
+        if (selection.state() == Selection::State::Second)
         {
-            rect = rect_from_points(cursor, game.selection[0]);
-            draw_rect_ingame(game, rect, c, {200, 127, 127}, {180, 180, 180});
+            draw_rect_ingame(draw_buffer, world, selection.selected(), c, {200, 127, 127}, {180, 180, 180});
         }
-        putchar(game.draw_buffer, cursor.x - game.camera.x + 1, cursor.y - game.camera.y + 1, c, {255, 127, 127}, {200, 200, 200});
+        putchar(draw_buffer, cursor.x - world.camera.x + 1, cursor.y - world.camera.y + 1, c, {255, 127, 127}, {200, 200, 200});
     }
 }
 
@@ -115,7 +116,7 @@ static void draw_bars(DrawBuffer& draw_buffer, World& world, Game& game)
     printf(draw_buffer, 0, view_h - 1, "X:%-4d Y:%-4d Z:%-4d", {0, 0, 0}, {255, 255, 255}, camera.x, camera.y, camera.z);
 }
 
-static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, size_t count)
+static void draw_map_lines(DrawBuffer& draw_buffer, World& world, u32 render_tick, size_t base, size_t count)
 {
     int view_w;
 
@@ -165,13 +166,13 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, s
             if ((!material_id && !floor_material_id) || ((!map.visible(x, y, camera.z) && task == 0) && 1))
                 continue;
 
-            /*if (flash == Map::Flash::Action)
+            if (flash == Map::Flash::Action)
             {
-                sym = "\\|/-"[game.tick_render % 4];
+                sym = "\\|/-"[render_tick % 4];
                 color = {0, 0, 0};
                 color_bg = {255, 255, 0};
             }
-            else*/ if (task)
+            else if (task)
             {
                 sym = '!';
                 color = {255, 255, 255};
@@ -200,10 +201,9 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, s
                 }
             }
 
-            /*
             if (flash == Map::Flash::Pending)
             {
-                if ((game.tick_render / 2) % 2)
+                if ((render_tick / 2) % 2)
                 {
                     color *= 0.75f;
                     color_bg *= 0.75f;
@@ -213,7 +213,7 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, s
                     color *= 0.5f;
                     color_bg *= 0.5f;
                 }
-            }*/
+            }
 
             while (under--)
             {
@@ -225,7 +225,7 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, s
     }
 }
 
-static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game)
+static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game, u32 render_tick)
 {
     static const size_t lines_per_job = 8;
 
@@ -242,13 +242,13 @@ static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game)
     task = thread_pool.task_create();
     for (size_t i = 0; i < job_count - 1; ++i)
     {
-        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), i * lines_per_job, lines_per_job));
+        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, i * lines_per_job, lines_per_job));
     }
-    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
+    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
     thread_pool.task_wait(task);
 }
 
-static void draw_actors(DrawBuffer& draw_buffer, World& world, int delta_z)
+static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick, int delta_z)
 {
     int count;
     int x;
@@ -292,22 +292,22 @@ static void draw_actors(DrawBuffer& draw_buffer, World& world, int delta_z)
         sym = actor_data.sym;
         color = actor_data.color;
         /* Useless animation to test the system */
-        /* anim = game.tick_render % 40;
+        anim = render_tick % 40;
         if (anim < 4)
         {
             color = {255, 255, 255};
             sym = anim_str[anim];
-        }*/
+        }
         for (int j = 0; j < delta_z; ++j)
             color *= 0.5;
         putchar(draw_buffer, x + 1, y + 1, sym, color, color_bg);
     }
 }
 
-static void draw_actors(DrawBuffer& draw_buffer, World& world)
+static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick)
 {
     for (int i = 0; i < 4; ++i)
-        draw_actors(draw_buffer, world, 3 - i);
+        draw_actors(draw_buffer, world, render_tick, 3 - i);
 }
 
 static void draw_items(DrawBuffer& draw_buffer, World& world)
@@ -355,21 +355,10 @@ static void draw_items(DrawBuffer& draw_buffer, World& world)
     }
 }
 
-void game_draw(GameState& game)
+void draw_world(DrawBuffer& buffer, World& world, Game& game, u32 render_tick)
 {
-    /*
-    x draw_map(game);
-    x draw_items(game);
-    draw_actors(game);
-    draw_ui_state(game);
-    x draw_bars(game);
-    */
-}
-
-void draw_world(DrawBuffer& buffer, World& world, Game& game)
-{
-    draw_map(buffer, world, game);
+    draw_map(buffer, world, game, render_tick);
     draw_items(buffer, world);
-    draw_actors(buffer, world);
+    draw_actors(buffer, world, render_tick);
     draw_bars(buffer, world, game);
 }

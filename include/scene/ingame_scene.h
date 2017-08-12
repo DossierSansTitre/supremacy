@@ -3,6 +3,8 @@
 
 #include <engine/game_scene.h>
 #include <world.h>
+#include <selection.h>
+#include <draw.h>
 
 class IngameScene : public GameScene
 {
@@ -13,7 +15,9 @@ public:
     void render(DrawBuffer& draw_buffer) override;
 
 private:
-    World*  _world;
+    World*      _world;
+    Selection   _selection;
+    u32         _render_tick;
 };
 
 #endif

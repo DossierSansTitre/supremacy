@@ -21,6 +21,5 @@ struct World
     Actors      actors;
 };
 
-void draw_world(DrawBuffer& draw_buffer, World& world, Game& thread_pool);
 
 #endif

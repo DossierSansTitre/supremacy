@@ -1,3 +1,5 @@
+#if 0
+
 #include <ctime>
 #include <game_state.h>
 #include <archive.h>
@@ -97,3 +99,5 @@ int old_main(int argc, char** argv)
     SDL_Quit();
     return 0;
 }
+
+#endif
