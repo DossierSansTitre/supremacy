@@ -14,6 +14,7 @@
 #include <ui_state.h>
 #include <math/vector.h>
 #include <draw_buffer.h>
+#include <scene.h>
 
 struct Game : private NonCopyable
 {
@@ -39,6 +40,19 @@ struct Game : private NonCopyable
     Actors      actors;
     Items       items;
     bool        vsync;
+    Scene*      scene;
+
+    template <typename T, typename... Ts>
+    void enter_scene(Ts... args)
+    {
+        if (scene)
+        {
+            scene->teardown();
+            delete scene;
+        }
+        scene = new T(args...);
+        scene->setup();
+    }
 };
 
 void game_loop(Game& game);
