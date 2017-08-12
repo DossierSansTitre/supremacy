@@ -1,5 +1,5 @@
 #include <cmath>
-#include <game.h>
+#include <game_state.h>
 #include <tile.h>
 #include <path.h>
 #include <action_id.h>
@@ -26,7 +26,7 @@ uint32_t distance_heuristic(Vector3i pos, const Container& container)
     return min;
 }
 
-static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
+static bool can_move_from(GameState& game, int actor, Vector3i src, Vector3i delta)
 {
     (void)actor;
 
@@ -55,7 +55,7 @@ static bool can_move_from(Game& game, int actor, Vector3i src, Vector3i delta)
     return false;
 }
 
-static bool can_move(Game& game, int actor, Vector3i delta)
+static bool can_move(GameState& game, int actor, Vector3i delta)
 {
     Vector3i src;
 
@@ -63,7 +63,7 @@ static bool can_move(Game& game, int actor, Vector3i delta)
     return can_move_from(game, actor, src, delta);
 }
 
-static bool try_move(Game& game, int actor, Vector3i delta)
+static bool try_move(GameState& game, int actor, Vector3i delta)
 {
     Vector3i src;
     Vector3i dst;
@@ -81,7 +81,7 @@ static bool try_move(Game& game, int actor, Vector3i delta)
     return b;
 }
 
-static bool try_move_auto_slope(Game& game, int actor, Vector3i delta)
+static bool try_move_auto_slope(GameState& game, int actor, Vector3i delta)
 {
     static const Vector3i up = {0, 0, 1};
 
@@ -94,7 +94,7 @@ static bool try_move_auto_slope(Game& game, int actor, Vector3i delta)
     return false;
 }
 
-static void try_pathfind(Game& game, int actor)
+static void try_pathfind(GameState& game, int actor)
 {
     static const size_t nodes_max = 500;
     static const size_t sample_size_max = 25;
@@ -154,7 +154,7 @@ static void try_pathfind(Game& game, int actor)
     }
 }
 
-static bool move_with_path(Game& game, int actor)
+static bool move_with_path(GameState& game, int actor)
 {
     Path& path = game.actors.path(actor);
     Vector3i next_node;
@@ -184,14 +184,14 @@ static bool move_with_path(Game& game, int actor)
     return true;
 }
 
-void drop_item_at(Game& game, Vector3i pos)
+void drop_item_at(GameState& game, Vector3i pos)
 {
     int frequency = Tile::from_id(game.map.tile_at(pos.x, pos.y, pos.z)).dropping_frequency;
     if (frequency != 0 && rand() % frequency == 0)
         game.items.add(Material::from_id(game.map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
 }
 
-static void ai_task(Game& game, int actor, uint16_t task)
+static void ai_task(GameState& game, int actor, uint16_t task)
 {
     Vector3i pos;
     Vector3i delta;
@@ -230,7 +230,7 @@ static void ai_task(Game& game, int actor, uint16_t task)
     try_pathfind(game, actor);
 }
 
-static void ai_wander(Game& game, int actor)
+static void ai_wander(GameState& game, int actor)
 {
     Actors& actors = game.actors;
     Vector3i delta = {0, 0, 0};
@@ -257,7 +257,7 @@ static void ai_wander(Game& game, int actor)
     try_move_auto_slope(game, actor, delta);
 }
 
-void game_ai(Game& game)
+void game_ai(GameState& game)
 {
     int count;
     uint16_t task;

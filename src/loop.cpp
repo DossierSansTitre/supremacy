@@ -1,8 +1,8 @@
 #include <chrono>
 #include <thread>
-#include <game.h>
+#include <game_state.h>
 
-void game_loop(Game& game)
+void game_loop(GameState& game)
 {
     using Clock = std::chrono::high_resolution_clock;
     using Timepoint = Clock::time_point;

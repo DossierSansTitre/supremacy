@@ -1,6 +1,6 @@
-#include <game.h>
+#include <game_state.h>
 
-void game_event(Game& game)
+void game_event(GameState& game)
 {
     SDL_Event event;
 

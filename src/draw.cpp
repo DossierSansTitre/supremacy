@@ -1,4 +1,4 @@
-#include <game.h>
+#include <game_state.h>
 #include <tile.h>
 #include <material.h>
 #include <actor_data.h>
@@ -6,7 +6,7 @@
 #include <math/rect.h>
 #include <math/linear.h>
 
-static void draw_rect_ingame(Game& game, Rect3i rect, int sym, Color color, Color color_bg)
+static void draw_rect_ingame(GameState& game, Rect3i rect, int sym, Color color, Color color_bg)
 {
     int view_w;
     int view_h;
@@ -58,7 +58,7 @@ static void draw_rect_ingame(Game& game, Rect3i rect, int sym, Color color, Colo
     }
 }
 
-static void draw_ui_state(Game& game)
+static void draw_ui_state(GameState& game)
 {
     Vector3i cursor;
     Rect3i rect;
@@ -80,7 +80,7 @@ static void draw_ui_state(Game& game)
     }
 }
 
-static void draw_bars(Game& game)
+static void draw_bars(GameState& game)
 {
     int fps_render;
     int fps_update;
@@ -111,7 +111,7 @@ static void draw_bars(Game& game)
     printf(game.draw_buffer, 0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
 }
 
-static void draw_map_lines(Game& game, size_t base, size_t count)
+static void draw_map_lines(GameState& game, size_t base, size_t count)
 {
     int view_w;
 
@@ -217,7 +217,7 @@ static void draw_map_lines(Game& game, size_t base, size_t count)
     }
 }
 
-static void draw_map(Game& game)
+static void draw_map(GameState& game)
 {
     static const size_t lines_per_job = 8;
 
@@ -240,7 +240,7 @@ static void draw_map(Game& game)
     thread_pool.task_wait(task);
 }
 
-static void draw_actors(Game& game, int delta_z)
+static void draw_actors(GameState& game, int delta_z)
 {
     int count;
     int x;
@@ -294,13 +294,13 @@ static void draw_actors(Game& game, int delta_z)
     }
 }
 
-static void draw_actors(Game& game)
+static void draw_actors(GameState& game)
 {
     for (int i = 0; i < 4; ++i)
         draw_actors(game, 3 - i);
 }
 
-static void draw_items(Game& game)
+static void draw_items(GameState& game)
 {
     int count;
     int x;
@@ -342,7 +342,7 @@ static void draw_items(Game& game)
     }
 }
 
-void game_draw(Game& game)
+void game_draw(GameState& game)
 {
     game.fps_counter_render.update();
     game.draw_buffer.clear();

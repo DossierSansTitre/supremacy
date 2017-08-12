@@ -1,4 +1,4 @@
-#include <game.h>
+#include <game_state.h>
 #include <task.h>
 #include <math/rect.h>
 #include <math/linear.h>
@@ -6,7 +6,7 @@
 // TODO: Remove this
 static uint16_t selection_task;
 
-static void toggle_vsync(Game& game)
+static void toggle_vsync(GameState& game)
 {
     if (game.vsync)
     {
@@ -20,7 +20,7 @@ static void toggle_vsync(Game& game)
     game.vsync = !game.vsync;
 }
 
-static Vector3i clamp_motion(Game& game, Vector3i origin, Vector3i delta)
+static Vector3i clamp_motion(GameState& game, Vector3i origin, Vector3i delta)
 {
     if (origin.x + delta.x < 0)
         delta.x = -origin.x;
@@ -37,7 +37,7 @@ static Vector3i clamp_motion(Game& game, Vector3i origin, Vector3i delta)
     return delta;
 }
 
-static void clamp_camera(Game& game)
+static void clamp_camera(GameState& game)
 {
     int w;
     int h;
@@ -50,7 +50,7 @@ static void clamp_camera(Game& game)
         game.camera.y = game.map.height() - h;
 }
 
-static Vector3i keyboard_motion(Game& game)
+static Vector3i keyboard_motion(GameState& game)
 {
     bool shift;
     int delta;
@@ -85,7 +85,7 @@ static Vector3i keyboard_motion(Game& game)
     return motion;
 }
 
-static void move_camera(Game& game, Vector3i motion)
+static void move_camera(GameState& game, Vector3i motion)
 {
     motion = clamp_motion(game, game.camera, motion);
     game.camera.x += motion.x;
@@ -95,7 +95,7 @@ static void move_camera(Game& game, Vector3i motion)
     clamp_camera(game);
 }
 
-void move_selection(Game& game, Vector3i motion)
+void move_selection(GameState& game, Vector3i motion)
 {
     motion = clamp_motion(game, game.cursor, motion);
     game.cursor.x += motion.x;
@@ -103,7 +103,7 @@ void move_selection(Game& game, Vector3i motion)
     game.cursor.z += motion.z;
 }
 
-void handle_motion(Game& game)
+void handle_motion(GameState& game)
 {
     Vector3i motion;
 
@@ -118,7 +118,7 @@ void handle_motion(Game& game)
     }
 }
 
-static void set_action_rect(Game& game, Rect3i rect, uint16_t task)
+static void set_action_rect(GameState& game, Rect3i rect, uint16_t task)
 {
     int x;
     int y;
@@ -149,7 +149,7 @@ static void set_action_rect(Game& game, Rect3i rect, uint16_t task)
     }
 }
 
-static void handle_ui_state_selection(Game& game)
+static void handle_ui_state_selection(GameState& game)
 {
     if (game.keyboard.key_pressed(SDLK_ESCAPE))
     {
@@ -174,7 +174,7 @@ static void handle_ui_state_selection(Game& game)
     }
 }
 
-static void start_selection(Game& game)
+static void start_selection(GameState& game)
 {
     game.cursor = game.camera;
     game.cursor.x += (game.draw_buffer.width() - 2) / 2;
@@ -183,7 +183,7 @@ static void start_selection(Game& game)
     game.selected_first = false;
 }
 
-static void handle_ui_state_none(Game& game)
+static void handle_ui_state_none(GameState& game)
 {
     if (game.keyboard.key_pressed(SDLK_m))
     {
@@ -207,7 +207,7 @@ static void handle_ui_state_none(Game& game)
         game.running = false;
 }
 
-static void handle_ui_state(Game& game)
+static void handle_ui_state(GameState& game)
 {
     switch (game.ui_state)
     {
@@ -220,7 +220,7 @@ static void handle_ui_state(Game& game)
     }
 }
 
-void game_update(Game& game)
+void game_update(GameState& game)
 {
     game.fps_counter_update.update();
     game.tick_render++;

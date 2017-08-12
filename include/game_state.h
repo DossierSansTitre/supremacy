@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
 
 #include <cstdint>
 #include <non_copyable.h>
@@ -14,11 +14,10 @@
 #include <ui_state.h>
 #include <math/vector.h>
 #include <draw_buffer.h>
-#include <scene.h>
 
-struct Game : private NonCopyable
+struct GameState : private NonCopyable
 {
-    Game();
+    GameState();
 
     bool        running;
     ThreadPool  thread_pool;
@@ -40,26 +39,13 @@ struct Game : private NonCopyable
     Actors      actors;
     Items       items;
     bool        vsync;
-    Scene*      scene;
-
-    template <typename T, typename... Ts>
-    void enter_scene(Ts... args)
-    {
-        if (scene)
-        {
-            scene->teardown();
-            delete scene;
-        }
-        scene = new T(args...);
-        scene->setup();
-    }
 };
 
-void game_loop(Game& game);
-void game_event(Game& game);
-void game_update(Game& game);
-void game_draw(Game& game);
+void game_loop(GameState& game);
+void game_event(GameState& game);
+void game_update(GameState& game);
+void game_draw(GameState& game);
 
-void game_ai(Game& game);
+void game_ai(GameState& game);
 
 #endif

@@ -1,5 +1,5 @@
 #include <ctime>
-#include <game.h>
+#include <game_state.h>
 #include <archive.h>
 #include <thread_pool.h>
 #include <tile.h>
@@ -26,7 +26,7 @@ static int find_suitable_height(const Map& map, int x, int y)
     return -1;
 }
 
-static void generate_dwarfs(Game& game)
+static void generate_dwarfs(GameState& game)
 {
     int w;
     int h;
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
     (void)argc;
     (void)argv;
 
-    Game game;
+    GameState game;
 
     load_game_data();
 
