@@ -5,6 +5,8 @@
 Game::Game(Window& window)
 : _window(window)
 , _renderer(_thread_pool)
+, _scene(nullptr)
+, _next_scene(nullptr)
 {
 
 }

@@ -4,12 +4,14 @@
 
 void IngameScene::setup()
 {
-
+    _world = new World({1024, 1024, 64});
+    generate_map(_world->map, 0x12345678);
+    _world->camera.z = 45;
 }
 
 void IngameScene::teardown()
 {
-
+    delete _world;
 }
 
 void IngameScene::update()
@@ -23,4 +25,5 @@ void IngameScene::update()
 void IngameScene::render(DrawBuffer& draw_buffer)
 {
     print(draw_buffer, 0, 0, "In Game!", {0, 255, 0}, {0, 0, 0});
+    draw_world(draw_buffer, *_world, game().thread_pool());
 }

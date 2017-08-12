@@ -5,6 +5,7 @@
 #include <item_data.h>
 #include <math/rect.h>
 #include <math/linear.h>
+#include <world.h>
 
 static void draw_rect_ingame(GameState& game, Rect3i rect, int sym, Color color, Color color_bg)
 {
@@ -111,7 +112,7 @@ static void draw_bars(GameState& game)
     printf(game.draw_buffer, 0, view_h - 1, "Z: %-3d", {0, 0, 0}, {255, 255, 255}, game.camera.z);
 }
 
-static void draw_map_lines(GameState& game, size_t base, size_t count)
+static void draw_map_lines(DrawBuffer& draw_buffer, World& world, size_t base, size_t count)
 {
     int view_w;
 
@@ -121,14 +122,17 @@ static void draw_map_lines(GameState& game, size_t base, size_t count)
 
     int limit = static_cast<int>(base + count);
 
-    view_w = game.draw_buffer.width();
+    view_w = draw_buffer.width();
+
+    Map& map = world.map;
+    Vector3i camera = world.camera;
 
     for (int j = base; j < limit; ++j)
     {
-        y = game.camera.y + j;
+        y = camera.y + j;
         for (int i = 0; i < view_w - 2; ++i)
         {
-            x = game.camera.x + i;
+            x = camera.x + i;
             TileID tile_id;
             MaterialID material_id;
             MaterialID floor_material_id;
@@ -139,32 +143,32 @@ static void draw_map_lines(GameState& game, size_t base, size_t count)
             Color color_bg;
 
             under = 0;
-            game.map.at(x, y, game.camera.z, tile_id, material_id);
-            floor_material_id = game.map.floor({x, y, game.camera.z});
-            task = game.map.task_at(x, y, game.camera.z);
-            flash = game.map.flash({x, y, game.camera.z});
+            map.at(x, y, camera.z, tile_id, material_id);
+            floor_material_id = map.floor({x, y, camera.z});
+            task = map.task_at(x, y, camera.z);
+            flash = map.flash({x, y, camera.z});
 
             while (!material_id && !floor_material_id)
             {
                 if (under >= 3)
                     break;
                 under++;
-                game.map.at(x, y, game.camera.z - under, tile_id, material_id);
-                floor_material_id = game.map.floor({x, y, game.camera.z - under});
-                task = game.map.task_at(x, y, game.camera.z - under);
-                flash = game.map.flash({x, y, game.camera.z - under});
+                map.at(x, y, camera.z - under, tile_id, material_id);
+                floor_material_id = map.floor({x, y, camera.z - under});
+                task = map.task_at(x, y, camera.z - under);
+                flash = map.flash({x, y, camera.z - under});
             }
 
-            if ((!material_id && !floor_material_id) || ((!game.map.visible(x, y, game.camera.z) && task == 0) && 1))
+            if ((!material_id && !floor_material_id) || ((!map.visible(x, y, camera.z) && task == 0) && 1))
                 continue;
 
-            if (flash == Map::Flash::Action)
+            /*if (flash == Map::Flash::Action)
             {
                 sym = "\\|/-"[game.tick_render % 4];
                 color = {0, 0, 0};
                 color_bg = {255, 255, 0};
             }
-            else if (task)
+            else*/ if (task)
             {
                 sym = '!';
                 color = {255, 255, 255};
@@ -193,6 +197,7 @@ static void draw_map_lines(GameState& game, size_t base, size_t count)
                 }
             }
 
+            /*
             if (flash == Map::Flash::Pending)
             {
                 if ((game.tick_render / 2) % 2)
@@ -205,38 +210,36 @@ static void draw_map_lines(GameState& game, size_t base, size_t count)
                     color *= 0.5f;
                     color_bg *= 0.5f;
                 }
-            }
+            }*/
 
             while (under--)
             {
                 color *= 0.5f;
                 color_bg *= 0.5f;
             }
-            putchar_fast(game.draw_buffer, i + 1, j + 1, sym, color, color_bg);
+            putchar_fast(draw_buffer, i + 1, j + 1, sym, color, color_bg);
         }
     }
 }
 
-static void draw_map(GameState& game)
+static void draw_map(DrawBuffer& draw_buffer, World& world, ThreadPool& thread_pool)
 {
     static const size_t lines_per_job = 8;
-
-    ThreadPool& thread_pool(game.thread_pool);
 
     int task;
     int view_h;
     size_t job_count;
 
-    view_h = game.draw_buffer.height() - 2;
+    view_h = draw_buffer.height() - 2;
 
     job_count = ceil((float)view_h / lines_per_job);
 
     task = thread_pool.task_create();
     for (size_t i = 0; i < job_count - 1; ++i)
     {
-        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(game), i * lines_per_job, lines_per_job));
+        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), i * lines_per_job, lines_per_job));
     }
-    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(game), (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
+    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
     thread_pool.task_wait(task);
 }
 
@@ -344,6 +347,7 @@ static void draw_items(GameState& game)
 
 void game_draw(GameState& game)
 {
+    /*
     game.fps_counter_render.update();
     game.draw_buffer.clear();
     draw_map(game);
@@ -353,4 +357,10 @@ void game_draw(GameState& game)
     draw_bars(game);
     game.renderer->render(game.draw_buffer);
     game.window.swap();
+    */
+}
+
+void draw_world(DrawBuffer& buffer, World& world, ThreadPool& thread_pool)
+{
+    draw_map(buffer, world, thread_pool);
 }

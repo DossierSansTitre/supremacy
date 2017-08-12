@@ -29,6 +29,8 @@ void Map::create(int width, int height, int depth)
 
     _tiles = new TileID[size];
     _materials = new MaterialID[size];
+    std::fill(_tiles, _tiles + size, 0);
+    std::fill(_materials, _materials + size, 0);
     _floors.resize(size);
     _visible.resize(size);
     _occupied.resize(size);
