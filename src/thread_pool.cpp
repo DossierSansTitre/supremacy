@@ -11,7 +11,7 @@ ThreadPool::ThreadPool()
 , _job_size(0u)
 {
     size_t thread_count;
-    
+
     thread_count = std::thread::hardware_concurrency();
 
     if (thread_count == 0)
@@ -75,12 +75,13 @@ bool ThreadPool::task_finished(int task) const
 
 void ThreadPool::task_perform(int task, const Job& job)
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
 
     _job_task.push_back(task);
     _job_function.push_back(job);
     _task_pending_count[task]++;
     _job_size++;
+    lock.unlock();
     _cv_worker.notify_one();
 }
 
