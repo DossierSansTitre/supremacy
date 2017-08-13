@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <ctime>
 #include <engine/game.h>
 #include <window.h>
 #include <scene/main_menu_scene.h>
@@ -23,6 +25,8 @@ static void launch_game(Window& window)
 int main()
 {
     Window* window;
+
+    srand(time(nullptr));
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

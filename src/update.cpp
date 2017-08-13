@@ -205,17 +205,3 @@ void update_ui(World& world, Keyboard& keyboard, Selection& selection, Vector2u 
     if (keyboard.key_pressed(SDLK_v))
         toggle_vsync();
 }
-
-/*
-   void game_update(GameState& game)
-   {
-   game.fps_counter_update.update();
-   game.tick_render++;
-   game.tick++;
-   game.map.tick();
-   if (game.keyboard.key_pressed(SDLK_v))
-   toggle_vsync(game);
-   handle_motion(game);
-   handle_ui_state(game);
-// game_ai();
-}*/
