@@ -41,11 +41,4 @@ struct GameState : private NonCopyable
     bool        vsync;
 };
 
-void game_loop(GameState& game);
-void game_event(GameState& game);
-void game_update(GameState& game);
-void game_draw(GameState& game);
-
-void game_ai(GameState& game);
-
 #endif

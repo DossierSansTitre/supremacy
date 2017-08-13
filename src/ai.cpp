@@ -7,6 +7,8 @@
 #include <material.h>
 #include <std/fixed_array.h>
 #include <math/linear.h>
+#include <update.h>
+#include <world.h>
 
 template <typename Container>
 uint32_t distance_heuristic(Vector3i pos, const Container& container)
@@ -26,75 +28,76 @@ uint32_t distance_heuristic(Vector3i pos, const Container& container)
     return min;
 }
 
-static bool can_move_from(GameState& game, int actor, Vector3i src, Vector3i delta)
+static bool can_move_from(World& world, int actor, Vector3i src, Vector3i delta)
 {
     (void)actor;
 
     Vector3i dst;
+    auto& map = world.map;
 
     dst = src + delta;
 
     if (delta.x == 0 && delta.y == 0 && delta.z == 0)
         return true;
-    if (game.map.occupied(dst))
+    if (map.occupied(dst))
         return false;
     if (delta.z < 0)
     {
-        if (!Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).move_up && !Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).move_down)
+        if (!Tile::from_id(map.tile_at(dst.x, dst.y, dst.z)).move_up && !Tile::from_id(map.tile_at(dst.x, dst.y, dst.z)).move_down)
             return false;
     }
     else if (delta.z > 0)
     {
-        if (!Tile::from_id(game.map.tile_at(src.x, src.y, src.z)).move_up)
+        if (!Tile::from_id(map.tile_at(src.x, src.y, src.z)).move_up)
             return false;
     }
-    if (!game.map.tile_at(dst.x, dst.y, dst.z) && game.map.floor(dst))
+    if (!map.tile_at(dst.x, dst.y, dst.z) && map.floor(dst))
         return true;
-    if (Tile::from_id(game.map.tile_at(dst.x, dst.y, dst.z)).walkable)
+    if (Tile::from_id(map.tile_at(dst.x, dst.y, dst.z)).walkable)
         return true;
     return false;
 }
 
-static bool can_move(GameState& game, int actor, Vector3i delta)
+static bool can_move(World& world, int actor, Vector3i delta)
 {
     Vector3i src;
 
-    src = game.actors.pos(actor);
-    return can_move_from(game, actor, src, delta);
+    src = world.actors.pos(actor);
+    return can_move_from(world, actor, src, delta);
 }
 
-static bool try_move(GameState& game, int actor, Vector3i delta)
+static bool try_move(World& world, int actor, Vector3i delta)
 {
     Vector3i src;
     Vector3i dst;
     bool b;
 
-    src = game.actors.pos(actor);
+    src = world.actors.pos(actor);
     dst = src + delta;
-    b = can_move(game, actor, delta);
+    b = can_move(world, actor, delta);
     if (b)
     {
-        game.actors.set_pos(actor, dst);
-        game.map.set_occupied(src, false);
-        game.map.set_occupied(dst, true);
+        world.actors.set_pos(actor, dst);
+        world.map.set_occupied(src, false);
+        world.map.set_occupied(dst, true);
     }
     return b;
 }
 
-static bool try_move_auto_slope(GameState& game, int actor, Vector3i delta)
+static bool try_move_auto_slope(World& world, int actor, Vector3i delta)
 {
     static const Vector3i up = {0, 0, 1};
 
-    if (try_move(game, actor, delta))
+    if (try_move(world, actor, delta))
         return true;
-    if (try_move(game, actor, delta + up))
+    if (try_move(world, actor, delta + up))
         return true;
-    if (try_move(game, actor, delta - up))
+    if (try_move(world, actor, delta - up))
         return true;
     return false;
 }
 
-static void try_pathfind(GameState& game, int actor)
+static void try_pathfind(World& world, int actor)
 {
     static const size_t nodes_max = 500;
     static const size_t sample_size_max = 25;
@@ -119,17 +122,20 @@ static void try_pathfind(GameState& game, int actor)
     FixedArray<Vector3i, sample_size_max> samples;
     size_t sample_size;
 
-    PathFinder& path_finder = game.actors.path_finder(actor);
-    Vector3i pos = game.actors.pos(actor);
+    auto& actors = world.actors;
+    auto& map = world.map;
+
+    PathFinder& path_finder = actors.path_finder(actor);
+    Vector3i pos = actors.pos(actor);
     Vector3i node;
     Vector3i delta;
     Vector3i dst;
 
-    sample_size = min(game.map.task_count(), sample_size_max);
+    sample_size = min(map.task_count(), sample_size_max);
     if (sample_size == 0)
         return;
     for (size_t i = 0; i < sample_size; ++i)
-        samples.push_back(game.map.task_by_index(rand() % game.map.task_count()));
+        samples.push_back(map.task_by_index(rand() % map.task_count()));
     path_finder.start(pos, distance_heuristic(pos, samples));
     for (size_t count = 0; count < nodes_max; ++count)
     {
@@ -139,14 +145,14 @@ static void try_pathfind(GameState& game, int actor)
         {
             delta = deltas[i];
             dst = node + delta;
-            uint16_t task = game.map.task_at(dst.x, dst.y, dst.z);
+            uint16_t task = map.task_at(dst.x, dst.y, dst.z);
             if (task)
             {
-                path_finder.finish_with(game.actors.path(actor), dst);
-                game.actors.set_task(actor, task);
+                path_finder.finish_with(actors.path(actor), dst);
+                actors.set_task(actor, task);
                 return;
             }
-            if (can_move_from(game, actor, node, delta))
+            if (can_move_from(world, actor, node, delta))
             {
                 path_finder.explore(dst, distance_heuristic(dst, samples));
             }
@@ -154,29 +160,30 @@ static void try_pathfind(GameState& game, int actor)
     }
 }
 
-static bool move_with_path(GameState& game, int actor)
+static bool move_with_path(World& world, int actor)
 {
-    Path& path = game.actors.path(actor);
+    auto& actors = world.actors;
+    Path& path = actors.path(actor);
     Vector3i next_node;
     Vector3i pos;
     Vector3i delta;
 
     if (path.size() < 2)
         return false;
-    if (game.actors.task(actor))
-        game.map.set_flash(game.actors.path(actor).front(), Map::Flash::Pending);
-    if (!game.actors.use_speed(actor, 100))
+    if (actors.task(actor))
+        world.map.set_flash(actors.path(actor).front(), Map::Flash::Pending);
+    if (!actors.use_speed(actor, 100))
         return true;
     next_node = path.back();
     path.pop_back();
-    pos = game.actors.pos(actor);
+    pos = actors.pos(actor);
     delta = next_node - pos;
     if (delta.x * delta.x + delta.y * delta.y > 1)
     {
         path.clear();
         return false;
     }
-    if (!try_move(game, actor, delta))
+    if (!try_move(world, actor, delta))
     {
         path.clear();
         return false;
@@ -184,61 +191,68 @@ static bool move_with_path(GameState& game, int actor)
     return true;
 }
 
-void drop_item_at(GameState& game, Vector3i pos)
+void drop_item_at(World& world, Vector3i pos)
 {
-    int frequency = Tile::from_id(game.map.tile_at(pos.x, pos.y, pos.z)).dropping_frequency;
+    auto& map = world.map;
+    auto& items = world.items;
+
+    int frequency = Tile::from_id(map.tile_at(pos.x, pos.y, pos.z)).dropping_frequency;
     if (frequency != 0 && rand() % frequency == 0)
-        game.items.add(Material::from_id(game.map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
+        items.add(Material::from_id(map.material_at(pos.x, pos.y, pos.z)).dropping_item, pos, 1);
 }
 
-static void ai_task(GameState& game, int actor, uint16_t task)
+static void ai_task(World& world, int actor, uint16_t task)
 {
     Vector3i pos;
     Vector3i delta;
 
-    pos = game.actors.path(actor).front();
-    delta = pos - game.actors.pos(actor);
+    auto& actors = world.actors;
+    auto& map = world.map;
+
+    pos = actors.path(actor).front();
+    delta = pos - actors.pos(actor);
     if (delta.x * delta.x + delta.y * delta.y > 1 || delta.z * delta.z > 1)
     {
-        game.actors.set_task(actor, 0);
+        actors.set_task(actor, 0);
         return;
     }
-    game.map.set_flash(pos, Map::Flash::Action);
-    if (!game.actors.use_speed(actor, 2000))
+    map.set_flash(pos, Map::Flash::Action);
+    if (!actors.use_speed(actor, 2000))
         return;
     const Task& task_data = Task::from_id(task);
     if (task_data.into == 0)
     {
-        drop_item_at(game, pos);
-        game.map.set_tile(pos.x, pos.y, pos.z, 0);
-        game.map.set_material(pos.x, pos.y, pos.z, 0);
+        drop_item_at(world, pos);
+        map.set_tile(pos.x, pos.y, pos.z, 0);
+        map.set_material(pos.x, pos.y, pos.z, 0);
     }
     else
     {
         const Tile& tile_data = Tile::from_id(TileID(task_data.into));
 
-        if (game.map.material_at(pos.x, pos.y, pos.z) == 0)
-            game.map.set_material(pos.x, pos.y, pos.z, game.map.floor(pos));
-        game.map.set_tile(pos.x, pos.y, pos.z, TileID(task_data.into));
+        if (map.material_at(pos.x, pos.y, pos.z) == 0)
+            map.set_material(pos.x, pos.y, pos.z, map.floor(pos));
+        map.set_tile(pos.x, pos.y, pos.z, TileID(task_data.into));
         if (tile_data.move_up)
-            game.map.set_floor(pos + Vector3i(0, 0, 1), MaterialID(0));
+            map.set_floor(pos + Vector3i(0, 0, 1), MaterialID(0));
         if (tile_data.move_down)
-            game.map.set_floor(pos, MaterialID(0));
+            map.set_floor(pos, MaterialID(0));
     }
-    game.map.set_task(pos.x, pos.y, pos.z, 0);
-    game.actors.set_task(actor, 0);
-    try_pathfind(game, actor);
+    map.set_task(pos.x, pos.y, pos.z, 0);
+    actors.set_task(actor, 0);
+    try_pathfind(world, actor);
 }
 
-static void ai_wander(GameState& game, int actor)
+static void ai_wander(World& world, int actor, u32 tick)
 {
-    Actors& actors = game.actors;
     Vector3i delta = {0, 0, 0};
     int r;
 
-    if ((actor + game.tick) % 16 == 0)
+    auto& actors = world.actors;
+
+    if ((actor + tick) % 16 == 0)
     {
-        try_pathfind(game, actor);
+        try_pathfind(world, actor);
         return;
     }
     if (!actors.use_speed(actor, 250))
@@ -254,26 +268,26 @@ static void ai_wander(GameState& game, int actor)
         delta.y++;
     else
         delta.y--;
-    try_move_auto_slope(game, actor, delta);
+    try_move_auto_slope(world, actor, delta);
 }
 
-void game_ai(GameState& game)
+void update_ai(World& world, u32 tick)
 {
     int count;
     uint16_t task;
-    Actors& actors = game.actors;
+    Actors& actors = world.actors;
 
     count = actors.count();
 
     for (int i = 0; i < count; ++i)
     {
         actors.speed_tick(i);
-        if (move_with_path(game, i))
+        if (move_with_path(world, i))
             continue;
         task = actors.task(i);
         if (task)
-            ai_task(game, i, task);
+            ai_task(world, i, task);
         else
-            ai_wander(game, i);
+            ai_wander(world, i, tick);
     }
 }

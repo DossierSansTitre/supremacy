@@ -2,13 +2,17 @@
 #include <task.h>
 #include <math/rect.h>
 #include <math/linear.h>
+#include <update.h>
+#include <world.h>
+#include <selection.h>
 
 // TODO: Remove this
 static uint16_t selection_task;
+static bool vsync = true;
 
-static void toggle_vsync(GameState& game)
+static void toggle_vsync()
 {
-    if (game.vsync)
+    if (vsync)
     {
         SDL_GL_SetSwapInterval(0);
     }
@@ -17,47 +21,50 @@ static void toggle_vsync(GameState& game)
         if (SDL_GL_SetSwapInterval(-1))
             SDL_GL_SetSwapInterval(1);
     }
-    game.vsync = !game.vsync;
+    vsync = !vsync;
 }
 
-static Vector3i clamp_motion(GameState& game, Vector3i origin, Vector3i delta)
+static Vector3i clamp_motion(const Map& map, Vector3i origin, Vector3i delta)
 {
     if (origin.x + delta.x < 0)
         delta.x = -origin.x;
-    else if (origin.x + delta.x >= game.map.width())
-        delta.x = game.map.width() - 1 - origin.x;
+    else if (origin.x + delta.x >= map.width())
+        delta.x = map.width() - 1 - origin.x;
     if (origin.y + delta.y < 0)
         delta.y = -origin.y;
-    else if (origin.y + delta.y >= game.map.height())
-        delta.y = game.map.height() - 1 - origin.y;
+    else if (origin.y + delta.y >= map.height())
+        delta.y = map.height() - 1 - origin.y;
     if (origin.z + delta.z < 0)
         delta.z = -origin.z;
-    else if (origin.z + delta.z >= game.map.depth())
-        delta.z = game.map.depth() - 1 - origin.z;
+    else if (origin.z + delta.z >= map.depth())
+        delta.z = map.depth() - 1 - origin.z;
     return delta;
 }
 
-static void clamp_camera(GameState& game)
+static void clamp_camera(World& world, Vector2u viewport)
 {
     int w;
     int h;
 
-    w = game.draw_buffer.width() - 2;
-    h = game.draw_buffer.height() - 2;
-    if (game.camera.x + w >= game.map.width())
-        game.camera.x = game.map.width() - w;
-    if (game.camera.y + h >= game.map.height())
-        game.camera.y = game.map.height() - h;
+    const auto& map = world.map;
+    auto& camera = world.camera;
+
+    w = viewport.x - 2;
+    h = viewport.y - 2;
+    if (camera.x + w >= map.width())
+        camera.x = map.width() - w;
+    if (camera.y + h >= map.height())
+        camera.y = map.height() - h;
 }
 
-static Vector3i keyboard_motion(GameState& game)
+static Vector3i keyboard_motion(Keyboard& keyboard)
 {
     bool shift;
     int delta;
     int delta_z;
     Vector3i motion = {0, 0, 0};
 
-    shift = (game.keyboard.down(SDL_SCANCODE_LSHIFT) || game.keyboard.down(SDL_SCANCODE_RSHIFT));
+    shift = (keyboard.down(SDL_SCANCODE_LSHIFT) || keyboard.down(SDL_SCANCODE_RSHIFT));
 
     if (shift)
     {
@@ -70,55 +77,52 @@ static Vector3i keyboard_motion(GameState& game)
         delta_z = 1;
     }
 
-    if (game.keyboard.repeated(SDL_SCANCODE_LEFT))
+    if (keyboard.repeated(SDL_SCANCODE_LEFT))
         motion.x -= delta;
-    if (game.keyboard.repeated(SDL_SCANCODE_RIGHT))
+    if (keyboard.repeated(SDL_SCANCODE_RIGHT))
         motion.x += delta;
-    if (game.keyboard.repeated(SDL_SCANCODE_UP))
+    if (keyboard.repeated(SDL_SCANCODE_UP))
         motion.y -= delta;
-    if (game.keyboard.repeated(SDL_SCANCODE_DOWN))
+    if (keyboard.repeated(SDL_SCANCODE_DOWN))
         motion.y += delta;
-    if (game.keyboard.key_repeated(SDLK_q))
+    if (keyboard.key_repeated(SDLK_q))
         motion.z += delta_z;
-    if (game.keyboard.key_repeated(SDLK_e))
+    if (keyboard.key_repeated(SDLK_e))
         motion.z -= delta_z;
     return motion;
 }
 
-static void move_camera(GameState& game, Vector3i motion)
+static void move_camera(World& world, Vector2u viewport, Vector3i motion)
 {
-    motion = clamp_motion(game, game.camera, motion);
-    game.camera.x += motion.x;
-    game.camera.y += motion.y;
-    game.camera.z += motion.z;
+    auto& camera = world.camera;
 
-    clamp_camera(game);
+    motion = clamp_motion(world.map, camera, motion);
+    camera += motion;
+    clamp_camera(world, viewport);
 }
 
-void move_selection(GameState& game, Vector3i motion)
+void move_selection(World& world, Selection& selection, Vector3i motion)
 {
-    motion = clamp_motion(game, game.cursor, motion);
-    game.cursor.x += motion.x;
-    game.cursor.y += motion.y;
-    game.cursor.z += motion.z;
+    auto cursor = selection.cursor();
+    motion = clamp_motion(world.map, cursor, motion);
+    cursor += motion;
+    selection.set_cursor(cursor);
+
+    world.camera.z += motion.z;
 }
 
-void handle_motion(GameState& game)
+void handle_motion(World& world, Keyboard& keyboard, Selection& selection, Vector2u viewport)
 {
     Vector3i motion;
 
-    motion = keyboard_motion(game);
-    if (game.ui_state == UiStateID::None)
-    {
-        move_camera(game, motion);
-    }
+    motion = keyboard_motion(keyboard);
+    if (selection.state() == Selection::State::Inactive)
+        move_camera(world, viewport, motion);
     else
-    {
-        move_selection(game, motion);
-    }
+        move_selection(world, selection, motion);
 }
 
-static void set_action_rect(GameState& game, Rect3i rect, uint16_t task)
+static void set_action_rect(Map& map, Rect3i rect, uint16_t task)
 {
     int x;
     int y;
@@ -138,9 +142,9 @@ static void set_action_rect(GameState& game, Rect3i rect, uint16_t task)
 
                 for (uint16_t tile : task_data.match)
                 {
-                    if (game.map.tile_at(x, y, z) == TileID(tile))
+                    if (map.tile_at(x, y, z) == TileID(tile))
                     {
-                        game.map.set_task(x, y, z, task);
+                        map.set_task(x, y, z, task);
                         break;
                     }
                 }
@@ -149,86 +153,69 @@ static void set_action_rect(GameState& game, Rect3i rect, uint16_t task)
     }
 }
 
-static void handle_ui_state_selection(GameState& game)
+static void handle_ui_state_selection(World& world, Keyboard& keyboard, Selection& selection)
 {
-    if (game.keyboard.key_pressed(SDLK_ESCAPE))
+    if (keyboard.key_pressed(SDLK_RETURN))
     {
-        if (game.selected_first)
-            game.selected_first = false;
-        else
-            game.ui_state = UiStateID::None;
-    }
-    else if (game.keyboard.key_pressed(SDLK_RETURN))
-    {
-        if (!game.selected_first)
-        {
-            game.selection[0] = game.cursor;
-            game.selected_first = true;
-        }
-        else
-        {
-            game.selection[1] = game.cursor;
-            game.ui_state = UiStateID::None;
-            set_action_rect(game, rect_from_points(game.selection[0], game.selection[1]), selection_task);
-        }
+        selection.advance();
+        if (selection.state() == Selection::State::Inactive)
+            set_action_rect(world.map, selection.selected(), selection_task);
     }
 }
 
-static void start_selection(GameState& game)
+static void start_selection(World& world, Selection& selection, Vector2u viewport)
 {
-    game.cursor = game.camera;
-    game.cursor.x += (game.draw_buffer.width() - 2) / 2;
-    game.cursor.y += (game.draw_buffer.height() - 2) / 2;
-    game.ui_state = UiStateID::Selection;
-    game.selected_first = false;
+    Vector3i cursor;
+
+    cursor = world.camera;
+    cursor += (Vector3i(viewport, 0) - Vector3i(2, 2, 0)) / 2;
+    selection.set_cursor(cursor);
+    selection.advance();
 }
 
-static void handle_ui_state_none(GameState& game)
+static void handle_ui_state_none(World& world, Keyboard& keyboard, Selection& selection, Vector2u viewport)
 {
-    if (game.keyboard.key_pressed(SDLK_m))
+    if (keyboard.key_pressed(SDLK_m))
     {
         selection_task = 1;
-        start_selection(game);
+        start_selection(world, selection, viewport);
         return;
     }
-    else if (game.keyboard.key_pressed(SDLK_n))
+    else if (keyboard.key_pressed(SDLK_n))
     {
         selection_task = 2;
-        start_selection(game);
+        start_selection(world, selection, viewport);
         return;
     }
-    else if (game.keyboard.key_pressed(SDLK_x))
+    else if (keyboard.key_pressed(SDLK_x))
     {
         selection_task = 3;
-        start_selection(game);
+        start_selection(world, selection, viewport);
         return;
     }
-    if (game.keyboard.key_pressed(SDLK_ESCAPE))
-        game.running = false;
 }
 
-static void handle_ui_state(GameState& game)
+void update_ui(World& world, Keyboard& keyboard, Selection& selection, Vector2u viewport)
 {
-    switch (game.ui_state)
-    {
-        case UiStateID::None:
-            handle_ui_state_none(game);
-            break;
-        case UiStateID::Selection:
-            handle_ui_state_selection(game);
-            break;
-    }
+    if (selection.state() == Selection::State::Inactive)
+        handle_ui_state_none(world, keyboard, selection, viewport);
+    else
+        handle_ui_state_selection(world, keyboard, selection);
+    handle_motion(world, keyboard, selection, viewport);
+    if (keyboard.key_pressed(SDLK_v))
+        toggle_vsync();
 }
 
-void game_update(GameState& game)
-{
-    game.fps_counter_update.update();
-    game.tick_render++;
-    game.tick++;
-    game.map.tick();
-    if (game.keyboard.key_pressed(SDLK_v))
-        toggle_vsync(game);
-    handle_motion(game);
-    handle_ui_state(game);
-    game_ai(game);
-}
+/*
+   void game_update(GameState& game)
+   {
+   game.fps_counter_update.update();
+   game.tick_render++;
+   game.tick++;
+   game.map.tick();
+   if (game.keyboard.key_pressed(SDLK_v))
+   toggle_vsync(game);
+   handle_motion(game);
+   handle_ui_state(game);
+// game_ai();
+}*/

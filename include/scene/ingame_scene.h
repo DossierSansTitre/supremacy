@@ -17,7 +17,9 @@ public:
 private:
     World*      _world;
     Selection   _selection;
+    u32         _update_tick;
     u32         _render_tick;
+    Vector2u    _viewport;
 };
 
 #endif
