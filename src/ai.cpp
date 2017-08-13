@@ -1,5 +1,4 @@
 #include <cmath>
-#include <game_state.h>
 #include <tile.h>
 #include <path.h>
 #include <action_id.h>

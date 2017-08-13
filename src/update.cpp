@@ -1,10 +1,11 @@
-#include <game_state.h>
+#include <SDL2/SDL.h>
 #include <task.h>
 #include <math/rect.h>
 #include <math/linear.h>
 #include <update.h>
 #include <world.h>
 #include <selection.h>
+#include <keyboard.h>
 
 // TODO: Remove this
 static uint16_t selection_task;

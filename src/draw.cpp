@@ -1,4 +1,3 @@
-#include <game_state.h>
 #include <tile.h>
 #include <material.h>
 #include <actor_data.h>
