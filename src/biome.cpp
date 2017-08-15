@@ -70,6 +70,13 @@ static void load_biome(Biome& biome, MemoryFile& file)
                 break;
         }
     }
+    file.read(&biome.color.r);
+    file.read(&biome.color.g);
+    file.read(&biome.color.b);
+    file.read(&biome.color_bg.r);
+    file.read(&biome.color_bg.g);
+    file.read(&biome.color_bg.b);
+    file.read(&biome.symbol);
 }
 
 void Biome::load(Archive& archive)

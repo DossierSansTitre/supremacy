@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <std/sparse_array.h>
 #include <archive.h>
+#include <color.h>
 
 struct Biome
 {
@@ -61,7 +62,10 @@ struct Biome
         };
     };
 
-    Array<Layer> layers;
+    Array<Layer>    layers;
+    Color           color;
+    Color           color_bg;
+    uint16_t        symbol;
 
     static SparseArray<Biome> _data;
 

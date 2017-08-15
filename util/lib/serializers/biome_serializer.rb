@@ -4,7 +4,10 @@ class BiomeSerializer < Serializer
   def serialize(biome)
     layers = biome.fetch('Layers', []).map{|layer| serialize_layer(biome, layer)}
     layers_data = [layers.size].pack('S<') + layers.join('')
-    [biome.id].pack('S<') + layers_data
+    color = biome.color('Color', '#000000')
+    bg_color = biome.color('BackgroundColor', '#000000')
+    symbol = biome.symbol('Symbol', 0)
+    [biome.id].pack('S<') + layers_data + [color, bg_color, symbol].flatten.pack('C6S<')
   end
 
   private
