@@ -1,5 +1,6 @@
 #include <scene/main_menu_scene.h>
 #include <scene/ingame_scene.h>
+#include <scene/worldmap_generation_scene.h>
 #include <engine/game.h>
 
 static void render_centered(DrawBuffer& buffer, int y, const char* str, Color color)
@@ -63,7 +64,7 @@ void MainMenuScene::menu_action()
 {
     if (_selection == 0)
     {
-        game().set_scene<IngameScene>();
+        game().set_scene<WorldmapGenerationScene>();
     }
     else if (_selection == 2)
     {
