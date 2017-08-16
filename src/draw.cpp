@@ -7,6 +7,9 @@
 #include <world.h>
 #include <engine/game.h>
 #include <selection.h>
+#include <draw.h>
+#include <worldmap.h>
+#include <biome.h>
 
 static void draw_rect_ingame(DrawBuffer& draw_buffer, World& world, Rect3i rect, int sym, Color color, Color color_bg)
 {
@@ -360,4 +363,19 @@ void draw_world(DrawBuffer& buffer, World& world, Game& game, u32 render_tick)
     draw_items(buffer, world);
     draw_actors(buffer, world, render_tick);
     draw_bars(buffer, world, game);
+}
+
+void draw_worldmap(DrawBuffer& draw_buffer, Worldmap& worldmap, Vector2i offset)
+{
+    Vector2i size;
+
+    size = worldmap.size();
+    for (int j = 0; j < size.y; ++j)
+    {
+        for (int i = 0; i < size.x; ++i)
+        {
+            const auto& biome = Biome::from_id(worldmap.biome({i, j}));
+            putchar(draw_buffer, i + offset.x, j + offset.y, biome.symbol, biome.color, biome.color_bg);
+        }
+    }
 }

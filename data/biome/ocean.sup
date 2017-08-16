@@ -1,0 +1,6 @@
+ID = 4
+Name = Ocean
+Color = #0000ff
+BackgroundColor = #0000cc
+Symbol = '~'
+Height = -10000 200

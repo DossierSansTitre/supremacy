@@ -3,6 +3,7 @@ Name = Greenland
 Color = #90d15c
 BackgroundColor = #508426
 Symbol = "'"
+Height = 200 600
 Layers = ---
 OCTAVE 2.0 7 2.2 20 15 Block:Rock
 FILL 10 Block:Dirt

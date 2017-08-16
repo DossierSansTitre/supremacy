@@ -185,6 +185,11 @@ public:
         _data = new_data;
     }
 
+    void clear()
+    {
+        resize(0);
+    }
+
 private:
     size_t  _size;
     size_t  _capacity;

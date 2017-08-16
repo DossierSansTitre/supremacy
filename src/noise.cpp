@@ -5,13 +5,13 @@ float lerp(float a, float b, float alpha)
     return (a * (1.f - alpha) + b * alpha);
 }
 
-float bilinear(float v00, float v10, float v01, float v11, float dx, float dy)
+float bilinear(const float* v, float dx, float dy)
 {
     float y0;
     float y1;
 
-    y0 = lerp(v00, v10, dx);
-    y1 = lerp(v01, v11, dx);
+    y0 = lerp(v[0], v[1], dx);
+    y1 = lerp(v[2], v[3], dx);
 
     return lerp(y0, y1, dy);
 }
@@ -44,26 +44,31 @@ float noise_clamped_2d(uint32_t seed, int32_t x, int32_t y)
     return noise_uniform_hash_2d(seed, x, y) / 4294967295.f;
 }
 
-float noise_fractal_2d(uint32_t seed, float x, float y)
+float noise_smooth_2d(uint32_t seed, int32_t x, int32_t y, int octave)
 {
-    int ix;
-    int iy;
+    float v[4];
     float dx;
     float dy;
-    float v[4];
+    int32_t pot;
+    int32_t alt_x;
+    int32_t alt_y;
+    int32_t rem_x;
+    int32_t rem_y;
 
-    ix = (int)x;
-    iy = (int)y;
+    pot = (1 << octave);
+    alt_x = x / pot;
+    alt_y = y / pot;
+    rem_x = x % pot;
+    rem_y = y % pot;
+    dx = float(rem_x) / pot;
+    dy = float(rem_y) / pot;
 
-    dx = x - ix;
-    dy = y - iy;
+    v[0] = noise_clamped_2d(seed, alt_x, alt_y);
+    v[1] = noise_clamped_2d(seed, alt_x + 1, alt_y);
+    v[2] = noise_clamped_2d(seed, alt_x, alt_y + 1);
+    v[3] = noise_clamped_2d(seed, alt_x + 1, alt_y + 1);
 
-    v[0] = noise_clamped_2d(seed, ix, iy);
-    v[1] = noise_clamped_2d(seed, ix + 1, iy);
-    v[2] = noise_clamped_2d(seed, ix, iy + 1);
-    v[3] = noise_clamped_2d(seed, ix + 1, iy + 1);
-
-    return bilinear(v[0], v[1], v[2], v[3], dx, dy);
+    return bilinear(v, dx, dy);
 }
 
 float noise_fractal_octave_2d(uint32_t seed, uint32_t x, uint32_t y, float persistance, int octaves)
@@ -71,19 +76,16 @@ float noise_fractal_octave_2d(uint32_t seed, uint32_t x, uint32_t y, float persi
     float amplitude;
     float acc;
     float max;
-    float frequency;
 
-    frequency = 1.f;
-    amplitude = 1.f;
-    acc = 0.f;
-    max = 0.f;
+    amplitude = persistance;
+    acc = noise_clamped_2d(seed, x, y);
+    max = 1.f;
 
-    for (int i = 0; i < octaves; ++i)
+    for (int i = 1; i < octaves; ++i)
     {
-        acc += noise_fractal_2d(seed, x / frequency, y / frequency) * amplitude;
+        acc += noise_smooth_2d(seed, x, y, i) * amplitude;
         max += amplitude;
         amplitude *= persistance;
-        frequency *= 2;
     }
 
     return acc / max;

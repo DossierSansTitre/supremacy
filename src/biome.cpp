@@ -77,6 +77,8 @@ static void load_biome(Biome& biome, MemoryFile& file)
     file.read(&biome.color_bg.g);
     file.read(&biome.color_bg.b);
     file.read(&biome.symbol);
+    file.read(&biome.height_min);
+    file.read(&biome.height_max);
 }
 
 void Biome::load(Archive& archive)

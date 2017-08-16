@@ -1,7 +1,7 @@
 #ifndef BIOME_H
 #define BIOME_H
 
-#include <cstdint>
+#include <types.h>
 #include <std/sparse_array.h>
 #include <archive.h>
 #include <color.h>
@@ -66,6 +66,8 @@ struct Biome
     Color           color;
     Color           color_bg;
     uint16_t        symbol;
+    i16             height_min;
+    i16             height_max;
 
     static SparseArray<Biome> _data;
 
