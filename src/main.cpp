@@ -24,7 +24,10 @@ static void launch_game(Window& window)
 
 int main()
 {
+    int status;
     Window* window;
+
+    status = 0;
 
     srand(time(nullptr));
 
@@ -32,11 +35,13 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     window = create_window();
-    init_game_data();
-    launch_game(*window);
+    if (init_game_data())
+        launch_game(*window);
+    else
+        status = 1;
 
     delete window;
 
     SDL_Quit();
-    return 0;
+    return status;
 }
