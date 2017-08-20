@@ -3,6 +3,7 @@
 #include <scene/worldmap_generation_scene.h>
 #include <worldmap_generator.h>
 #include <draw.h>
+#include <serialize.h>
 
 void WorldmapGenerationScene::setup()
 {
@@ -20,9 +21,18 @@ void WorldmapGenerationScene::update()
     auto& keyboard = game().keyboard();
 
     if (keyboard.pressed(SDL_SCANCODE_ESCAPE))
+    {
         game().set_scene<MainMenuScene>();
+    }
+    else if (keyboard.pressed(SDL_SCANCODE_RETURN))
+    {
+        save_worldmap(*_worldmap);
+        game().set_scene<MainMenuScene>();
+    }
     else if (keyboard.key_pressed(SDLK_r))
+    {
         generate();
+    }
 }
 
 void WorldmapGenerationScene::render(DrawBuffer& draw_buffer)
@@ -34,5 +44,5 @@ void WorldmapGenerationScene::generate()
 {
     delete _worldmap;
     WorldmapGenerator generator;
-    _worldmap = generator.generate({128, 64});
+    _worldmap = generator.generate(1, {128, 64});
 }

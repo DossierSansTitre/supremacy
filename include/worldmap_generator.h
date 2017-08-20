@@ -9,7 +9,7 @@ public:
     WorldmapGenerator();
     ~WorldmapGenerator();
 
-    Worldmap* generate(Vector2i size);
+    Worldmap* generate(u16 id, Vector2i size);
 };
 
 #endif

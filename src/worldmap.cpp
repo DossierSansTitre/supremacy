@@ -1,7 +1,8 @@
 #include <worldmap.h>
 
-Worldmap::Worldmap(Vector2i size)
-: _size(size)
+Worldmap::Worldmap(u16 id, Vector2i size)
+: _id(id)
+, _size(size)
 {
     _biomes.resize(size.x * size.y);
 }

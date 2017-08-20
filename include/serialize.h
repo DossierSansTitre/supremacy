@@ -1,6 +1,7 @@
 #ifndef SERIALIZE_H
 #define SERIALIZE_H
 
+#include <fstream>
 #include <archive.h>
 #include <std/sparse_array.h>
 #include <log.h>
@@ -23,5 +24,9 @@ void unserialize_resource_array(SparseArray<T>& array, Archive& archive, const c
     }
     log_line(LogLevel::Info, "Loaded %-20s (%d elements)", filename, count);
 }
+
+class Worldmap;
+void save_worldmap(const Worldmap& worldmap);
+void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap);
 
 #endif

@@ -43,14 +43,14 @@ WorldmapGenerator::~WorldmapGenerator()
 }
 
 
-Worldmap* WorldmapGenerator::generate(Vector2i size)
+Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size)
 {
     Worldmap*   worldmap;
     Array<i16>  heightmap;
     Array<u16>  biomes;
     i16         height;
 
-    worldmap = new Worldmap(size);
+    worldmap = new Worldmap(id, size);
 
     generate_heightmap(heightmap, size, rand());
 
