@@ -16,6 +16,7 @@ private:
     void generate();
 
     Worldmap*   _worldmap;
+    u16         _world_id;
 };
 
 #endif
