@@ -1,6 +1,19 @@
 #include <engine/game.h>
 #include <log.h>
 #include <window.h>
+#include <fstream>
+
+static void init_rng(Rng& rng)
+{
+    u64 s[2];
+    std::ifstream stream("/dev/random", std::ios::binary);
+
+    do
+    {
+        stream.read((char*)s, 16);
+    } while (s[0] == 0 && s[1] == 0);
+    rng.seed(s);
+}
 
 Game::Game(Window& window)
 : _window(window)
@@ -8,7 +21,7 @@ Game::Game(Window& window)
 , _scene(nullptr)
 , _next_scene(nullptr)
 {
-
+    init_rng(_rng);
 }
 
 Game::~Game()

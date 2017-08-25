@@ -3,6 +3,7 @@
 
 #include <non_copyable.h>
 #include <engine/game_scene.h>
+#include <math/rng.h>
 #include <keyboard.h>
 #include <thread_pool.h>
 #include <renderer.h>
@@ -19,6 +20,7 @@ public:
 
     Window&     window() { return _window; }
     Keyboard&   keyboard() { return _keyboard; }
+    Rng&        rng() { return _rng; }
     ThreadPool& thread_pool() { return _thread_pool; }
     Renderer&   renderer() { return _renderer; }
     DrawBuffer& draw_buffer() { return _draw_buffer; }
@@ -48,6 +50,7 @@ private:
 
     Window&     _window;
     Keyboard    _keyboard;
+    Rng         _rng;
     ThreadPool  _thread_pool;
     Renderer    _renderer;
     DrawBuffer  _draw_buffer;
