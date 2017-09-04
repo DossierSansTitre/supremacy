@@ -13,6 +13,7 @@ public:
 
 private:
     Array<u16>  _worldmaps;
+    u16         _cursor;
 };
 
 #endif
