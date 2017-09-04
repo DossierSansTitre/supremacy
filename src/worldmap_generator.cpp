@@ -2,6 +2,7 @@
 #include <noise.h>
 #include <biome.h>
 #include <log.h>
+#include <math/algorithm.h>
 
 static float mask_border(int value, int length)
 {
@@ -20,16 +21,12 @@ static void generate_heightmap(Array<i16>& heightmap, Vector2i size, u32 seed)
     float value;
     float mask;
 
-    for (int y = 0; y < size.y; ++y)
-    {
-        for (int x = 0; x < size.x; ++x)
-        {
-            value = noise_fractal_octave_2d(seed, x, y, 2.f, 5);
-            mask = mask_border(x, size.x);
-            mask *= mask_border(y, size.y);
-            heightmap[x + y * size.x] = value * mask * 1500 - 500;
-        }
-    }
+    iterate(size, [&] (Vector2i v) {
+        value = noise_fractal_octave_2d(seed, v.x, v.y, 2.f, 5);
+        mask = mask_border(v.x, size.x);
+        mask *= mask_border(v.y, size.y);
+        heightmap[v.x + v.y * size.x] = value * mask * 1500 - 500;
+    });
 }
 
 WorldmapGenerator::WorldmapGenerator()
@@ -55,27 +52,19 @@ Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
     worldmap = new Worldmap(id, size);
 
     generate_heightmap(heightmap, size, world_rng.rand());
-
-    for (int y = 0; y < size.y; ++y)
-    {
-        for (int x = 0; x < size.x; ++x)
+    iterate(size, [&] (auto v) {
+        biomes.clear();
+        for (size_t i = 1; i < Biome::count(); ++i)
         {
-            biomes.clear();
+            const auto& b = Biome::from_id(i);
 
-            for (size_t i = 1; i < Biome::count(); ++i)
-            {
-                const auto& b = Biome::from_id(i);
-
-                if (b.height_max == 0)
-                    continue;
-                height = heightmap[x + y * size.x];
-                if (height >= b.height_min && height < b.height_max)
-                    biomes.push_back(i);
-            }
-
-            worldmap->set_biome({x, y}, biomes[rand() % biomes.size()]);
+            if (b.height_max == 0)
+                continue;
+            height = heightmap[v.x + v.y * size.x];
+            if (height >= b.height_min && height < b.height_max)
+                biomes.push_back(i);
         }
-    }
-
+        worldmap->set_biome(v, biomes[rand() % biomes.size()]);
+    });
     return worldmap;
 }
