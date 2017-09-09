@@ -2,12 +2,13 @@
 #include <worldmap.h>
 #include <biome.h>
 #include <math/algorithm.h>
+#include <log.h>
 
 void draw(DrawBuffer& db, const Worldmap& worldmap, Rect2i dst, Rect2i src)
 {
     float dt;
 
-    dt = src.size.x / dst.size.x;
+    dt = float(src.size.x) / dst.size.x;
     iterate(dst.size, [&] (Vector2i d) {
         Vector2i s;
 

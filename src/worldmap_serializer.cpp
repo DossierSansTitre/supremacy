@@ -32,7 +32,7 @@ Worldmap* load_worldmap(u16 world_id)
     char buffer[4096];
 
     snprintf(buffer, 4096, "worlds/world_%05u/map.bin", world_id);
-    stream.open(buffer, std::ios::binary);
+    stream.open(save_path(buffer), std::ios::binary);
 
     return unserialize_worldmap(stream, world_id);
 }

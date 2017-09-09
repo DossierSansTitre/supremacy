@@ -17,8 +17,14 @@ public:
     void render(DrawBuffer& db) override;
 
 private:
+    void move_cursor(Vector2i delta);
+    void fix_camera();
+
     u16         _world_id;
     Worldmap*   _worldmap;
+    Vector2i    _cursor;
+    Vector2i    _camera;
+    int         _width;
 };
 
 #endif

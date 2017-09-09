@@ -22,7 +22,7 @@ static void generate_heightmap(Array<i16>& heightmap, Vector2i size, u32 seed)
     float mask;
 
     iterate(size, [&] (Vector2i v) {
-        value = noise_fractal_octave_2d(seed, v.x, v.y, 2.f, 6);
+        value = noise_fractal_octave_2d(seed, v.x, v.y, 2.f, 7);
         mask = mask_border(v.x, size.x);
         mask *= mask_border(v.y, size.y);
         heightmap[v.x + v.y * size.x] = value * mask * 1500 - 500;
