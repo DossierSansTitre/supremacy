@@ -1,5 +1,6 @@
 #include <scene/load_world_selection_scene.h>
 #include <scene/main_menu_scene.h>
+#include <scene/embark_scene.h>
 #include <engine/game.h>
 #include <dirent.h>
 #include <util/file_path.h>
@@ -22,7 +23,6 @@ void LoadWorldSelectionScene::setup()
         if (strncmp(name, prefix, strlen(prefix)) != 0)
             continue;
         world_id = atol(name + strlen(prefix));
-        log_line(LogLevel::Debug, "Found world %x", world_id);
         _worldmaps.push_back(world_id);
     }
     closedir(dir);
@@ -38,6 +38,8 @@ void LoadWorldSelectionScene::update()
         _cursor--;
     if (kb.repeated(SDL_SCANCODE_DOWN) && (_cursor < _worldmaps.size() - 1))
         _cursor++;
+    if (kb.repeated(SDL_SCANCODE_RETURN))
+        game().set_scene<EmbarkScene>();
 }
 
 void LoadWorldSelectionScene::render(DrawBuffer& db)

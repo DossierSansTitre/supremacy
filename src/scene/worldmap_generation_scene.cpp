@@ -64,5 +64,5 @@ void WorldmapGenerationScene::generate()
 {
     delete _worldmap;
     WorldmapGenerator generator;
-    _worldmap = generator.generate(_world_id, {128, 64}, game().rng());
+    _worldmap = generator.generate(_world_id, {256, 128}, game().rng());
 }

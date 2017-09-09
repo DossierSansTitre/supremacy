@@ -8,6 +8,7 @@
 #include <tile.h>
 #include <util/file_path.h>
 #include <log.h>
+#include <unistd.h>
 
 static bool make_save_path(const char* path)
 {
@@ -31,6 +32,8 @@ bool init_game_data()
 {
     bool good;
     Archive archive;
+
+    log_line(LogLevel::Info, "Game started with PID %u", getpid());
 
     good = true;
     good &= make_game_paths();
