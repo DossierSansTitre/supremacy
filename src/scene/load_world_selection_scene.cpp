@@ -39,7 +39,7 @@ void LoadWorldSelectionScene::update()
     if (kb.repeated(SDL_SCANCODE_DOWN) && (_cursor < _worldmaps.size() - 1))
         _cursor++;
     if (kb.repeated(SDL_SCANCODE_RETURN))
-        game().set_scene<EmbarkScene>();
+        game().set_scene<EmbarkScene>(_worldmaps[_cursor]);
 }
 
 void LoadWorldSelectionScene::render(DrawBuffer& db)

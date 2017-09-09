@@ -25,3 +25,27 @@ void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap)
     stream.write((char*)&worldmap._size.y, 4);
     stream.write((char*)worldmap._biomes.data(), len * sizeof(BiomeID));
 }
+
+Worldmap* load_worldmap(u16 world_id)
+{
+    std::ifstream stream;
+    char buffer[4096];
+
+    snprintf(buffer, 4096, "worlds/world_%05u/map.bin", world_id);
+    stream.open(buffer, std::ios::binary);
+
+    return unserialize_worldmap(stream, world_id);
+}
+
+Worldmap* unserialize_worldmap(std::ifstream& stream, u16 world_id)
+{
+    Worldmap* worldmap;
+    Vector2i size;
+
+    stream.read((char*)&size.x, 4);
+    stream.read((char*)&size.y, 4);
+    worldmap = new Worldmap(world_id, size);
+    stream.read((char*)worldmap->_biomes.data(), size.x * size.y * sizeof(BiomeID));
+
+    return worldmap;
+}

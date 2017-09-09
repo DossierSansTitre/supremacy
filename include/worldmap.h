@@ -9,7 +9,8 @@
 class Worldmap
 {
 public:
-    friend void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap);
+    friend void         serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap);
+    friend Worldmap*    unserialize_worldmap(std::ifstream& stream, u16 world_id);
 
     Worldmap(u16 id, Vector2i size);
 

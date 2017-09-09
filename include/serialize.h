@@ -5,6 +5,7 @@
 #include <archive.h>
 #include <std/sparse_array.h>
 #include <log.h>
+#include <types.h>
 
 template <typename T, typename Func>
 void unserialize_resource_array(SparseArray<T>& array, Archive& archive, const char* filename, Func func)
@@ -28,5 +29,7 @@ void unserialize_resource_array(SparseArray<T>& array, Archive& archive, const c
 class Worldmap;
 void save_worldmap(const Worldmap& worldmap);
 void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap);
+Worldmap* load_worldmap(u16 world_id);
+Worldmap* unserialize_worldmap(std::ifstream& stream, u16 world_id);
 
 #endif
