@@ -190,6 +190,6 @@ private:
     std::vector<int>        _flash_reset;
 };
 
-void generate_map(Map& map, uint32_t seed);
+void generate_map(Map& map, BiomeID biome_id, uint32_t seed);
 
 #endif

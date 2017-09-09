@@ -1,5 +1,6 @@
 #include <scene/embark_scene.h>
 #include <scene/load_world_selection_scene.h>
+#include <scene/ingame_scene.h>
 #include <serialize.h>
 #include <engine/game.h>
 #include <draw.h>
@@ -58,6 +59,11 @@ void EmbarkScene::update()
         move_cursor({0, -speed});
     if (kb.repeated(SDL_SCANCODE_DOWN))
         move_cursor({0, speed});
+
+    if (kb.pressed(SDL_SCANCODE_RETURN))
+    {
+        game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
+    }
     fix_camera();
 }
 

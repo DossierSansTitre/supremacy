@@ -9,12 +9,15 @@
 class IngameScene : public GameScene
 {
 public:
+    IngameScene(u16 world_id, u32 region_id);
     void setup() override;
     void teardown() override;
     void update() override;
     void render(DrawBuffer& draw_buffer) override;
 
 private:
+    u16         _world_id;
+    u32         _region_id;
     World*      _world;
     Selection   _selection;
     u32         _update_tick;
