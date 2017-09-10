@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <util/file_path.h>
 #include <serialize.h>
+#include <math/algorithm.h>
 
 static u16 get_next_world_id()
 {
@@ -27,6 +28,7 @@ void WorldmapGenerationScene::setup()
 {
     _worldmap = nullptr;
     _world_id = get_next_world_id();
+    _world_size = 256;
     generate();
 }
 
@@ -52,17 +54,43 @@ void WorldmapGenerationScene::update()
     {
         generate();
     }
+    if (keyboard.pressed(SDL_SCANCODE_RIGHT))
+        change_size(_world_size * 2);
+    if (keyboard.pressed(SDL_SCANCODE_LEFT))
+        change_size(_world_size / 2);
 }
 
 void WorldmapGenerationScene::render(DrawBuffer& draw_buffer)
 {
-    printf(draw_buffer, 1, 0, "World %u", {255, 255, 255}, {0, 0, 0}, _world_id);
-    draw_worldmap(draw_buffer, *_worldmap, Vector2i(1, 1));
+    int size;
+    int w;
+    int h;
+
+    w = draw_buffer.size().x;
+    h = draw_buffer.size().y - 2;
+    size = min(w, h);
+
+    printf(draw_buffer, 0, 0, "World %u", {255, 255, 255}, {0, 0, 0}, _world_id);
+    draw(draw_buffer, *_worldmap, {{0, 1}, {size, size}}, {{0, 0}, _worldmap->size()});
+    printf(draw_buffer, 0, size + 1, "Size: %dx%d", {255, 255, 255}, {0, 0, 0}, _world_size, _world_size);
 }
 
 void WorldmapGenerationScene::generate()
 {
     delete _worldmap;
     WorldmapGenerator generator;
-    _worldmap = generator.generate(_world_id, {512, 512}, game().rng());
+    _worldmap = generator.generate(_world_id, {_world_size, _world_size}, game().rng());
+}
+
+void WorldmapGenerationScene::change_size(int size)
+{
+    if (size < 32)
+        size = 32;
+    else if (size > 512)
+        size = 512;
+    if (size != _world_size)
+    {
+        _world_size = size;
+        generate();
+    }
 }

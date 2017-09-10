@@ -30,4 +30,16 @@ void iterate(Vector<T, 2> size, const F& fn)
     }
 }
 
+template <class T>
+constexpr const T& min(const T& a, const T& b)
+{
+    return (a < b) ? a : b;
+}
+
+template <class T>
+constexpr const T& max(const T& a, const T& b)
+{
+    return (a < b) ? b : a;
+}
+
 #endif

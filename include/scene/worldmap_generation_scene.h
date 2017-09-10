@@ -13,10 +13,12 @@ public:
     void render(DrawBuffer& draw_buffer) override;
 
 private:
-    void generate();
+    void    generate();
+    void    change_size(int size);
 
     Worldmap*   _worldmap;
     u16         _world_id;
+    int         _world_size;
 };
 
 #endif
