@@ -2,6 +2,7 @@ class BiomeSerializer < Serializer
   type :biome
 
   def serialize(biome)
+    name = biome.fetch('DisplayName', biome.name)
     layers = biome.fetch('Layers', []).map{|layer| serialize_layer(biome, layer)}
     layers_data = [layers.size].pack('S<') + layers.join('')
     color = biome.color('Color', '#000000')
@@ -9,7 +10,7 @@ class BiomeSerializer < Serializer
     symbol = biome.symbol('Symbol', 0)
     height = biome.fetch('Height', '0 0').split(' ').map{|x| x.strip.to_i}
     temperature = biome.fetch('Temperature', '0 1000').split(' ').map{|x| x.strip.to_i}
-    [biome.id].pack('S<') + layers_data + [color, bg_color, symbol, height, temperature].flatten.pack('C6S<S<S<S<S<')
+    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature].flatten.pack('C6S<S<S<S<S<')
   end
 
   private

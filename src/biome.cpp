@@ -46,7 +46,13 @@ static void load_layer_replace(Biome::Layer& layer, MemoryFile& file)
 
 static void load_biome(Biome& biome, MemoryFile& file)
 {
+    u16 name_len;
     uint16_t layer_count;
+    file.read(&name_len);
+    biome.name = new char[name_len + 1];
+    biome.name[name_len] = 0;
+    file.read(biome.name, name_len);
+
     file.read(&layer_count);
     biome.layers.resize(layer_count);
     for (uint16_t i = 0; i < layer_count; ++i)

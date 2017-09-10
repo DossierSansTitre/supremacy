@@ -62,6 +62,7 @@ struct Biome
         };
     };
 
+    char*           name;
     Array<Layer>    layers;
     Color           color;
     Color           color_bg;
