@@ -10,7 +10,9 @@ class BiomeSerializer < Serializer
     symbol = biome.symbol('Symbol', 0)
     height = biome.fetch('Height', '0 0').split(' ').map{|x| x.strip.to_i}
     temperature = biome.fetch('Temperature', '0 1000').split(' ').map{|x| x.strip.to_i}
-    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature].flatten.pack('C6S<S<S<S<S<')
+    rain = biome.fetch('Rain', '0 1000').split(' ').map{|x| x.strip.to_i}
+    drainage = biome.fetch('Drainage', '0 1000').split(' ').map{|x| x.strip.to_i}
+    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature, rain, drainage].flatten.pack('C6S<S<S<S<S<S<S<S<S<')
   end
 
   private

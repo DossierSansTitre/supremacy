@@ -52,8 +52,12 @@ WorldmapGenerator::~WorldmapGenerator()
 Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
 {
     Worldmap*   worldmap;
+
     u16         height;
     u16         temperature;
+    u16         rain;
+    u16         drainage;
+
     BiomeID     biome_id;
     Rng         world_rng;
     size_t      index;
@@ -67,9 +71,11 @@ Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
     generate_value_map(worldmap->_drainage, size, 1000, world_rng.rand());
     iterate(size, [&] (auto v) {
         biome_id = 0;
-        index = v.x + v.y * size.x;
+        index = worldmap->index(v);
         height = worldmap->_height[index];
         temperature = worldmap->_temperature[index];
+        rain = worldmap->_rain[index];
+        drainage = worldmap->_drainage[index];
         for (size_t i = 1; i < Biome::count(); ++i)
         {
             const auto& b = Biome::from_id(i);
@@ -79,6 +85,10 @@ Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
             if (height < b.height_min || height >= b.height_max)
                 continue;
             if (temperature < b.temperature_min || temperature >= b.temperature_max)
+                continue;
+            if (rain < b.rain_min || rain >= b.rain_max)
+                continue;
+            if (drainage < b.drainage_min || drainage >= b.drainage_max)
                 continue;
             biome_id = i;
             break;

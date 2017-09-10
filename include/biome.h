@@ -67,10 +67,14 @@ struct Biome
     Color           color;
     Color           color_bg;
     uint16_t        symbol;
-    i16             height_min;
-    i16             height_max;
-    i16             temperature_min;
-    i16             temperature_max;
+    u16             height_min;
+    u16             height_max;
+    u16             temperature_min;
+    u16             temperature_max;
+    u16             rain_min;
+    u16             rain_max;
+    u16             drainage_min;
+    u16             drainage_max;
 
     static SparseArray<Biome> _data;
 
