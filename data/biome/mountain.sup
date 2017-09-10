@@ -3,7 +3,7 @@ Name = Mountain
 Color = #ffffff
 BackgroundColor = #bbbbbb
 Symbol = "^"
-Height = 600 1000
+Height = 750 1000
 Layers = ---
 OCTAVE 3.0 7 2.2 15 30 Block:Rock
 FILL 10 Block:Rock

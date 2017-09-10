@@ -23,7 +23,11 @@ void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap)
     len = worldmap._size.x * worldmap._size.y;
     stream.write((char*)&worldmap._size.x, 4);
     stream.write((char*)&worldmap._size.y, 4);
-    stream.write((char*)worldmap._biomes.data(), len * sizeof(BiomeID));
+    serialize(stream, worldmap._biomes.data(), len);
+    serialize(stream, worldmap._height.data(), len);
+    serialize(stream, worldmap._temperature.data(), len);
+    serialize(stream, worldmap._rain.data(), len);
+    serialize(stream, worldmap._drainage.data(), len);
 }
 
 Worldmap* load_worldmap(u16 world_id)
@@ -41,11 +45,19 @@ Worldmap* unserialize_worldmap(std::ifstream& stream, u16 world_id)
 {
     Worldmap* worldmap;
     Vector2i size;
+    size_t len;
 
     stream.read((char*)&size.x, 4);
     stream.read((char*)&size.y, 4);
+
+    len = size.x * size.y;
     worldmap = new Worldmap(world_id, size);
-    stream.read((char*)worldmap->_biomes.data(), size.x * size.y * sizeof(BiomeID));
+
+    unserialize(stream, worldmap->_biomes.data(), len);
+    unserialize(stream, worldmap->_height.data(), len);
+    unserialize(stream, worldmap->_temperature.data(), len);
+    unserialize(stream, worldmap->_rain.data(), len);
+    unserialize(stream, worldmap->_drainage.data(), len);
 
     return worldmap;
 }

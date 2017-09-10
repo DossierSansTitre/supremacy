@@ -8,7 +8,8 @@ class BiomeSerializer < Serializer
     bg_color = biome.color('BackgroundColor', '#000000')
     symbol = biome.symbol('Symbol', 0)
     height = biome.fetch('Height', '0 0').split(' ').map{|x| x.strip.to_i}
-    [biome.id].pack('S<') + layers_data + [color, bg_color, symbol, height].flatten.pack('C6S<S<S<')
+    temperature = biome.fetch('Temperature', '0 1000').split(' ').map{|x| x.strip.to_i}
+    [biome.id].pack('S<') + layers_data + [color, bg_color, symbol, height, temperature].flatten.pack('C6S<S<S<S<S<')
   end
 
   private

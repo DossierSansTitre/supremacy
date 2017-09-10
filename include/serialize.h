@@ -26,6 +26,18 @@ void unserialize_resource_array(SparseArray<T>& array, Archive& archive, const c
     log_line(LogLevel::Info, "Loaded %-20s (%d elements)", filename, count);
 }
 
+template <typename T>
+void serialize(std::ofstream& stream, const T* data, size_t size)
+{
+    stream.write(reinterpret_cast<const char*>(data), size * sizeof(T));
+}
+
+template <typename T>
+void unserialize(std::ifstream& stream, T* data, size_t size)
+{
+    stream.read(reinterpret_cast<char*>(data), size * sizeof(T));
+}
+
 class Worldmap;
 void save_worldmap(const Worldmap& worldmap);
 void serialize_worldmap(std::ofstream& stream, const Worldmap& worldmap);

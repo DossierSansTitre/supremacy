@@ -15,9 +15,8 @@ static float mask_border(int value, int length)
     return 1.f;
 }
 
-static void generate_heightmap(Array<i16>& heightmap, Vector2i size, u32 seed)
+static void generate_heightmap(Array<u16>& heightmap, Vector2i size, u32 seed)
 {
-    heightmap.resize(size.x * size.y);
     float value;
     float mask;
 
@@ -25,7 +24,17 @@ static void generate_heightmap(Array<i16>& heightmap, Vector2i size, u32 seed)
         value = noise_fractal_octave_2d(seed, v.x, v.y, 2.f, 7);
         mask = mask_border(v.x, size.x);
         mask *= mask_border(v.y, size.y);
-        heightmap[v.x + v.y * size.x] = value * mask * 1500 - 500;
+        heightmap[v.x + v.y * size.x] = value * mask * 1000;
+    });
+}
+
+static void generate_value_map(Array<u16>& value_map, Vector2i size, u16 max, u32 seed)
+{
+    float value;
+
+    iterate(size, [&] (Vector2i v) {
+        value = noise_fractal_octave_2d(seed, v.x, v.y, 2.f, 7);
+        value_map[v.x + v.y * size.x] = value * max;
     });
 }
 
@@ -43,28 +52,40 @@ WorldmapGenerator::~WorldmapGenerator()
 Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
 {
     Worldmap*   worldmap;
-    Array<i16>  heightmap;
-    Array<u16>  biomes;
-    i16         height;
+    u16         height;
+    u16         temperature;
+    BiomeID     biome_id;
     Rng         world_rng;
+    size_t      index;
 
     world_rng.seed(rng);
     worldmap = new Worldmap(id, size);
 
-    generate_heightmap(heightmap, size, world_rng.rand());
+    generate_heightmap(worldmap->_height, size, world_rng.rand());
+    generate_value_map(worldmap->_temperature, size, 1000, world_rng.rand());
+    generate_value_map(worldmap->_rain, size, 1000, world_rng.rand());
+    generate_value_map(worldmap->_drainage, size, 1000, world_rng.rand());
     iterate(size, [&] (auto v) {
-        biomes.clear();
+        biome_id = 0;
+        index = v.x + v.y * size.x;
+        height = worldmap->_height[index];
+        temperature = worldmap->_temperature[index];
         for (size_t i = 1; i < Biome::count(); ++i)
         {
             const auto& b = Biome::from_id(i);
 
             if (b.height_max == 0)
                 continue;
-            height = heightmap[v.x + v.y * size.x];
-            if (height >= b.height_min && height < b.height_max)
-                biomes.push_back(i);
+            if (height < b.height_min || height >= b.height_max)
+                continue;
+            if (temperature < b.temperature_min || temperature >= b.temperature_max)
+                continue;
+            biome_id = i;
+            break;
         }
-        worldmap->set_biome(v, biomes[rand() % biomes.size()]);
+        if (!biome_id)
+            log_line(LogLevel::Fatal, "Could not find suitable biome (Height: %d, Temp: %d)", height, temperature);
+        worldmap->_biomes[index] = biome_id;
     });
     return worldmap;
 }

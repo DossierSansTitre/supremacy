@@ -68,6 +68,8 @@ struct Biome
     uint16_t        symbol;
     i16             height_min;
     i16             height_max;
+    i16             temperature_min;
+    i16             temperature_max;
 
     static SparseArray<Biome> _data;
 

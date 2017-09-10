@@ -1,0 +1,7 @@
+ID = 5
+Name = Desert
+Color = #bbbb00
+BackgroundColor = #dddd22
+Symbol = "."
+Height = 250 750
+Temperature = 700 1000

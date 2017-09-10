@@ -4,10 +4,12 @@ Worldmap::Worldmap(u16 id, Vector2i size)
 : _id(id)
 , _size(size)
 {
-    _biomes.resize(size.x * size.y);
-}
+    size_t s;
 
-void Worldmap::set_biome(Vector2i pos, BiomeID biome)
-{
-    _biomes[pos.x + pos.y * _size.x] = biome;
+    s = size.x * size.y;
+    _biomes.resize(s);
+    _height.resize(s);
+    _temperature.resize(s);
+    _rain.resize(s);
+    _drainage.resize(s);
 }

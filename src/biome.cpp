@@ -79,6 +79,8 @@ static void load_biome(Biome& biome, MemoryFile& file)
     file.read(&biome.symbol);
     file.read(&biome.height_min);
     file.read(&biome.height_max);
+    file.read(&biome.temperature_min);
+    file.read(&biome.temperature_max);
 }
 
 void Biome::load(Archive& archive)
