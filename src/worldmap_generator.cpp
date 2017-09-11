@@ -56,6 +56,32 @@ static void generate_heightmap(Array<u16>& heightmap, Vector2i size, u32 seed)
     });
 }
 
+static void generate_temperature(Array<u16>& temperature, Vector2i size, u32 seed)
+{
+    Vector2i center;
+    Vector2i delta;
+
+    generate_value_map(temperature, size, 1000, seed);
+    center = size / 2;
+    i32 value;
+    float inv_size = 1.f / size.x;
+    float inv_square = inv_size * inv_size;
+
+    iterate(size, [&] (Vector2i v) {
+        size_t i = v.x + size.x * v.y;
+        delta = center - v;
+
+        value = temperature[i];
+        value -= (delta.y * delta.y) * (2048.f / (size.x * size.x)) - 50;
+        if (value > 1000)
+            value = 1000;
+        else if (value < 0)
+            value = 0;
+        temperature[i] = value;
+    });
+}
+
+
 WorldmapGenerator::WorldmapGenerator()
 {
 
@@ -84,7 +110,7 @@ Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
     worldmap = new Worldmap(id, size);
 
     generate_heightmap(worldmap->_height, size, world_rng.rand());
-    generate_value_map(worldmap->_temperature, size, 1000, world_rng.rand());
+    generate_temperature(worldmap->_temperature, size, world_rng.rand());
     generate_value_map(worldmap->_rain, size, 1000, world_rng.rand());
     generate_value_map(worldmap->_drainage, size, 1000, world_rng.rand());
     iterate(size, [&] (auto v) {
