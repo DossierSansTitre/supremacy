@@ -57,4 +57,15 @@ T manhattan_distance(Vector<T, N> a, Vector<T, N> b)
     return manhattan_length(a - b);
 }
 
+template <typename T, size_t N>
+float dot(Vector<T, N> a, Vector<T, N>b)
+{
+    float f;
+
+    f = 0;
+    for (size_t i = 0; i < N; ++i)
+        f += a[i] * b[i];
+    return f;
+}
+
 #endif

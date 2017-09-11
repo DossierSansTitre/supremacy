@@ -1,0 +1,8 @@
+ID = 7
+Name = Swamp
+Color = #008800
+BackgroundColor = #005500
+Symbol = "~"
+Height = 250 750
+Drainage = 0 333
+Rain = 666 1000

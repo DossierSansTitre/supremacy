@@ -1,0 +1,9 @@
+ID = 10
+Name = Forest
+Color = #aaaaff
+BackgroundColor = #888888
+Symbol = "T"
+Height = 250 750
+Drainage = 333 1000
+Rain = 500 1000
+Temperature = 0 333

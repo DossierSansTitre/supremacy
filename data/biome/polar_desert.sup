@@ -1,0 +1,8 @@
+ID = 8
+Name = PolarDesert
+DisplayName = Polar Desert
+Color = #ffffff
+BackgroundColor = #8888ff
+Symbol = "."
+Height = 0 250
+Temperature = 0 250
