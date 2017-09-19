@@ -213,14 +213,12 @@ static void draw(DrawBuffer& draw_buffer, const Map& map, u32 render_tick, Vecto
 
 static void draw_map_lines(DrawBuffer& draw_buffer, World& world, u32 render_tick, size_t base, size_t count)
 {
-    u32 max_w;
-    u32 max_h;
+    size_t max_w;
 
     max_w = draw_buffer.width() - 2;
-    max_h = static_cast<u32>(count);
     const auto camera = world.camera;
 
-    for (u32 y = 0; y < max_h; ++y)
+    for (u32 y = 0; y < count; ++y)
     {
         for (u32 x = 0; x < max_w; ++x)
         {
