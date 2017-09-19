@@ -118,111 +118,113 @@ static void draw_bars(DrawBuffer& draw_buffer, World& world, Game& game)
     printf(draw_buffer, 0, view_h - 1, "X:%-4d Y:%-4d Z:%-4d", {0, 0, 0}, {255, 255, 255}, camera.x, camera.y, camera.z);
 }
 
+static void draw(DrawBuffer& draw_buffer, const Map& map, u32 render_tick, Vector3i src, Vector2u dst)
+{
+    u16         under;
+    TileID      tile_id;
+    MaterialID  material_id;
+    MaterialID  floor_material_id;
+    u16         task;
+    Map::Flash  flash;
+    u16         sym;
+    Color       color;
+    Color       color_bg;
+    Vector3i    under_src;
+
+    under = 0;
+    under_src = src;
+    map.at(src.x, src.y, src.z, tile_id, material_id);
+    floor_material_id = map.floor(src);
+    task = map.task_at(src);
+    flash = map.flash(src);
+
+    while (!material_id && !floor_material_id)
+    {
+        if (under >= 3)
+            break;
+        under++;
+        under_src = src - Vector3i(0, 0, under);
+
+        map.at(under_src, tile_id, material_id);
+        floor_material_id = map.floor(under_src);
+        task = map.task_at(under_src);
+        flash = map.flash(under_src);
+    }
+
+    if ((!material_id && !floor_material_id) || (!map.visible(under_src) && task == 0))
+        return;
+
+    if (flash == Map::Flash::Action)
+    {
+        sym = "\\|/-"[render_tick % 4];
+        color = {0, 0, 0};
+        color_bg = {255, 255, 0};
+    }
+    else if (task)
+    {
+        sym = '!';
+        color = {255, 255, 255};
+        color_bg = {255, 0, 0};
+    }
+    else
+    {
+        /* There is no material, a.k.a. we have to render some floor */
+        if (!material_id)
+        {
+            const Material& material = Material::from_id(floor_material_id);
+            sym = under ? ' ' : 130;
+            color = material.color;
+            color_bg = material.color_bg;
+        }
+        else
+        {
+            const Tile& tile = Tile::from_id(tile_id);
+            const Material& material = Material::from_id(material_id);
+            if (under && tile.dim_sym)
+                sym = tile.dim_sym;
+            else
+                sym = tile.sym;
+            color = material.color;
+            color_bg = material.color_bg;
+        }
+    }
+
+    if (flash == Map::Flash::Pending)
+    {
+        if ((render_tick / 2) % 2)
+        {
+            color *= 0.75f;
+            color_bg *= 0.75f;
+        }
+        else
+        {
+            color *= 0.5f;
+            color_bg *= 0.5f;
+        }
+    }
+
+    while (under--)
+    {
+        color *= 0.5f;
+        color_bg *= 0.5f;
+    }
+    putchar_fast(draw_buffer, dst.x, dst.y, sym, color, color_bg);
+}
+
 static void draw_map_lines(DrawBuffer& draw_buffer, World& world, u32 render_tick, size_t base, size_t count)
 {
-    int view_w;
+    u32 max_w;
+    u32 max_h;
 
-    int x;
-    int y;
-    int under;
+    max_w = draw_buffer.width() - 2;
+    max_h = static_cast<u32>(count);
+    const auto camera = world.camera;
 
-    int limit = static_cast<int>(base + count);
-
-    view_w = draw_buffer.width();
-
-    Map& map = world.map;
-    Vector3i camera = world.camera;
-
-    for (int j = base; j < limit; ++j)
+    for (u32 y = 0; y < max_h; ++y)
     {
-        y = camera.y + j;
-        for (int i = 0; i < view_w - 2; ++i)
+        for (u32 x = 0; x < max_w; ++x)
         {
-            x = camera.x + i;
-            TileID tile_id;
-            MaterialID material_id;
-            MaterialID floor_material_id;
-            uint16_t task;
-            Map::Flash flash;
-            uint16_t sym;
-            Color color;
-            Color color_bg;
-
-            under = 0;
-            map.at(x, y, camera.z, tile_id, material_id);
-            floor_material_id = map.floor({x, y, camera.z});
-            task = map.task_at(x, y, camera.z);
-            flash = map.flash({x, y, camera.z});
-
-            while (!material_id && !floor_material_id)
-            {
-                if (under >= 3)
-                    break;
-                under++;
-                map.at(x, y, camera.z - under, tile_id, material_id);
-                floor_material_id = map.floor({x, y, camera.z - under});
-                task = map.task_at(x, y, camera.z - under);
-                flash = map.flash({x, y, camera.z - under});
-            }
-
-            if ((!material_id && !floor_material_id) || ((!map.visible(x, y, camera.z) && task == 0) && 1))
-                continue;
-
-            if (flash == Map::Flash::Action)
-            {
-                sym = "\\|/-"[render_tick % 4];
-                color = {0, 0, 0};
-                color_bg = {255, 255, 0};
-            }
-            else if (task)
-            {
-                sym = '!';
-                color = {255, 255, 255};
-                color_bg = {255, 0, 0};
-            }
-            else
-            {
-                /* There is no material, a.k.a. we have to render some floor */
-                if (!material_id)
-                {
-                    const Material& material = Material::from_id(floor_material_id);
-                    sym = under ? ' ' : 130;
-                    color = material.color;
-                    color_bg = material.color_bg;
-                }
-                else
-                {
-                    const Tile& tile = Tile::from_id(tile_id);
-                    const Material& material = Material::from_id(material_id);
-                    if (under && tile.dim_sym)
-                        sym = tile.dim_sym;
-                    else
-                        sym = tile.sym;
-                    color = material.color;
-                    color_bg = material.color_bg;
-                }
-            }
-
-            if (flash == Map::Flash::Pending)
-            {
-                if ((render_tick / 2) % 2)
-                {
-                    color *= 0.75f;
-                    color_bg *= 0.75f;
-                }
-                else
-                {
-                    color *= 0.5f;
-                    color_bg *= 0.5f;
-                }
-            }
-
-            while (under--)
-            {
-                color *= 0.5f;
-                color_bg *= 0.5f;
-            }
-            putchar_fast(draw_buffer, i + 1, j + 1, sym, color, color_bg);
+            draw(draw_buffer, world.map, render_tick, camera + Vector3i(x, base + y, 0), Vector2u(x + 1, base + y + 1));
         }
     }
 }

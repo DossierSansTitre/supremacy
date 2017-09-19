@@ -44,6 +44,11 @@ public:
         out_material = material_at(i);
     }
 
+    void at(Vector3i pos, TileID& out_tile, MaterialID& out_material) const
+    {
+        at(pos.x, pos.y, pos.z, out_tile, out_material);
+    }
+
     TileID tile_at(int i) const
     {
         if (i == -1)
@@ -87,6 +92,11 @@ public:
         return task_at(index(x, y, z));
     }
 
+    uint16_t task_at(Vector3i pos) const
+    {
+        return task_at(index(pos.x, pos.y, pos.z));
+    }
+
     MaterialID floor(Vector3i position) const
     {
         int i = index(position);
@@ -113,6 +123,11 @@ public:
     bool visible(int x, int y, int z) const
     {
         return visible(index(x, y, z));
+    }
+
+    bool visible(Vector3i pos) const
+    {
+        return visible(index(pos.x, pos.y, pos.z));
     }
 
     bool occupied(Vector3i pos) const
