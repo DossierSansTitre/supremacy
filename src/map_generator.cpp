@@ -131,7 +131,7 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
                     for (int i = 0; i < width; ++i)
                     {
                         float n;
-                        n = noise_fractal_octave_2d(seed, i, j, layer.octave.persistance, layer.octave.octaves);
+                        n = perlin_octave_corrected(seed, i, j, layer.octave.persistance, layer.octave.octaves, 1.5f);
                         n = pow(n, layer.octave.power);
 
                         int h;
