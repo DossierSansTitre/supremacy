@@ -42,4 +42,10 @@ constexpr const T& max(const T& a, const T& b)
     return (a < b) ? b : a;
 }
 
+template <class T>
+constexpr const T& clamp(const T& v, const T& min, const T& max)
+{
+    return (v < min) ? min : ((v < max) ? v : max);
+}
+
 #endif

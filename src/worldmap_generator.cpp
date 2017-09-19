@@ -4,23 +4,12 @@
 #include <log.h>
 #include <math/algorithm.h>
 
-static float mask_border(int value, int length)
-{
-    static const int border = 5;
-
-    if (value < border)
-        return float(value) / border;
-    else if (value >= length - border - 1)
-        return float(length - value - 1) / border;
-    return 1.f;
-}
-
-static void generate_value_map(Array<u16>& value_map, Vector2i size, u16 max, u32 seed)
+static void generate_value_map(Array<u16>& value_map, Vector2i size, u16 max, u32 seed, float correction)
 {
     float value;
 
     iterate(size, [&] (Vector2i v) {
-        value = perlin_octave_corrected(seed, v.x, v.y, 1.6f, 7, 1.5f);
+        value = perlin_octave_corrected(seed, v.x, v.y, 1.6f, 7, correction);
         value_map[v.x + v.y * size.x] = value * max;
     });
 }
@@ -30,11 +19,9 @@ static void generate_heightmap(Array<u16>& heightmap, Vector2i size, u32 seed)
     Vector2i center;
     Vector2i delta;
 
-    generate_value_map(heightmap, size, 1000, seed);
+    generate_value_map(heightmap, size, 1000, seed, 1.5f);
     center = size / 2;
     i32 value;
-    float inv_size = 1.f / size.x;
-    float inv_square = inv_size * inv_size;
 
     iterate(size, [&] (Vector2i v) {
         size_t i = v.x + size.x * v.y;
@@ -42,10 +29,7 @@ static void generate_heightmap(Array<u16>& heightmap, Vector2i size, u32 seed)
 
         value = heightmap[i];
         value -= (((delta.x * delta.x + delta.y * delta.y)) * (4096.f / (size.x * size.x)) - 175);
-        if (value > 999)
-            value = 999;
-        else if (value < 0)
-            value = 0;
+        value = clamp(value, 0, 999);
         heightmap[i] = value;
     });
 }
@@ -55,11 +39,9 @@ static void generate_temperature(Array<u16>& temperature, Vector2i size, u32 see
     Vector2i center;
     Vector2i delta;
 
-    generate_value_map(temperature, size, 1000, seed);
+    generate_value_map(temperature, size, 1000, seed, 1.f);
     center = size / 2;
     i32 value;
-    float inv_size = 1.f / size.x;
-    float inv_square = inv_size * inv_size;
 
     iterate(size, [&] (Vector2i v) {
         size_t i = v.x + size.x * v.y;
@@ -67,10 +49,7 @@ static void generate_temperature(Array<u16>& temperature, Vector2i size, u32 see
 
         value = temperature[i];
         value -= (delta.y * delta.y) * (2048.f / (size.x * size.x)) - 50;
-        if (value > 1000)
-            value = 1000;
-        else if (value < 0)
-            value = 0;
+        value = clamp(value, 0, 999);
         temperature[i] = value;
     });
 }
@@ -105,8 +84,8 @@ Worldmap* WorldmapGenerator::generate(u16 id, Vector2i size, Rng& rng)
 
     generate_heightmap(worldmap->_height, size, world_rng.rand());
     generate_temperature(worldmap->_temperature, size, world_rng.rand());
-    generate_value_map(worldmap->_rain, size, 1000, world_rng.rand());
-    generate_value_map(worldmap->_drainage, size, 1000, world_rng.rand());
+    generate_value_map(worldmap->_rain, size, 1000, world_rng.rand(), 1.2f);
+    generate_value_map(worldmap->_drainage, size, 1000, world_rng.rand(), 1.2f);
     iterate(size, [&] (auto v) {
         biome_id = 0;
         index = worldmap->index(v);
