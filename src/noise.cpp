@@ -130,13 +130,13 @@ float perlin_octave_corrected(u32 seed, u32 x, u32 y, float persistance, int oct
 {
     float f;
 
-    f = noise_fractal_octave_2d(seed, x, y, persistance, octaves);
-    f += correction;
-    f /= (correction * 2);
+    f = noise_fractal_octave_2d(seed, x, y, persistance, octaves) * correction;
+    f += 1.f;
+    f /= 2.f;
 
     if (f < 0.f)
         return 0.f;
-    if (f > 1.f)
-        return 1.f;
+    if (f >= 0.999f)
+        return 0.999f;
     return f;
 }

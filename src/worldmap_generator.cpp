@@ -20,14 +20,8 @@ static void generate_value_map(Array<u16>& value_map, Vector2i size, u16 max, u3
     float value;
 
     iterate(size, [&] (Vector2i v) {
-        value = noise_fractal_octave_2d(seed, v.x, v.y, 1.6f, 7);
-        value *= 1.5f;
-        value = (value + 1.f) / 2.f;
-        if (value < 0.f)
-            value = 0.f;
-        else if (value > 1.f)
-            value = 1.f;
-        value_map[v.x + v.y * size.x] = value * (max - 1);
+        value = perlin_octave_corrected(seed, v.x, v.y, 1.6f, 7, 1.5f);
+        value_map[v.x + v.y * size.x] = value * max;
     });
 }
 
@@ -48,8 +42,8 @@ static void generate_heightmap(Array<u16>& heightmap, Vector2i size, u32 seed)
 
         value = heightmap[i];
         value -= (((delta.x * delta.x + delta.y * delta.y)) * (4096.f / (size.x * size.x)) - 175);
-        if (value > 1000)
-            value = 1000;
+        if (value > 999)
+            value = 999;
         else if (value < 0)
             value = 0;
         heightmap[i] = value;
