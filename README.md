@@ -2,6 +2,8 @@
 
 # supremacy
 
+[![Build Status](https://travis-ci.org/DossierSansTitre/supremacy.svg?branch=travis)](https://travis-ci.org/DossierSansTitre/supremacy)
+
 A dwarf fortress inspired game.
 
 ## License
