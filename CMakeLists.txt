@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
 
-project(supremacy)
+project(supremacy C CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
@@ -22,7 +22,7 @@ if(NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++14 -fno-exceptions -fno-rtti -fstrict-aliasing -fno-stack-protector")
 endif()
 
-if (APPLE)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
@@ -38,11 +38,8 @@ endif()
 
 configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/include/config.h")
 
-if (WIN32)
-    find_package(GLEW)
-endif()
-
 find_package(OpenGL)
+find_package(GLEW)
 find_package(SDL2)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -50,10 +47,7 @@ file(GLOB_RECURSE HEADERS "src/*.h")
 
 include_directories(include)
 include_directories(${CMAKE_BINARY_DIR}/include)
-
-if (WIN32)
-    include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
-endif()
+include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
 
 if(APP_BUNDLE)
     set(MACOSX_BUNDLE_ICON_FILE Supremacy.icns)
@@ -63,10 +57,8 @@ if(APP_BUNDLE)
 else()
     add_executable(supremacy ${SOURCES} ${HEADERS})
 endif()
-target_link_libraries(supremacy sdl2 ${OPENGL_LIBRARIES})
-if (WIN32)
-    target_link_libraries(supremacy ${GLEW_LIBRARY})
-endif()
+
+target_link_libraries(supremacy sdl2 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
 
 file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
 file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")

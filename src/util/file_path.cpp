@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <cstring>
 #include <cstdlib>
 #include <util/file_path.h>

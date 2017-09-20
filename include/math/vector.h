@@ -1,6 +1,7 @@
 #ifndef MATH_VECTOR_H
 #define MATH_VECTOR_H
 
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 

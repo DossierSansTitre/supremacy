@@ -1,3 +1,4 @@
+#include <cstring>
 #include <worldmap.h>
 #include <serialize.h>
 #include <util/file_path.h>

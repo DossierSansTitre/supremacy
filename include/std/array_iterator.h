@@ -1,6 +1,8 @@
 #ifndef STD_ARRAY_ITERATOR_H
 #define STD_ARRAY_ITERATOR_H
 
+#include <cstddef>
+
 template <typename T>
 class ArrayIterator
 {

@@ -1,6 +1,7 @@
 #ifndef STD_REVERSE_ITERATOR_H
 #define STD_REVERSE_ITERATOR_H
 
+#include <cstddef>
 #include <std/algorithm.h>
 
 template <typename Iter>

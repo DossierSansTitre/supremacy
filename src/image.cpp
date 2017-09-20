@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include <SDL2/SDL.h>
 #include <archive.h>
 #include <image.h>
@@ -51,7 +52,7 @@ char* load_image(const char* name, uint32_t& width, uint32_t& height)
 
     size_t size = width * height * 4;
     pixels = new char[size];
-    memcpy(pixels, img_rgba->pixels, size);
+    std::memcpy(pixels, img_rgba->pixels, size);
     SDL_FreeSurface(img_rgba);
 
     return pixels;

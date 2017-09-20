@@ -25,7 +25,7 @@ bool MemoryFile::read(void* dst, size_t len)
 {
     if (_cursor + len > _size)
         return false;
-    memcpy(dst, (char*)_data + _cursor, len);
+    std::memcpy(dst, (char*)_data + _cursor, len);
     _cursor += len;
     return true;
 }

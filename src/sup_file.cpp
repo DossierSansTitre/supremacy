@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sup_file.h>
 #include <memory_file.h>
 #include <archive.h>
@@ -23,7 +24,7 @@ void SupFile::open(const char* data, size_t size)
 
     close();
     _data = new char[size];
-    memcpy(_data, data, size);
+    std::memcpy(_data, data, size);
     file.open(_data, size);
     file.read(sup, 4);
     file.read(&_count);

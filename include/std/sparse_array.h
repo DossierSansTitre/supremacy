@@ -1,6 +1,8 @@
 #ifndef SPARSE_ARRAY_H
 #define SPARSE_ARRAY_H
 
+#include <cstdint>
+#include <cstddef>
 #include <std/array.h>
 
 template <typename T, typename Alloc, typename IndiceAlloc>
