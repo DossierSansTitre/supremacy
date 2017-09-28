@@ -3,6 +3,7 @@
 #include <log.h>
 #include <window.h>
 #include <opengl.h>
+#include <rendering/renderer_opengl_legacy.h>
 
 static void init_rng(Rng& rng)
 {
@@ -100,7 +101,7 @@ void Game::select_renderer()
     log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
     log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
     log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    _renderer = new Renderer(*_window, _thread_pool);
+    _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
 }
 
 void Game::update()
@@ -111,9 +112,9 @@ void Game::update()
 
 void Game::render()
 {
-    _renderer->clear(_draw_buffer, *_window);
+    _renderer->clear();
     _scene->render(_draw_buffer);
-    _renderer->render(_draw_buffer);
+    _renderer->render();
     _window->swap();
     _fps_counter_render.update();
 }

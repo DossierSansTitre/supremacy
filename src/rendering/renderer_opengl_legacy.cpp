@@ -1,8 +1,9 @@
 #include <algorithm>
 #include <config.h>
-#include <renderer.h>
+#include <rendering/renderer_opengl_legacy.h>
 #include <util/file_path.h>
 #include <window.h>
+#include <log.h>
 
 static uint16_t float16(float in)
 {
@@ -18,9 +19,10 @@ static uint16_t float16(float in)
     return ((e << 10) | m);
 }
 
-Renderer::Renderer(const Window& window, ThreadPool& thread_pool)
-: _thread_pool(thread_pool)
+RendererOpenGLLegacy::RendererOpenGLLegacy(Window& window, DrawBuffer& draw_buffer)
+: Renderer(window, draw_buffer)
 {
+    log_line(LogLevel::Info, "Using the OpenGL Legacy Renderer");
     glMatrixMode(GL_PROJECTION);
     glOrtho(0, window.width(), window.height(), 0, 1, -1);
     glMatrixMode(GL_MODELVIEW);
@@ -36,12 +38,12 @@ Renderer::Renderer(const Window& window, ThreadPool& thread_pool)
     glGenBuffers(1, &_ibo);
 }
 
-Renderer::~Renderer()
+RendererOpenGLLegacy::~RendererOpenGLLegacy()
 {
 
 }
 
-void Renderer::resize(Vector2u size)
+void RendererOpenGLLegacy::resize(Vector2u size)
 {
     _size = size;
     _tiles_x = size.x;
@@ -51,32 +53,15 @@ void Renderer::resize(Vector2u size)
     build_vertices();
 }
 
-void Renderer::clear(DrawBuffer& draw_buffer, const Window& window)
+void RendererOpenGLLegacy::clear()
 {
-    draw_buffer.resize(window.width() / _tile_width, window.height() / _tile_height);
+    _draw_buffer.resize(_window.width() / _tile_width, _window.height() / _tile_height);
 }
 
-struct RendererDrawCmd
+void RendererOpenGLLegacy::render()
 {
-    Renderer*           renderer;
-    const DrawBuffer*   db;
-};
-
-static void renderer_draw_cmd(RendererDrawCmd* cmd, size_t start, size_t len)
-{
-    cmd->renderer->render_lines(*cmd->db, start, len);
-}
-
-void Renderer::render(const DrawBuffer& db)
-{
-    static const int factor = 512;
-
-    RendererDrawCmd cmd;
-    cmd.renderer = this;
-    cmd.db = &db;
-
-    if (db.size() != _size)
-        resize(db.size());
+    if (_draw_buffer.size() != _size)
+        resize(_draw_buffer.size());
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_static);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_SHORT, 0, 0);
@@ -84,7 +69,7 @@ void Renderer::render(const DrawBuffer& db)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
     glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
-    _thread_pool.run_over(&renderer_draw_cmd, &cmd, _tiles_x * _tiles_y, factor);
+    render_tiles();
     glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
 
     glBindTexture(GL_TEXTURE_2D, _texture);
@@ -103,15 +88,16 @@ void Renderer::render(const DrawBuffer& db)
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
-void Renderer::render_lines(const DrawBuffer& db, size_t start, size_t length)
+void RendererOpenGLLegacy::render_tiles()
 {
-    for (size_t i = 0; i < length; ++i)
-    {
-        render_tile(db, start + i);
-    }
+    size_t max;
+
+    max = _tiles_x * _tiles_y;
+    for (size_t i = 0; i < max; ++i)
+        render_tile(i);
 }
 
-void Renderer::render_tile(const DrawBuffer& db, size_t index)
+void RendererOpenGLLegacy::render_tile(size_t index)
 {
     static const float texture_size = 1.f / 32.f;
 
@@ -122,7 +108,7 @@ void Renderer::render_tile(const DrawBuffer& db, size_t index)
     uint16_t    t16y[2];
 
 
-    glyph = db.at(index);
+    glyph = _draw_buffer.at(index);
 
     tx[0] = (glyph.symbol % 32) * texture_size;
     ty[0] = (glyph.symbol / 32) * texture_size;
@@ -141,7 +127,7 @@ void Renderer::render_tile(const DrawBuffer& db, size_t index)
     render_vertex(index, 3, t16x[0], t16y[1], glyph.color, glyph.color_bg);
 }
 
-void Renderer::render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg)
+void RendererOpenGLLegacy::render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg)
 {
     Vertex& v = _vertices[index * 4 + sub_index];
 
@@ -155,7 +141,7 @@ void Renderer::render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16
     v.color_bg_b = color_bg.b;
 }
 
-void Renderer::build_indices()
+void RendererOpenGLLegacy::build_indices()
 {
     size_t indice_count;
     uint32_t* data;
@@ -178,7 +164,7 @@ void Renderer::build_indices()
     glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }
 
-void Renderer::build_vertices()
+void RendererOpenGLLegacy::build_vertices()
 {
     size_t count;
     int16_t* data;

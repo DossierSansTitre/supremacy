@@ -1,27 +1,24 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef RENDERER_OPENGL_LEGACY_H
+#define RENDERER_OPENGL_LEGACY_H
 
 #include <vector>
-#include <non_copyable.h>
 #include <opengl.h>
 #include <color.h>
-#include <thread_pool.h>
-#include <draw_buffer.h>
 #include <math/vector.h>
+#include <rendering/renderer.h>
 
-class Window;
-class Renderer : private NonCopyable
+class RendererOpenGLLegacy : public Renderer
 {
 public:
-    Renderer(const Window& window, ThreadPool& thread_pool);
-    ~Renderer();
+    RendererOpenGLLegacy(Window& window, DrawBuffer& draw_buffer);
+    virtual ~RendererOpenGLLegacy();
 
-    void clear(DrawBuffer& draw_buffer, const Window& window);
-    void render(const DrawBuffer& draw_buffer);
-    void render_lines(const DrawBuffer& db, size_t start, size_t length);
+    virtual void clear() override;
+    virtual void render() override;
 
 private:
-    void render_tile(const DrawBuffer& db, size_t index);
+    void render_tiles();
+    void render_tile(size_t index);
     void render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg);
 
     struct Vertex {
@@ -52,8 +49,6 @@ private:
     void build_indices();
     void build_vertices();
     void resize(Vector2u size);
-
-    ThreadPool& _thread_pool;
 
     GLuint _texture;
     GLuint _vbo;

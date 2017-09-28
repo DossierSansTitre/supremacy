@@ -6,7 +6,7 @@
 #include <math/rng.h>
 #include <keyboard.h>
 #include <thread_pool.h>
-#include <renderer.h>
+#include <rendering/renderer.h>
 #include <draw_buffer.h>
 #include <fps_counter.h>
 
