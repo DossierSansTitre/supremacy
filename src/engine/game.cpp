@@ -4,6 +4,7 @@
 #include <window.h>
 #include <opengl.h>
 #include <rendering/renderer_opengl_legacy.h>
+#include <rendering/renderer_opengl_shader.h>
 
 static void init_rng(Rng& rng)
 {
@@ -95,13 +96,21 @@ void Game::stop()
 
 void Game::select_renderer()
 {
-    _window = Window::create(2, 1);
+    _window = Window::create(3, 2);
+    if (_window)
+    {
+        _renderer = new RendererOpenGLShader(*_window, _draw_buffer);
+    }
+    else
+    {
+        _window = Window::create(2, 1);
+        _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
+    }
     log_line(LogLevel::Info, "OpenGL Info:");
     log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
     log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
     log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
     log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
 }
 
 void Game::update()
