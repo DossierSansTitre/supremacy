@@ -50,12 +50,24 @@ void Renderer::clear(DrawBuffer& draw_buffer, const Window& window)
     draw_buffer.resize(window.width() / _tile_width, window.height() / _tile_height);
 }
 
+struct RendererDrawCmd
+{
+    Renderer*           renderer;
+    const DrawBuffer*   db;
+};
+
+static void renderer_draw_cmd(RendererDrawCmd* cmd, size_t start, size_t len)
+{
+    cmd->renderer->render_lines(*cmd->db, start, len);
+}
+
 void Renderer::render(const DrawBuffer& db)
 {
-    static const int factor = 12;
+    static const int factor = 512;
 
-    int job;
-    int remain;
+    RendererDrawCmd cmd;
+    cmd.renderer = this;
+    cmd.db = &db;
 
     if (db.size() != _size)
         resize(db.size());
@@ -66,17 +78,7 @@ void Renderer::render(const DrawBuffer& db)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
     glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
-
-    job = _thread_pool.create();
-    for (size_t i = 0; i < _tiles_y / factor; ++i)
-    {
-        _thread_pool.perform(job, std::bind(&Renderer::render_lines, this, std::ref(db), i * factor, factor));
-    }
-    remain = _tiles_y % factor;
-    if (remain)
-        _thread_pool.perform(job, std::bind(&Renderer::render_lines, this, std::ref(db), _tiles_y - remain, remain));
-    _thread_pool.wait(job);
-
+    _thread_pool.run_over(&renderer_draw_cmd, &cmd, _tiles_x * _tiles_y, factor);
     glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
 
     glBindTexture(GL_TEXTURE_2D, _texture);
@@ -95,16 +97,11 @@ void Renderer::render(const DrawBuffer& db)
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
-void Renderer::render_lines(const DrawBuffer& db, uint32_t base, uint32_t count)
+void Renderer::render_lines(const DrawBuffer& db, size_t start, size_t length)
 {
-    size_t index_base;
-    size_t index_count;
-
-    index_base = base * _tiles_x;
-    index_count = count * _tiles_x;
-    for (size_t i = 0; i < index_count; ++i)
+    for (size_t i = 0; i < length; ++i)
     {
-        render_tile(db, index_base + i);
+        render_tile(db, start + i);
     }
 }
 

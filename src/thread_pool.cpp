@@ -75,12 +75,15 @@ bool ThreadPool::finished(int job) const
     return _job_pending_count[job] == 0u;
 }
 
-void ThreadPool::perform(int job, const Task& task)
+void ThreadPool::perform(int job, Task task, void* obj, size_t start, size_t len)
 {
     std::unique_lock<std::mutex> lock(_mutex);
 
     _task_job.push_back(job);
     _task_function.push_back(task);
+    _task_obj.push_back(obj);
+    _task_start.push_back(start);
+    _task_len.push_back(len);
     _job_pending_count[job]++;
     _task_size++;
     lock.unlock();
@@ -112,13 +115,19 @@ void ThreadPool::worker_main()
 
             int job = _task_job.back();
             Task task = _task_function.back();
+            void* obj = _task_obj.back();
+            size_t start = _task_start.back();
+            size_t len = _task_len.back();
             _task_job.pop_back();
             _task_function.pop_back();
+            _task_obj.pop_back();
+            _task_start.pop_back();
+            _task_len.pop_back();
             _task_size--;
 
             lock.unlock();
 
-            task();
+            (*task)(obj, start, len);
 
             lock.lock();
             _job_pending_count[job]--;

@@ -18,9 +18,9 @@ public:
 
     void clear(DrawBuffer& draw_buffer, const Window& window);
     void render(const DrawBuffer& draw_buffer);
+    void render_lines(const DrawBuffer& db, size_t start, size_t length);
 
 private:
-    void render_lines(const DrawBuffer& db, uint32_t base, uint32_t count);
     void render_tile(const DrawBuffer& db, size_t index);
     void render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg);
 

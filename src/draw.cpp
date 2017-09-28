@@ -227,27 +227,32 @@ static void draw_map_lines(DrawBuffer& draw_buffer, World& world, u32 render_tic
     }
 }
 
-static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game, u32 render_tick)
+struct DrawLineCmd
+{
+    DrawBuffer* db;
+    World*      world;
+    u32         render_tick;
+};
+
+static void draw_line_cmd(DrawLineCmd* cmd, size_t start, size_t len)
+{
+    draw_map_lines(*cmd->db, *cmd->world, cmd->render_tick, start, len);
+}
+
+static void draw_map(DrawBuffer& db, World& world, Game& game, u32 render_tick)
 {
     static const size_t lines_per_job = 8;
 
     auto& thread_pool = game.thread_pool();
-
-    int job;
     int view_h;
-    size_t job_count;
+    DrawLineCmd cmd;
 
-    view_h = draw_buffer.height() - 2;
+    view_h = db.height() - 2;
+    cmd.db = &db;
+    cmd.world = &world;
+    cmd.render_tick = render_tick;
 
-    job_count = ceil((float)view_h / lines_per_job);
-
-    job = thread_pool.create();
-    for (size_t i = 0; i < job_count - 1; ++i)
-    {
-        thread_pool.perform(job, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, i * lines_per_job, lines_per_job));
-    }
-    thread_pool.perform(job, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
-    thread_pool.wait(job);
+    thread_pool.run_over(&draw_line_cmd, &cmd, view_h, lines_per_job);
 }
 
 static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick, int delta_z)
