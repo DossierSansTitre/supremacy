@@ -13,7 +13,7 @@ class Window;
 class Renderer : private NonCopyable
 {
 public:
-    Renderer(ThreadPool& thread_pool);
+    Renderer(const Window& window, ThreadPool& thread_pool);
     ~Renderer();
 
     void clear(DrawBuffer& draw_buffer, const Window& window);

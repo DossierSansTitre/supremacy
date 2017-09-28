@@ -15,14 +15,14 @@ class GameScene;
 class Game : NonCopyable
 {
 public:
-    Game(Window& window);
+    Game();
     ~Game();
 
-    Window&     window() { return _window; }
+    Window&     window() { return *_window; }
     Keyboard&   keyboard() { return _keyboard; }
     Rng&        rng() { return _rng; }
     ThreadPool& thread_pool() { return _thread_pool; }
-    Renderer&   renderer() { return _renderer; }
+    Renderer&   renderer() { return *_renderer; }
     DrawBuffer& draw_buffer() { return _draw_buffer; }
     FpsCounter& fps_counter_update() { return _fps_counter_update; }
     FpsCounter& fps_counter_render() { return _fps_counter_render; }
@@ -40,19 +40,21 @@ public:
         return scene;
     }
 
-    void loop();
-    void stop();
+    void    loop();
+    void    stop();
+    void    select_renderer();
 
 private:
     void    update();
     void    render();
     void    handle_events();
 
-    Window&     _window;
+
+    Window*     _window;
     Keyboard    _keyboard;
     Rng         _rng;
     ThreadPool  _thread_pool;
-    Renderer    _renderer;
+    Renderer*   _renderer;
     DrawBuffer  _draw_buffer;
     GameScene*  _scene;
     GameScene*  _next_scene;

@@ -7,16 +7,16 @@
 class Window : private NonCopyable
 {
 public:
-    Window();
+    Window(SDL_Window* window, SDL_GLContext opengl);
     ~Window();
 
-    void    init();
-    void    destroy();
+    static Window* create(int opengl_major, int opengl_minor);
 
     uint32_t    width() const { return _width; }
     uint32_t    height() const { return _height; }
     bool        focus() const { return _focus; }
 
+    void    show(bool visible);
     void    swap();
     bool    poll_event(SDL_Event& event);
 

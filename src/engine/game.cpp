@@ -1,7 +1,8 @@
+#include <fstream>
 #include <engine/game.h>
 #include <log.h>
 #include <window.h>
-#include <fstream>
+#include <opengl.h>
 
 static void init_rng(Rng& rng)
 {
@@ -15,9 +16,9 @@ static void init_rng(Rng& rng)
     rng.seed(s);
 }
 
-Game::Game(Window& window)
-: _window(window)
-, _renderer(_thread_pool)
+Game::Game()
+: _window(nullptr)
+, _renderer(nullptr)
 , _scene(nullptr)
 , _next_scene(nullptr)
 {
@@ -55,7 +56,7 @@ void Game::loop()
     {
         render();
 
-        if (!_window.focus())
+        if (!_window->focus())
             SDL_Delay(50);
 
         while (update_acc >= update_delay)
@@ -91,6 +92,17 @@ void Game::stop()
     log_line(LogLevel::Info, "Engine stopped");
 }
 
+void Game::select_renderer()
+{
+    _window = Window::create(2, 1);
+    log_line(LogLevel::Info, "OpenGL Info:");
+    log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
+    log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
+    log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
+    log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    _renderer = new Renderer(*_window, _thread_pool);
+}
+
 void Game::update()
 {
     _scene->update();
@@ -99,10 +111,10 @@ void Game::update()
 
 void Game::render()
 {
-    _renderer.clear(_draw_buffer, _window);
+    _renderer->clear(_draw_buffer, *_window);
     _scene->render(_draw_buffer);
-    _renderer.render(_draw_buffer);
-    _window.swap();
+    _renderer->render(_draw_buffer);
+    _window->swap();
     _fps_counter_render.update();
 }
 
@@ -111,7 +123,7 @@ void Game::handle_events()
     SDL_Event event;
 
     _keyboard.tick();
-    while (_window.poll_event(event))
+    while (_window->poll_event(event))
     {
         switch (event.type)
         {

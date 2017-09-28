@@ -18,9 +18,15 @@ static uint16_t float16(float in)
     return ((e << 10) | m);
 }
 
-Renderer::Renderer(ThreadPool& thread_pool)
+Renderer::Renderer(const Window& window, ThreadPool& thread_pool)
 : _thread_pool(thread_pool)
 {
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(0, window.width(), window.height(), 0, 1, -1);
+    glMatrixMode(GL_MODELVIEW);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
     _texture = load_texture("tileset.bmp", _texture_width, _texture_height);
     _tile_width = _texture_width / 32;
     _tile_height = _texture_height / 32;
