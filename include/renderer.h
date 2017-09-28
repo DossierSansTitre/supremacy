@@ -21,12 +21,10 @@ public:
 
 private:
     void render_lines(const DrawBuffer& db, uint32_t base, uint32_t count);
-    void render_tile(const DrawBuffer& db, uint32_t x, uint32_t y);
-    void render_vertex(size_t index, size_t sub_index, uint32_t x, uint32_t y, float tx, float ty, Color color, Color color_bg);
+    void render_tile(const DrawBuffer& db, size_t index);
+    void render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg);
 
     struct Vertex {
-        int16_t     x;
-        int16_t     y;
         uint16_t    texture_x;
         uint16_t    texture_y;
         uint8_t     color_r;
@@ -59,6 +57,7 @@ private:
 
     GLuint _texture;
     GLuint _vbo;
+    GLuint _vbo_static;
     GLuint _ibo;
 
     Vector2u    _size;
