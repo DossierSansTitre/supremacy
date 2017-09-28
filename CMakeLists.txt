@@ -11,11 +11,16 @@ endif()
 if (APPLE)
     option(APP_BUNDLE "Build a macOS bundle application")
 endif()
+option(NO_THREADING "Disable the thread pool")
 
 if (APP_BUNDLE)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 else()
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endif()
+
+if (NO_THREADING)
+    add_definitions(-DNO_THREADING=1)
 endif()
 
 if(NOT MSVC)

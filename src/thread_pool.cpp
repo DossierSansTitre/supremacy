@@ -1,10 +1,12 @@
 #include <thread_pool.h>
+#include <iostream>
 
 #if defined(__APPLE__)
 # include <mach/thread_act.h>
 # include <mach/thread_policy.h>
 #endif
 
+#if !defined(NO_THREADING)
 ThreadPool::ThreadPool()
 : _running(true)
 , _task_size(0u)
@@ -45,54 +47,54 @@ ThreadPool::~ThreadPool()
         t.join();
 }
 
-int ThreadPool::task_create()
+int ThreadPool::create()
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    int task;
+    int job;
 
-    if (_free_tasks.empty())
+    if (_free_jobs.empty())
     {
-        task = static_cast<int>(_task_size);
-        _task_size++;
-        _task_pending_count.resize(_task_size);
+        job = static_cast<int>(_job_size);
+        _job_size++;
+        _job_pending_count.resize(_job_size);
     }
     else
     {
-        task = _free_tasks.back();
-        _free_tasks.pop_back();
+        job = _free_jobs.back();
+        _free_jobs.pop_back();
     }
-    _task_pending_count[task] = 0u;
+    _job_pending_count[job] = 0u;
 
-    return task;
+    return job;
 }
 
-bool ThreadPool::task_finished(int task) const
+bool ThreadPool::finished(int job) const
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    return _task_pending_count[task] == 0u;
+    return _job_pending_count[job] == 0u;
 }
 
-void ThreadPool::task_perform(int task, const Job& job)
+void ThreadPool::perform(int job, const Task& task)
 {
     std::unique_lock<std::mutex> lock(_mutex);
 
-    _job_task.push_back(task);
-    _job_function.push_back(job);
-    _task_pending_count[task]++;
-    _job_size++;
+    _task_job.push_back(job);
+    _task_function.push_back(task);
+    _job_pending_count[job]++;
+    _task_size++;
     lock.unlock();
     _cv_worker.notify_one();
 }
 
-void ThreadPool::task_wait(int task)
+void ThreadPool::wait(int job)
 {
     std::unique_lock<std::mutex> lock(_mutex);
 
-    while (_task_pending_count[task] > 0)
+    while (_job_pending_count[job] > 0)
         _cv_master.wait(lock);
 
-    _free_tasks.push_back(task);
+    _free_jobs.push_back(job);
 }
 
 void ThreadPool::worker_main()
@@ -105,23 +107,61 @@ void ThreadPool::worker_main()
 
         for (;;)
         {
-            if (_job_size == 0)
+            if (_task_size == 0)
                 break;
 
-            int task = _job_task.back();
-            Job job = _job_function.back();
-            _job_task.pop_back();
-            _job_function.pop_back();
-            _job_size--;
+            int job = _task_job.back();
+            Task task = _task_function.back();
+            _task_job.pop_back();
+            _task_function.pop_back();
+            _task_size--;
 
             lock.unlock();
 
-            job();
+            task();
 
             lock.lock();
-            _task_pending_count[task]--;
-            if (_task_pending_count[task] == 0)
+            _job_pending_count[job]--;
+            if (_job_pending_count[job] == 0)
                 _cv_master.notify_all();
         }
     }
 }
+
+#else
+
+ThreadPool::ThreadPool()
+: _running(true)
+, _task_size(0u)
+, _job_size(0u)
+{
+}
+
+ThreadPool::~ThreadPool()
+{
+}
+
+int ThreadPool::task_create()
+{
+    return 0;
+}
+
+bool ThreadPool::task_finished(int task) const
+{
+    return true;
+}
+
+void ThreadPool::task_perform(int task, const Job& job)
+{
+    job();
+}
+
+void ThreadPool::task_wait(int task)
+{
+}
+
+void ThreadPool::worker_main()
+{
+}
+
+#endif

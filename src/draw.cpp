@@ -233,7 +233,7 @@ static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game, u32 rend
 
     auto& thread_pool = game.thread_pool();
 
-    int task;
+    int job;
     int view_h;
     size_t job_count;
 
@@ -241,13 +241,13 @@ static void draw_map(DrawBuffer& draw_buffer, World& world, Game& game, u32 rend
 
     job_count = ceil((float)view_h / lines_per_job);
 
-    task = thread_pool.task_create();
+    job = thread_pool.create();
     for (size_t i = 0; i < job_count - 1; ++i)
     {
-        thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, i * lines_per_job, lines_per_job));
+        thread_pool.perform(job, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, i * lines_per_job, lines_per_job));
     }
-    thread_pool.task_perform(task, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
-    thread_pool.task_wait(task);
+    thread_pool.perform(job, std::bind(draw_map_lines, std::ref(draw_buffer), std::ref(world), render_tick, (job_count - 1) * lines_per_job, view_h - (job_count - 1) * lines_per_job));
+    thread_pool.wait(job);
 }
 
 static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick, int delta_z)

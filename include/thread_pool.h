@@ -10,16 +10,16 @@
 class ThreadPool : private NonCopyable
 {
 public:
-    using Job = std::function<void(void)>;
+    using Task = std::function<void(void)>;
 
     ThreadPool();
     ~ThreadPool();
 
     size_t  pool_size() const { return _threads.size(); }
-    int     task_create();
-    bool    task_finished(int task) const;
-    void    task_perform(int task, const Job& job);
-    void    task_wait(int task);
+    int     create();
+    bool    finished(int job) const;
+    void    perform(int job, const Task& task);
+    void    wait(int job);
 
 private:
     void worker_main();
@@ -28,13 +28,13 @@ private:
     mutable std::mutex          _mutex;
     std::vector<std::thread>    _threads;
 
-    size_t                      _task_size;
-    std::vector<int>            _free_tasks;
-    std::vector<unsigned>       _task_pending_count;
-
     size_t                      _job_size;
-    std::vector<int>            _job_task;
-    std::vector<Job>            _job_function;
+    std::vector<int>            _free_jobs;
+    std::vector<unsigned>       _job_pending_count;
+
+    size_t                      _task_size;
+    std::vector<int>            _task_job;
+    std::vector<Task>           _task_function;
 
     std::condition_variable     _cv_worker;
     std::condition_variable     _cv_master;
