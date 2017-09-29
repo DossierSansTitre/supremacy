@@ -43,16 +43,6 @@ void putchar(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color
     putchar_fast(draw_buffer, x, y, symbol, color, color_bg);
 }
 
-void putchar_fast(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color, Color color_bg)
-{
-    Glyph g;
-
-    g.symbol = symbol;
-    g.color = color;
-    g.color_bg = color_bg;
-    draw_buffer.set(x, y, g);
-}
-
 void print(DrawBuffer& draw_buffer, int x, int y, const char* str, Color color, Color color_bg)
 {
     for (size_t i = 0; str[i]; ++i)
