@@ -1,6 +1,7 @@
 #include <iostream>
 #include <opengl.h>
 #include <window.h>
+#include <cli_options.h>
 
 Window::Window(SDL_Window* window, SDL_GLContext opengl)
 : _window(window)
@@ -27,10 +28,12 @@ static SDL_Window* create_window()
     SDL_Window* window;
     SDL_DisplayMode dm;
     uint32_t sdl_flags;
+    const auto& opts = CliOptions::instance();
 
     SDL_GetDesktopDisplayMode(0, &dm);
     sdl_flags = SDL_WINDOW_OPENGL;
-    sdl_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    if (!opts.windowed)
+        sdl_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
     window = SDL_CreateWindow(
         "Supremacy",

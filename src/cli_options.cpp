@@ -22,5 +22,7 @@ void CliOptions::parse(int argc, char** argv)
     {
         if (strcmp(argv[i], "--legacy") == 0)
             legacy = true;
+        else if (strcmp(argv[i], "--window") == 0)
+            windowed = true;
     }
 }

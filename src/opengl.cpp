@@ -5,7 +5,6 @@ GLuint load_texture_data(const char* data, uint32_t width, uint32_t height)
 {
     GLuint tex;
 
-    glEnable(GL_TEXTURE_2D);
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
