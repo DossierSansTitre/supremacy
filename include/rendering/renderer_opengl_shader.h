@@ -13,6 +13,7 @@ public:
     virtual void render() override;
 
 private:
+    GLuint  _program;
 };
 
 #endif

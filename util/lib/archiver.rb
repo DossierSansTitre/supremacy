@@ -5,7 +5,7 @@ module Archiver
     FileUtils.mkpath(File.join(binary_dir, 'data'))
     files = {}
     Dir.chdir(File.join(binary_dir, 'data_unpacked')) do
-      f = Dir['**/*'].reject{|path| path == '.' || path == '..'}
+      f = Dir['**/*'].reject{|path| File.directory?(path)}
       f.each {|name| files[name] = File.binread(name)}
     end
     File.open(File.join(binary_dir, 'supremacy.bin'), "wb") do |file|

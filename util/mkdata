@@ -6,6 +6,7 @@ require 'archiver'
 require 'fileutils'
 
 COPY_FILES = [
+  'shaders',
   'tileset.bmp'
 ]
 
@@ -16,10 +17,13 @@ end
 
 data_dir = ARGV.shift
 binary_dir = ARGV.shift
-FileUtils.mkpath(File.join(binary_dir, 'data_unpacked'))
+
+data_unpacked_dir = File.join(binary_dir, 'data_unpacked')
+FileUtils.rm_rf(data_unpacked_dir)
+FileUtils.mkpath(data_unpacked_dir)
 
 COPY_FILES.each do |f|
-  FileUtils.cp(File.join(data_dir, f), File.join(binary_dir, 'data_unpacked'))
+  FileUtils.cp_r(File.join(data_dir, f), data_unpacked_dir)
 end
 
 Serializer.serialize_all(data_dir, binary_dir)
