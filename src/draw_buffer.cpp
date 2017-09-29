@@ -1,5 +1,6 @@
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <draw_buffer.h>
 
 DrawBuffer::DrawBuffer()
@@ -14,20 +15,25 @@ DrawBuffer::~DrawBuffer()
 
 void DrawBuffer::resize(uint32_t width, uint32_t height)
 {
+    size_t size;
+
     _size.x = width;
     _size.y = height;
-    _glyphs.resize(width * height);
+    size = width * height;
+    _symbol.resize(size);
+    _color.resize(size * 3);
+    _color_bg.resize(size * 3);
     clear();
 }
 
 void DrawBuffer::clear()
 {
-    for (auto& g : _glyphs)
-    {
-        g.symbol = ' ';
-        g.color = {0, 0, 0};
-        g.color_bg = {0, 0, 0};
-    }
+    size_t size;
+
+    size = _size.x * _size.y;
+    std::memset(_symbol.data(), 0, size);
+    std::memset(_color.data(), 0, size * 3);
+    std::memset(_color_bg.data(), 0, size * 3);
 }
 
 void putchar(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color, Color color_bg)

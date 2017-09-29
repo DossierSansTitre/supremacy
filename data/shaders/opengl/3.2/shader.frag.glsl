@@ -1,5 +1,7 @@
 #version 150
 
+in vec2 fTexCoord;
+
 out vec4 color;
 
 void main()

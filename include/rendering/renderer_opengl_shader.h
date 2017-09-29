@@ -13,7 +13,16 @@ public:
     virtual void render() override;
 
 private:
+    void    init_buffers();
+
     GLuint  _program;
+    GLuint  _vao;
+    GLuint  _vbo;
+    GLuint  _ibo;
+    GLuint  _texture;
+    GLuint  _symbol;
+    GLuint  _color;
+    GLuint  _color_bg;
 };
 
 #endif

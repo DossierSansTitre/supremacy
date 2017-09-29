@@ -47,6 +47,8 @@ static GLuint link_shader(GLuint vert, GLuint frag)
     program = glCreateProgram();
     glAttachShader(program, vert);
     glAttachShader(program, frag);
+    glBindAttribLocation(program, 0, "vPosition");
+    glBindAttribLocation(program, 1, "vTexCoord");
     glLinkProgram(program);
     glGetProgramiv(program, GL_LINK_STATUS, &link_status);
     if (link_status != GL_TRUE)
@@ -76,6 +78,7 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     shader_vert = load_shader(archive, GL_VERTEX_SHADER, "shaders/opengl/3.2/shader.vert.glsl");
     shader_frag = load_shader(archive, GL_FRAGMENT_SHADER, "shaders/opengl/3.2/shader.frag.glsl");
     _program = link_shader(shader_vert, shader_frag);
+    init_buffers();
 }
 
 RendererOpenGLShader::~RendererOpenGLShader()
@@ -90,6 +93,37 @@ void RendererOpenGLShader::clear()
 
 void RendererOpenGLShader::render()
 {
-    glClearColor(1.f, 0.f, 0.f, 1.f);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
+    glBindVertexArray(_vao);
+    glUseProgram(_program);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+}
+
+void RendererOpenGLShader::init_buffers()
+{
+    static const uint16_t ibo_data[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
+    static const float vbo_data[] = {
+        -1.f, -1.f, 0.f, 0.f,
+         1.f, -1.f, 1.f, 0.f,
+         1.f,  1.f, 1.f, 1.f,
+        -1.f,  1.f, 0.f, 1.f,
+    };
+
+    glGenVertexArrays(1, &_vao);
+    glGenBuffers(1, &_vbo);
+    glGenBuffers(1, &_ibo);
+    glBindVertexArray(_vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * 6, ibo_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, vbo_data, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 }
