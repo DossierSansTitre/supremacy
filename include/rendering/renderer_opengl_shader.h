@@ -10,8 +10,10 @@ public:
     RendererOpenGLShader(Window& window, DrawBuffer& draw_buffer);
     virtual ~RendererOpenGLShader();
 
-    virtual void clear() override;
-    virtual void render() override;
+    virtual void    clear() override;
+    virtual void    render() override;
+
+    void    resize(Vector2u size);
 
 private:
     void    init_buffers();

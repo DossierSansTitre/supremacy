@@ -85,6 +85,7 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     _tile_count_uniform = glGetUniformLocation(_program, "uTileCount");
     init_buffers();
     init_textures();
+    resize({(_window.width() / _texture_size.x) & (~1), _window.height() / _texture_size.y});
 }
 
 RendererOpenGLShader::~RendererOpenGLShader()
@@ -120,17 +121,34 @@ void RendererOpenGLShader::render()
 
     glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, _symbol);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
 
     glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_2D, _color);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, db.color());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, db.color());
 
     glActiveTexture(GL_TEXTURE0 + 3);
     glBindTexture(GL_TEXTURE_2D, _color_bg);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, db.color_bg());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, db.color_bg());
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+}
+
+
+void RendererOpenGLShader::resize(Vector2u size)
+{
+    auto& db = _draw_buffer;
+
+    db.resize(size.x, size.y);
+    size_t w = db.width();
+    size_t h = db.height();
+
+    glBindTexture(GL_TEXTURE_2D, _symbol);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, _color);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_2D, _color_bg);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 }
 
 void RendererOpenGLShader::init_buffers()
