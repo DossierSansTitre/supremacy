@@ -94,7 +94,7 @@ RendererOpenGLShader::~RendererOpenGLShader()
 
 void RendererOpenGLShader::clear()
 {
-    _draw_buffer.resize((_window.width() / 12) & (~1), _window.height() / 16);
+    _draw_buffer.resize((_window.width() / _texture_size.x) & (~1), _window.height() / _texture_size.y);
 }
 
 void RendererOpenGLShader::render()
@@ -178,6 +178,8 @@ void RendererOpenGLShader::init_textures()
     uint32_t h;
 
     _texture = load_texture("tileset.bmp", w, h);
+    _texture_size.x = w / 32;
+    _texture_size.y = h / 32;
     _symbol = create_texture();
     _color = create_texture();
     _color_bg = create_texture();

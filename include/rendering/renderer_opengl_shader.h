@@ -2,6 +2,7 @@
 #define RENDERER_OPENGL_SHADER_H
 
 #include <rendering/renderer.h>
+#include <math/vector.h>
 
 class RendererOpenGLShader : public Renderer
 {
@@ -29,6 +30,8 @@ private:
     GLint   _color_uniform;
     GLint   _color_bg_uniform;
     GLint   _tile_count_uniform;
+
+    Vector2i _texture_size;
 };
 
 #endif
