@@ -106,7 +106,8 @@ void RendererOpenGLShader::render()
     size_t h = db.height();
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glBindVertexArray(_vao);
     glUseProgram(_program);
 
@@ -132,6 +133,9 @@ void RendererOpenGLShader::render()
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, db.color_bg());
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
+
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 
