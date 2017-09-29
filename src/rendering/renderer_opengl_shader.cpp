@@ -78,7 +78,13 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     shader_vert = load_shader(archive, GL_VERTEX_SHADER, "shaders/opengl/3.2/shader.vert.glsl");
     shader_frag = load_shader(archive, GL_FRAGMENT_SHADER, "shaders/opengl/3.2/shader.frag.glsl");
     _program = link_shader(shader_vert, shader_frag);
+    _texture_uniform = glGetUniformLocation(_program, "uTexture");
+    _symbol_uniform = glGetUniformLocation(_program, "uSymbol");
+    _color_uniform = glGetUniformLocation(_program, "uColor");
+    _color_bg_uniform = glGetUniformLocation(_program, "uColorBg");
+    _tile_count_uniform = glGetUniformLocation(_program, "uTileCount");
     init_buffers();
+    init_textures();
 }
 
 RendererOpenGLShader::~RendererOpenGLShader()
@@ -88,15 +94,42 @@ RendererOpenGLShader::~RendererOpenGLShader()
 
 void RendererOpenGLShader::clear()
 {
-
+    _draw_buffer.resize((_window.width() / 12) & (~1), _window.height() / 16);
 }
 
 void RendererOpenGLShader::render()
 {
+    auto& db = _draw_buffer;
+
+    size_t w = db.width();
+    size_t h = db.height();
+
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindVertexArray(_vao);
     glUseProgram(_program);
+
+    glUniform1i(_texture_uniform, 0);
+    glUniform1i(_symbol_uniform, 1);
+    glUniform1i(_color_uniform, 2);
+    glUniform1i(_color_bg_uniform, 3);
+    glUniform2f(_tile_count_uniform, db.width(), db.height());
+
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, _symbol);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
+
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, _color);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, db.color());
+
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_2D, _color_bg);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, db.color_bg());
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 }
 
@@ -108,10 +141,10 @@ void RendererOpenGLShader::init_buffers()
     };
 
     static const float vbo_data[] = {
-        -1.f, -1.f, 0.f, 0.f,
-         1.f, -1.f, 1.f, 0.f,
-         1.f,  1.f, 1.f, 1.f,
-        -1.f,  1.f, 0.f, 1.f,
+        -1.f,  1.f, 0.f, 0.f,
+         1.f,  1.f, 1.f, 0.f,
+         1.f, -1.f, 1.f, 1.f,
+        -1.f, -1.f, 0.f, 1.f,
     };
 
     glGenVertexArrays(1, &_vao);
@@ -126,4 +159,26 @@ void RendererOpenGLShader::init_buffers()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+}
+
+static GLuint create_texture()
+{
+    GLuint tex;
+
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    return tex;
+}
+
+void RendererOpenGLShader::init_textures()
+{
+    uint32_t w;
+    uint32_t h;
+
+    _texture = load_texture("tileset.bmp", w, h);
+    _symbol = create_texture();
+    _color = create_texture();
+    _color_bg = create_texture();
 }

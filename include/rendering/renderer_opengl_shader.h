@@ -14,6 +14,7 @@ public:
 
 private:
     void    init_buffers();
+    void    init_textures();
 
     GLuint  _program;
     GLuint  _vao;
@@ -23,6 +24,11 @@ private:
     GLuint  _symbol;
     GLuint  _color;
     GLuint  _color_bg;
+    GLint   _texture_uniform;
+    GLint   _symbol_uniform;
+    GLint   _color_uniform;
+    GLint   _color_bg_uniform;
+    GLint   _tile_count_uniform;
 };
 
 #endif

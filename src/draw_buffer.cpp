@@ -21,8 +21,8 @@ void DrawBuffer::resize(uint32_t width, uint32_t height)
     _size.y = height;
     size = width * height;
     _symbol.resize(size);
-    _color.resize(size * 3);
-    _color_bg.resize(size * 3);
+    _color.resize(size * 4);
+    _color_bg.resize(size * 4);
     clear();
 }
 
@@ -32,8 +32,8 @@ void DrawBuffer::clear()
 
     size = _size.x * _size.y;
     std::memset(_symbol.data(), 0, size);
-    std::memset(_color.data(), 0, size * 3);
-    std::memset(_color_bg.data(), 0, size * 3);
+    std::memset(_color.data(), 0, size * 4);
+    std::memset(_color_bg.data(), 0, size * 4);
 }
 
 void putchar(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color, Color color_bg)

@@ -99,17 +99,12 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
         height_map[i] = 0;
 
     const Biome& biome = Biome::from_id(biome_id);
-
-    log_line(LogLevel::Info, "Generating map with biome 0x%02x", (int)biome_id);
-
     map.create(width, height, depth);
-
     for (const auto& layer : biome.layers)
     {
         switch (layer.type)
         {
             case Biome::LayerType::Fill:
-                log_line(LogLevel::Debug, "MapGen - Fill layer (height: %d, tile: %d, material: %d)", layer.fill.height, layer.fill.tile, layer.fill.material);
                 for (int j = 0; j < height; ++j)
                 {
                     for (int i = 0; i < width; ++i)
@@ -125,7 +120,6 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
                 }
                 break;
             case Biome::LayerType::Octave:
-                log_line(LogLevel::Debug, "MapGen - Octave layer (tile: %d, material: %d)", layer.octave.tile, layer.octave.material);
                 for (int j = 0; j < height; ++j)
                 {
                     for (int i = 0; i < width; ++i)
@@ -142,7 +136,6 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
                 }
                 break;
             case Biome::LayerType::Smooth:
-                log_line(LogLevel::Debug, "MapGen - Smooth layer (from tile: %d, to tile: %d)", layer.smooth.from, layer.smooth.to);
                 smooth_pass(map, height_map, layer.smooth.from, layer.smooth.to);
                 break;
             case Biome::LayerType::Replace:

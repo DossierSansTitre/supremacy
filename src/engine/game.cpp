@@ -5,6 +5,7 @@
 #include <opengl.h>
 #include <rendering/renderer_opengl_legacy.h>
 #include <rendering/renderer_opengl_shader.h>
+#include <cli_options.h>
 
 static void init_rng(Rng& rng)
 {
@@ -96,7 +97,11 @@ void Game::stop()
 
 void Game::select_renderer()
 {
-    _window = Window::create(3, 2);
+    auto& opts = CliOptions::instance();
+
+    _window = nullptr;
+    if (!opts.legacy)
+        _window = Window::create(3, 2);
     if (_window)
     {
         _renderer = new RendererOpenGLShader(*_window, _draw_buffer);

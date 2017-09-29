@@ -3,14 +3,16 @@
 #include <engine/game.h>
 #include <scene/main_menu_scene.h>
 #include <init.h>
+#include <cli_options.h>
 
-int main()
+int main(int argc, char** argv)
 {
     Game game;
     int status;
 
     status = 0;
 
+    CliOptions::instance().parse(argc, argv);
     srand(time(nullptr));
 
     SDL_Init(SDL_INIT_VIDEO);
