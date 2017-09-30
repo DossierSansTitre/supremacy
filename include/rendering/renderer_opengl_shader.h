@@ -3,6 +3,7 @@
 
 #include <rendering/renderer.h>
 #include <math/vector.h>
+#include <opengl.h>
 
 class RendererOpenGLShader : public Renderer
 {

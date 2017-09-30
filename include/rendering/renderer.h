@@ -3,7 +3,7 @@
 
 #include <non_copyable.h>
 #include <draw_buffer.h>
-#include <window.h>
+#include <window/window.h>
 
 class Renderer : private NonCopyable
 {

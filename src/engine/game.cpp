@@ -1,7 +1,7 @@
 #include <fstream>
 #include <engine/game.h>
 #include <log.h>
-#include <window.h>
+#include <window/window.h>
 #include <opengl.h>
 #include <rendering/renderer_opengl_legacy.h>
 #include <rendering/renderer_opengl_shader.h>
@@ -59,8 +59,8 @@ void Game::loop()
     {
         render();
 
-        if (!_window->focus())
-            SDL_Delay(50);
+        //if (!_window->focus())
+        //    SDL_Delay(50);
 
         while (update_acc >= update_delay)
         {
@@ -101,14 +101,14 @@ void Game::select_renderer()
 
     _window = nullptr;
     if (!opts.legacy)
-        _window = Window::create(3, 2);
+        _window = Window::create(WindowType::SDL2, WindowRenderApi::OpenGL, 3, 2);
     if (_window)
     {
         _renderer = new RendererOpenGLShader(*_window, _draw_buffer);
     }
     else
     {
-        _window = Window::create(2, 1);
+        _window = Window::create(WindowType::SDL2, WindowRenderApi::OpenGL, 2, 1);
         _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
     }
     log_line(LogLevel::Info, "OpenGL Info:");
@@ -135,21 +135,6 @@ void Game::render()
 
 void Game::handle_events()
 {
-    SDL_Event event;
-
     _keyboard.tick();
-    while (_window->poll_event(event))
-    {
-        switch (event.type)
-        {
-            case SDL_KEYDOWN:
-                _keyboard.press_key(event.key.keysym.scancode);
-                break;
-            case SDL_KEYUP:
-                _keyboard.release_key(event.key.keysym.scancode);
-                break;
-            default:
-                break;
-        }
-    }
+    _window->poll(_keyboard);
 }

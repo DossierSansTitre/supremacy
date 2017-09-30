@@ -1,22 +1,21 @@
 #include <iostream>
 #include <opengl.h>
-#include <window.h>
+#include <window/sdl2.h>
 #include <cli_options.h>
 
-Window::Window(SDL_Window* window, SDL_GLContext opengl)
+WindowSDL2::WindowSDL2(SDL_Window* window, SDL_GLContext opengl)
 : _window(window)
 , _opengl(opengl)
-, _focus(true)
 {
     int w;
     int h;
 
     SDL_GetWindowSize(_window, &w, &h);
-    _width = w;
-    _height = h;
+    this->_width = w;
+    this->_height = h;
 }
 
-Window::~Window()
+WindowSDL2::~WindowSDL2()
 {
     SDL_GL_MakeCurrent(_window, nullptr);
     SDL_GL_DeleteContext(_opengl);
@@ -61,8 +60,11 @@ static SDL_GLContext create_gl_context(SDL_Window* window)
     return opengl;
 }
 
-Window* Window::create(int opengl_major, int opengl_minor)
+WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
 {
+    if (api != WindowRenderApi::OpenGL)
+        return nullptr;
+
     SDL_GLprofile gl_profile;
     SDL_Window* window;
     SDL_GLContext opengl;
@@ -71,12 +73,12 @@ Window* Window::create(int opengl_major, int opengl_minor)
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, opengl_major);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, opengl_minor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
 
-    if (opengl_major >= 3)
+    if (major >= 3)
         gl_profile = SDL_GL_CONTEXT_PROFILE_CORE;
     else
         gl_profile = SDL_GL_CONTEXT_PROFILE_COMPATIBILITY;
@@ -90,38 +92,21 @@ Window* Window::create(int opengl_major, int opengl_minor)
         SDL_DestroyWindow(window);
         return nullptr;
     }
-    return new Window(window, opengl);
+    return new WindowSDL2(window, opengl);
 }
 
-void Window::swap()
+void WindowSDL2::swap()
 {
     SDL_GL_SwapWindow(_window);
 }
 
-bool Window::poll_event(SDL_Event& event)
+void WindowSDL2::poll(Keyboard& keyboard)
 {
-    int ret;
+    SDL_Event e;
 
     for (;;)
     {
-        ret = SDL_PollEvent(&event);
-        if (!ret)
-            return false;
-        if (event.type == SDL_WINDOWEVENT) {
-            switch (event.window.event)
-            {
-                case SDL_WINDOWEVENT_FOCUS_GAINED:
-                    _focus = true;
-                    break;
-                case SDL_WINDOWEVENT_FOCUS_LOST:
-                    _focus = false;
-                    break;
-            }
-        }
-        else
-        {
-            break;
-        }
+        if (!SDL_PollEvent(&e))
+            return;
     }
-    return true;
 }

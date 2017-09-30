@@ -2,7 +2,8 @@
 #include <config.h>
 #include <rendering/renderer_opengl_legacy.h>
 #include <util/file_path.h>
-#include <window.h>
+#include <window/window.h>
+#include <opengl.h>
 #include <log.h>
 
 static uint16_t float16(float in)
