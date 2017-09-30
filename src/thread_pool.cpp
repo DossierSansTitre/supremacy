@@ -150,22 +150,22 @@ ThreadPool::~ThreadPool()
 {
 }
 
-int ThreadPool::task_create()
+int ThreadPool::create()
 {
     return 0;
 }
 
-bool ThreadPool::task_finished(int task) const
+bool ThreadPool::finished(int job) const
 {
     return true;
 }
 
-void ThreadPool::task_perform(int task, const Job& job)
+void ThreadPool::perform(int job, Task task, void* obj, size_t start, size_t len)
 {
-    job();
+    task(obj, start, len);
 }
 
-void ThreadPool::task_wait(int task)
+void ThreadPool::wait(int job)
 {
 }
 
