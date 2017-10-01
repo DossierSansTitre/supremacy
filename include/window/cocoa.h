@@ -12,7 +12,7 @@ public:
     static WindowCocoa* create(WindowRenderApi api, int major, int minor);
 
     void    swap() override;
-    void    poll(Keyboard& keyboard) override;
+    void    poll(Input& input) override;
 
 private:
     void*   _window;

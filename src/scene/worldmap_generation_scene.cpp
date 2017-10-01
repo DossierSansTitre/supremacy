@@ -41,11 +41,11 @@ void WorldmapGenerationScene::update()
 {
     auto& keyboard = game().keyboard();
 
-    if (keyboard.pressed(SDL_SCANCODE_ESCAPE))
+    if (keyboard.pressed(Keyboard::Escape))
     {
         game().set_scene<MainMenuScene>();
     }
-    else if (keyboard.pressed(SDL_SCANCODE_RETURN))
+    else if (keyboard.pressed(Keyboard::Enter))
     {
         save_worldmap(*_worldmap);
         game().set_scene<MainMenuScene>();
@@ -54,9 +54,9 @@ void WorldmapGenerationScene::update()
     {
         generate();
     }
-    if (keyboard.pressed(SDL_SCANCODE_RIGHT))
+    if (keyboard.pressed(Keyboard::Right))
         change_size(_world_size * 2);
-    if (keyboard.pressed(SDL_SCANCODE_LEFT))
+    if (keyboard.pressed(Keyboard::Left))
         change_size(_world_size / 2);
 }
 

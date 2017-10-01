@@ -3,6 +3,7 @@
 
 #include <types.h>
 #include <non_copyable.h>
+#include <engine/input.h>
 
 enum class WindowType
 {
@@ -27,7 +28,7 @@ public:
     uint32_t        width() const { return _width; }
     uint32_t        height() const { return _height; }
     virtual void    swap() = 0;
-    virtual void    poll(Keyboard& keyboard) = 0;
+    virtual void    poll(Input& input) = 0;
 
     static Window*  create(WindowType type, WindowRenderApi api, int major, int minor);
 

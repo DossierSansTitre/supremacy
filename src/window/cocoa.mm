@@ -4,22 +4,70 @@
 #import <keyboard.h>
 
 static const uint8_t kc_lookup_table[128] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x4f, 0x50, 0x51, 0x52, 0x00,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Enter,   Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Escape,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Escape,  Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Unknown,
+    Keyboard::Unknown, Keyboard::Left,
+    Keyboard::Right,   Keyboard::Down,
+    Keyboard::Up,      Keyboard::Unknown,
 };
 
 static NSAutoreleasePool* ar_pool;
@@ -127,29 +175,52 @@ void WindowCocoa::swap()
     [context flushBuffer];
 }
 
-#import <log.h>
-
-void WindowCocoa::poll(Keyboard& keyboard)
+void WindowCocoa::poll(Input& input)
 {
+    InputEvent e;
     NSEvent* event;
+    NSEvent* current_event;
     uint32_t kc;
     bool down;
 
-    while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask
+    NSEventModifierFlags modifier_flags = 0;
+    NSEventModifierFlags event_modifier_flags;
+    current_event = [NSApp currentEvent];
+
+    if (current_event)
+        modifier_flags = [current_event modifierFlags];
+
+    while ((event = [NSApp nextEventMatchingMask:NSEventMaskAny
                      untilDate:[NSDate distantPast]
                      inMode:NSDefaultRunLoopMode
                      dequeue:YES]))
     {
         [NSApp sendEvent:event];
         NSEventType type = [event type];
-        if (type == kCGEventKeyDown || type == kCGEventKeyUp)
+        down = (type == NSEventTypeKeyDown);
+        if (down || type == NSEventTypeKeyUp)
         {
-            down = (type == kCGEventKeyDown);
+            if ([event isARepeat])
+                continue;
             kc = [event keyCode];
             if (kc >= 128)
                 continue;
             kc = kc_lookup_table[kc];
-            keyboard.set_scancode(kc, down);
+            e.type = down ? InputEventType::KeyDown : InputEventType::KeyUp;
+            e.key.scancode = kc;
+            input.dispatch(e);
+        }
+        else if (type == NSEventTypeFlagsChanged)
+        {
+            event_modifier_flags = [event modifierFlags];
+            if ((modifier_flags & NSEventModifierFlagShift) ^ (event_modifier_flags & NSEventModifierFlagShift))
+            {
+                down = (event_modifier_flags & NSEventModifierFlagShift);
+                e.type = down ? InputEventType::KeyDown : InputEventType::KeyUp;
+                e.key.scancode = Keyboard::Shift;
+                input.dispatch(e);
+            }
+            modifier_flags = event_modifier_flags;
         }
     }
 }

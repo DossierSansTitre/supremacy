@@ -13,7 +13,7 @@ public:
     static WindowSDL2* create(WindowRenderApi api, int major, int minor);
 
     void    swap() override;
-    void    poll(Keyboard& keyboard) override;
+    void    poll(Input& input) override;
 
 private:
     SDL_Window*     _window;

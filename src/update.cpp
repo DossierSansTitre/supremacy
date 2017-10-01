@@ -65,7 +65,7 @@ static Vector3i keyboard_motion(Keyboard& keyboard)
     int delta_z;
     Vector3i motion = {0, 0, 0};
 
-    shift = (keyboard.down(SDL_SCANCODE_LSHIFT) || keyboard.down(SDL_SCANCODE_RSHIFT));
+    shift = keyboard.down(Keyboard::Shift);
 
     if (shift)
     {
@@ -78,17 +78,17 @@ static Vector3i keyboard_motion(Keyboard& keyboard)
         delta_z = 1;
     }
 
-    if (keyboard.repeated(SDL_SCANCODE_LEFT))
+    if (keyboard.repeated(Keyboard::Left))
         motion.x -= delta;
-    if (keyboard.repeated(SDL_SCANCODE_RIGHT))
+    if (keyboard.repeated(Keyboard::Right))
         motion.x += delta;
-    if (keyboard.repeated(SDL_SCANCODE_UP))
+    if (keyboard.repeated(Keyboard::Up))
         motion.y -= delta;
-    if (keyboard.repeated(SDL_SCANCODE_DOWN))
+    if (keyboard.repeated(Keyboard::Down))
         motion.y += delta;
-    if (keyboard.key_repeated(SDLK_q))
+    if (keyboard.key_repeated(Keyboard::Unknown))
         motion.z += delta_z;
-    if (keyboard.key_repeated(SDLK_e))
+    if (keyboard.key_repeated(Keyboard::Unknown))
         motion.z -= delta_z;
     return motion;
 }

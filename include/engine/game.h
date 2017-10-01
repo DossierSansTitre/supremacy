@@ -3,6 +3,7 @@
 
 #include <non_copyable.h>
 #include <engine/game_scene.h>
+#include <engine/input.h>
 #include <math/rng.h>
 #include <keyboard.h>
 #include <thread_pool.h>
@@ -18,6 +19,7 @@ public:
     Game();
     ~Game();
 
+    Input&      input() { return _input; }
     Window&     window() { return *_window; }
     Keyboard&   keyboard() { return _keyboard; }
     Rng&        rng() { return _rng; }
@@ -49,7 +51,7 @@ private:
     void    render();
     void    handle_events();
 
-
+    Input       _input;
     Window*     _window;
     Keyboard    _keyboard;
     Rng         _rng;

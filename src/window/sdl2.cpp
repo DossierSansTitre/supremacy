@@ -101,8 +101,9 @@ void WindowSDL2::swap()
     SDL_GL_SwapWindow(_window);
 }
 
-void WindowSDL2::poll(Keyboard& keyboard)
+void WindowSDL2::poll(Input& input)
 {
+#if 0
     SDL_Event e;
     bool down;
 
@@ -116,4 +117,5 @@ void WindowSDL2::poll(Keyboard& keyboard)
             keyboard.set_scancode(e.key.keysym.scancode, down);
         }
     }
+#endif
 }

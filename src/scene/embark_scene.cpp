@@ -42,25 +42,25 @@ void EmbarkScene::update()
 {
     auto& kb = game().keyboard();
 
-    if (kb.pressed(SDL_SCANCODE_ESCAPE))
+    if (kb.pressed(Keyboard::Escape))
     {
         game().set_scene<LoadWorldSelectionScene>();
     }
 
     int speed = 1;
 
-    if (kb.down(SDL_SCANCODE_LSHIFT))
+    if (kb.down(Keyboard::Shift))
         speed = 10;
-    if (kb.repeated(SDL_SCANCODE_RIGHT))
+    if (kb.repeated(Keyboard::Right))
         move_cursor({speed, 0});
-    if (kb.repeated(SDL_SCANCODE_LEFT))
+    if (kb.repeated(Keyboard::Left))
         move_cursor({-speed, 0});
-    if (kb.repeated(SDL_SCANCODE_UP))
+    if (kb.repeated(Keyboard::Up))
         move_cursor({0, -speed});
-    if (kb.repeated(SDL_SCANCODE_DOWN))
+    if (kb.repeated(Keyboard::Down))
         move_cursor({0, speed});
 
-    if (kb.pressed(SDL_SCANCODE_RETURN))
+    if (kb.pressed(Keyboard::Enter))
     {
         game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
     }

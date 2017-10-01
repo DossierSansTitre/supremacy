@@ -84,7 +84,7 @@ void IngameScene::update()
 {
     auto& keyboard = game().keyboard();
 
-    if (keyboard.pressed(SDL_SCANCODE_ESCAPE))
+    if (keyboard.pressed(Keyboard::Escape))
     {
         game().set_scene<MainMenuScene>();
         return;

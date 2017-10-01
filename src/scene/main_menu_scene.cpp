@@ -19,18 +19,29 @@ void MainMenuScene::setup()
 
 void MainMenuScene::update()
 {
-    auto& keyboard = game().keyboard();
+    auto& input = game().input();
+    InputEvent e;
 
-    if (keyboard.pressed(SDL_SCANCODE_RETURN))
-        menu_action();
-    else if (keyboard.pressed(SDL_SCANCODE_DOWN))
-        _selection++;
-    else if (keyboard.pressed(SDL_SCANCODE_UP))
-        _selection--;
-    if (_selection < 0)
-        _selection = 0;
-    else if (_selection > 2)
-        _selection = 2;
+    while (input.poll(e))
+    {
+        if (e.type != InputEventType::KeyDown)
+            continue;
+        switch (e.key.scancode)
+        {
+            case Keyboard::Enter:
+                menu_action();
+                break;
+            case Keyboard::Down:
+                _selection++;
+                break;
+            case Keyboard::Up:
+                _selection--;
+        }
+        if (_selection < 0)
+            _selection = 0;
+        else if (_selection > 2)
+            _selection = 2;
+    }
 }
 
 void MainMenuScene::render(DrawBuffer& draw_buffer)

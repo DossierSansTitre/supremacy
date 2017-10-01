@@ -15,12 +15,14 @@ public:
 
     enum
     {
-        Enter   = 0x28,
-        Escape  = 0x29,
-        Right   = 0x4f,
-        Left    = 0x50,
-        Down    = 0x51,
-        Up      = 0x52
+        Unknown = 0x00,
+        Enter   = 0x01,
+        Escape  = 0x02,
+        Right   = 0x03,
+        Left    = 0x04,
+        Down    = 0x05,
+        Up      = 0x06,
+        Shift   = 0x07
     };
 
     bool    down(uint32_t scancode) const { return _scancode_down[scancode]; }

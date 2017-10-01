@@ -135,6 +135,6 @@ void Game::render()
 
 void Game::handle_events()
 {
-    _keyboard.tick();
-    _window->poll(_keyboard);
+    _input.tick();
+    _window->poll(_input);
 }
