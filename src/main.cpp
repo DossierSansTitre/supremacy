@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     CliOptions::instance().parse(argc, argv);
     srand(time(nullptr));
 
-    SDL_Init(SDL_INIT_VIDEO);
+    //SDL_Init(SDL_INIT_VIDEO);
     game.select_renderer();
     if (init_game_data())
     {

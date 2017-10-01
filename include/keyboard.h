@@ -16,8 +16,9 @@ public:
     enum
     {
         Enter   = 0x28,
-        Left    = 0x4f,
-        Right   = 0x50,
+        Escape  = 0x29,
+        Right   = 0x4f,
+        Left    = 0x50,
         Down    = 0x51,
         Up      = 0x52
     };

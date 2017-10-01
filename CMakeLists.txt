@@ -47,7 +47,7 @@ find_package(OpenGL)
 find_package(GLEW)
 find_package(SDL2)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.mm")
 file(GLOB_RECURSE HEADERS "src/*.h")
 
 include_directories(include)

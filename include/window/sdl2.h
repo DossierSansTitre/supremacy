@@ -9,7 +9,7 @@ class WindowSDL2 : public Window
 public:
     WindowSDL2(SDL_Window* window, SDL_GLContext opengl);
     ~WindowSDL2();
-    
+
     static WindowSDL2* create(WindowRenderApi api, int major, int minor);
 
     void    swap() override;

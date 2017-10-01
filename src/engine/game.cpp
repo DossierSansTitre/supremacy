@@ -101,7 +101,7 @@ void Game::select_renderer()
 
     _window = nullptr;
     if (!opts.legacy)
-        _window = Window::create(WindowType::SDL2, WindowRenderApi::OpenGL, 3, 2);
+        _window = Window::create(WindowType::Cocoa, WindowRenderApi::OpenGL, 3, 2);
     if (_window)
     {
         _renderer = new RendererOpenGLShader(*_window, _draw_buffer);
