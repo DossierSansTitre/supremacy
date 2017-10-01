@@ -48,8 +48,11 @@ WindowCocoa::WindowCocoa(void* window, void* context)
 : _window(window)
 , _context(context)
 {
-    this->_width = 800;
-    this->_height = 600;
+    NSRect frame;
+
+    frame = [[NSScreen mainScreen] frame];
+    this->_width = frame.size.width;
+    this->_height = frame.size.height;
 }
 
 WindowCocoa::~WindowCocoa()
@@ -68,20 +71,25 @@ static NativeWindow* create_cocoa_window()
     [NSApp activateIgnoringOtherApps:YES];
     [[NSApplication sharedApplication] finishLaunching];
 
-    frame = NSMakeRect(0, 0, 800, 600);
+    frame = [[NSScreen mainScreen] frame];
     win = [[NativeWindow alloc] initWithContentRect:frame
-        styleMask:NSTitledWindowMask
+        styleMask:NSWindowStyleMaskBorderless
         backing:NSBackingStoreBuffered
         defer:NO];
+    [win setLevel:NSMainMenuWindowLevel+1];
+    [win setOpaque:YES];
     [win setCollectionBehavior:[win collectionBehavior] | NSWindowCollectionBehaviorFullScreenPrimary];
     [win setTitle:[NSString stringWithCString:"Supremacy" encoding:NSASCIIStringEncoding]];
     [win setFrame:frame display:YES animate:YES];
+    [win toggleFullScreen:nil];
     return win;
 }
 
 static NSOpenGLContext* create_cocoa_opengl(NativeWindow* win, int major, int minor)
 {
-    NSRect frame = NSMakeRect(0, 0, 800, 600);
+    NSRect frame;
+
+    frame = [[NSScreen mainScreen] frame];
     NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc]
     initWithAttributes:glAttributes];
     NSOpenGLView* view = [[NSOpenGLView alloc] initWithFrame:frame pixelFormat:pixelFormat];
@@ -112,7 +120,9 @@ WindowCocoa* WindowCocoa::create(WindowRenderApi api, int major, int minor)
 void WindowCocoa::swap()
 {
     NSOpenGLContext* context;
-
+    GLint                       sync = 0;
+    CGLContextObj               ctx = CGLGetCurrentContext();
+    CGLSetParameter(ctx, kCGLCPSwapInterval, &sync);
     context = static_cast<NSOpenGLContext*>(_context);
     [context flushBuffer];
 }
@@ -130,6 +140,7 @@ void WindowCocoa::poll(Keyboard& keyboard)
                      inMode:NSDefaultRunLoopMode
                      dequeue:YES]))
     {
+        [NSApp sendEvent:event];
         NSEventType type = [event type];
         if (type == kCGEventKeyDown || type == kCGEventKeyUp)
         {

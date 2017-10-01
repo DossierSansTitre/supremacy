@@ -59,6 +59,9 @@ void MainMenuScene::render(DrawBuffer& draw_buffer)
         render_centered(draw_buffer, 14 + i, menu_items[i], color);
         sel++;
     }
+    int fps_render = game().fps_counter_render().get();
+    int fps_update = game().fps_counter_update().get();
+    printf(draw_buffer, 0, 0, "FPS: %d(%d)", {0, 0, 0}, {255, 255, 255}, fps_render, fps_update);
 }
 
 void MainMenuScene::menu_action()
