@@ -13,23 +13,32 @@ public:
     Keyboard();
     ~Keyboard();
 
-    bool    down(SDL_Scancode scancode) const { return _down[scancode]; }
-    bool    pressed(SDL_Scancode scancode) const { return _pressed[scancode]; }
-    bool    repeated(SDL_Scancode scancode) const;
+    enum
+    {
+        Enter   = 0x28,
+        Left    = 0x4f,
+        Right   = 0x50,
+        Down    = 0x51,
+        Up      = 0x52
+    };
 
-    bool    key_down(SDL_Keycode keycode) const { return down(SDL_GetScancodeFromKey(keycode)); }
-    bool    key_pressed(SDL_Keycode keycode) const { return pressed(SDL_GetScancodeFromKey(keycode)); }
-    bool    key_repeated(SDL_Keycode keycode) const { return repeated(SDL_GetScancodeFromKey(keycode)); }
+    bool    down(uint32_t scancode) const { return _scancode_down[scancode]; }
+    bool    pressed(uint32_t scancode) const { return _scancode_pressed[scancode]; }
+    bool    repeated(uint32_t scancode) const;
+
+    bool    key_down(SDL_Keycode keycode) const { return false; }
+    bool    key_pressed(SDL_Keycode keycode) const { return false; }
+    bool    key_repeated(SDL_Keycode keycode) const { return false; }
 
     void    tick();
-    void    press_key(uint32_t keycode);
-    void    release_key(uint32_t keycode);
+
+    void    set_scancode(uint32_t scancode, bool down);
 
 private:
     uint32_t                        _tick;
-    std::bitset<SDL_NUM_SCANCODES>  _down;
-    std::bitset<SDL_NUM_SCANCODES>  _pressed;
-    uint32_t                        _pressed_ticks[SDL_NUM_SCANCODES];
+    std::bitset<128>                _scancode_down;
+    std::bitset<128>                _scancode_pressed;
+    uint32_t                        _scancode_ticks[128];
 };
 
 #endif

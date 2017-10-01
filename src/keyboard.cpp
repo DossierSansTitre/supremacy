@@ -11,7 +11,7 @@ Keyboard::~Keyboard()
 
 }
 
-bool Keyboard::repeated(SDL_Scancode scancode) const
+bool Keyboard::repeated(uint32_t scancode) const
 {
     static const uint32_t delay_initial = 8;
     static const uint32_t delay = 2;
@@ -19,11 +19,11 @@ bool Keyboard::repeated(SDL_Scancode scancode) const
     uint32_t key_tick;
     uint32_t delta;
 
-    if (_pressed[scancode])
+    if (_scancode_pressed[scancode])
         return true;
-    if (_down[scancode])
+    if (_scancode_down[scancode])
     {
-        key_tick = _pressed_ticks[scancode];
+        key_tick = _scancode_ticks[scancode];
         delta = _tick - key_tick;
         if (delta < delay_initial)
             return false;
@@ -36,20 +36,21 @@ bool Keyboard::repeated(SDL_Scancode scancode) const
 void Keyboard::tick()
 {
     _tick++;
-    _pressed.reset();
+    _scancode_pressed.reset();
 }
 
-void Keyboard::press_key(uint32_t keycode)
+void Keyboard::set_scancode(uint32_t scancode, bool down)
 {
-    if (!_down[keycode])
+    if (scancode >= 0x80)
+        return;
+    if (down)
     {
-        _down[keycode] = true;
-        _pressed[keycode] = true;
-        _pressed_ticks[keycode] = _tick;
+        _scancode_down[scancode] = true;
+        _scancode_pressed[scancode] = true;
+        _scancode_ticks[scancode] = _tick;
     }
-}
-
-void Keyboard::release_key(uint32_t keycode)
-{
-    _down[keycode] = false;
+    else
+    {
+        _scancode_down[scancode] = false;
+    }
 }

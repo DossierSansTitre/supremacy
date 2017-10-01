@@ -2,6 +2,7 @@
 #include <opengl.h>
 #include <window/sdl2.h>
 #include <cli_options.h>
+#include <keyboard.h>
 
 WindowSDL2::WindowSDL2(SDL_Window* window, SDL_GLContext opengl)
 : _window(window)
@@ -103,10 +104,16 @@ void WindowSDL2::swap()
 void WindowSDL2::poll(Keyboard& keyboard)
 {
     SDL_Event e;
+    bool down;
 
     for (;;)
     {
         if (!SDL_PollEvent(&e))
             return;
+        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+        {
+            down = (e.type == SDL_KEYDOWN);
+            keyboard.set_scancode(e.key.keysym.scancode, down);
+        }
     }
 }
