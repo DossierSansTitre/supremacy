@@ -13,6 +13,7 @@ public:
 
     void    swap() override;
     void    poll(Input& input) override;
+    void    vsync(bool sync) override;
 
 private:
     void*   _window;

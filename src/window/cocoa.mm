@@ -77,6 +77,7 @@ WindowCocoa::WindowCocoa(void* window, void* context)
 {
     NSRect frame;
 
+    vsync(true);
     frame = [[NSScreen mainScreen] frame];
     this->_width = frame.size.width;
     this->_height = frame.size.height;
@@ -178,9 +179,6 @@ WindowCocoa* WindowCocoa::create(WindowRenderApi api, int major, int minor)
 void WindowCocoa::swap()
 {
     NSOpenGLContext* context;
-    GLint                       sync = 0;
-    CGLContextObj               ctx = CGLGetCurrentContext();
-    CGLSetParameter(ctx, kCGLCPSwapInterval, &sync);
     context = static_cast<NSOpenGLContext*>(_context);
     [context flushBuffer];
 }
@@ -218,6 +216,17 @@ void WindowCocoa::poll(Input& input)
             e.type = down ? InputEventType::KeyDown : InputEventType::KeyUp;
             e.key.scancode = kc;
             input.dispatch(e);
+
+            if (down)
+            {
+                NSString* ns_str = [event characters];
+                if (!ns_str)
+                    continue;
+                uint32_t unicode = [ns_str characterAtIndex:0];
+                e.type = InputEventType::Text;
+                e.text.unicode = unicode;
+                input.dispatch(e);
+            }
         }
         else if (type == NSEventTypeFlagsChanged)
         {
@@ -236,4 +245,13 @@ void WindowCocoa::poll(Input& input)
             [NSApp sendEvent:event];
         }
     }
+}
+
+void WindowCocoa::vsync(bool sync)
+{
+    int sync_value;
+
+    sync_value = sync ? 1 : 0;
+    [(NSOpenGLContext*)_context setValues:&sync_value forParameter:NSOpenGLCPSwapInterval];
+    Window::vsync(sync);
 }

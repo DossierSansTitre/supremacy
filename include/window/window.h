@@ -29,12 +29,15 @@ public:
     uint32_t        height() const { return _height; }
     virtual void    swap() = 0;
     virtual void    poll(Input& input) = 0;
+    virtual void    vsync(bool sync);
+    void            toggle_vsync();
 
     static Window*  create(WindowType type, WindowRenderApi api, int major, int minor);
 
 protected:
     uint32_t    _width;
     uint32_t    _height;
+    bool        _vsync;
 };
 
 #endif

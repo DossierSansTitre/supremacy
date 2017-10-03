@@ -61,6 +61,15 @@ void WorldmapGenerationScene::update()
                 break;
             }
         }
+        else if (e.type == InputEventType::Text)
+        {
+            switch (e.text.unicode)
+            {
+            case U'r':
+                generate();
+                break;
+            }
+        }
     }
 }
 

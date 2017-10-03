@@ -94,14 +94,27 @@ void IngameScene::update()
             case Keyboard::Escape:
                 game().set_scene<MainMenuScene>();
                 return;
+            default:
+                update_ui(e, input.keyboard, *_world, _selection, _viewport);
+                break;
             }
         }
-
+        else if (e.type == InputEventType::Text)
+        {
+            switch (e.text.unicode)
+            {
+            case U'v':
+                game().window().toggle_vsync();
+                break;
+            default:
+                update_ui(e, input.keyboard, *_world, _selection, _viewport);
+                break;
+            }
+        }
     }
 
     _world->map.tick();
     update_ai(*_world, _update_tick);
-    //update_ui(*_world, keyboard, _selection, _viewport);
 
     _update_tick++;
     _render_tick++;

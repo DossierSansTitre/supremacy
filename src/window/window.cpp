@@ -15,6 +15,16 @@ Window::~Window()
 
 }
 
+void Window::vsync(bool sync)
+{
+    _vsync = sync;
+}
+
+void Window::toggle_vsync()
+{
+    vsync(!_vsync);
+}
+
 Window* Window::create(WindowType type, WindowRenderApi api, int major, int minor)
 {
     switch (type)
