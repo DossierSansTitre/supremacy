@@ -40,29 +40,38 @@ void EmbarkScene::teardown()
 
 void EmbarkScene::update()
 {
-    auto& kb = game().keyboard();
+    auto& input = game().input();
+    InputEvent e;
 
-    if (kb.pressed(Keyboard::Escape))
+    while (input.poll(e))
     {
-        game().set_scene<LoadWorldSelectionScene>();
-    }
+        if (e.type == InputEventType::KeyDown)
+        {
+            bool shift = input.keyboard.down(Keyboard::Shift);
+            int speed = shift ? 10 : 1;
 
-    int speed = 1;
-
-    if (kb.down(Keyboard::Shift))
-        speed = 10;
-    if (kb.repeated(Keyboard::Right))
-        move_cursor({speed, 0});
-    if (kb.repeated(Keyboard::Left))
-        move_cursor({-speed, 0});
-    if (kb.repeated(Keyboard::Up))
-        move_cursor({0, -speed});
-    if (kb.repeated(Keyboard::Down))
-        move_cursor({0, speed});
-
-    if (kb.pressed(Keyboard::Enter))
-    {
-        game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
+            switch (e.key.scancode)
+            {
+            case Keyboard::Escape:
+                game().set_scene<LoadWorldSelectionScene>();
+                break;
+            case Keyboard::Enter:
+                game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
+                break;
+            case Keyboard::Right:
+                move_cursor(Vector2i(speed, 0));
+                break;
+            case Keyboard::Left:
+                move_cursor(Vector2i(-speed, 0));
+                break;
+            case Keyboard::Up:
+                move_cursor(Vector2i(0, -speed));
+                break;
+            case Keyboard::Down:
+                move_cursor(Vector2i(0, speed));
+                break;
+            }
+        }
     }
     fix_camera();
 }

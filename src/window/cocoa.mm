@@ -2,6 +2,7 @@
 #import <Cocoa/Cocoa.h>
 #import <window/cocoa.h>
 #import <keyboard.h>
+#import <std/array.h>
 
 static const uint8_t kc_lookup_table[128] = {
     Keyboard::Unknown, Keyboard::Unknown,
@@ -70,28 +71,6 @@ static const uint8_t kc_lookup_table[128] = {
     Keyboard::Up,      Keyboard::Unknown,
 };
 
-static NSAutoreleasePool* ar_pool;
-
-static NSOpenGLPixelFormatAttribute glAttributes[] = {
-    NSOpenGLPFANoRecovery,
-    NSOpenGLPFAAccelerated,
-    NSOpenGLPFAColorSize, 32,
-    NSOpenGLPFAAlphaSize, 8,
-    NSOpenGLPFADepthSize, 24,
-    NSOpenGLPFAStencilSize, 8,
-    NSOpenGLPFADoubleBuffer,
-    NSOpenGLPFAMinimumPolicy,
-    kCGLPFAOpenGLProfile,
-    kCGLOGLPVersion_3_2_Core,
-    0
-};
-
-@interface NativeWindow : NSWindow
-@end
-
-@implementation NativeWindow
-@end
-
 WindowCocoa::WindowCocoa(void* window, void* context)
 : _window(window)
 , _context(context)
@@ -105,12 +84,13 @@ WindowCocoa::WindowCocoa(void* window, void* context)
 
 WindowCocoa::~WindowCocoa()
 {
-
+    [(NSOpenGLContext*)_context release];
+    [(NSWindow*)_window release];
 }
 
-static NativeWindow* create_cocoa_window()
+static NSWindow* create_cocoa_window()
 {
-    NativeWindow* win;
+    NSWindow* win;
     NSRect frame;
 
     [NSApplication sharedApplication];
@@ -120,11 +100,10 @@ static NativeWindow* create_cocoa_window()
     [[NSApplication sharedApplication] finishLaunching];
 
     frame = [[NSScreen mainScreen] frame];
-    win = [[NativeWindow alloc] initWithContentRect:frame
+    win = [[NSWindow alloc] initWithContentRect:frame
         styleMask:NSWindowStyleMaskBorderless
         backing:NSBackingStoreBuffered
         defer:NO];
-    [win setLevel:NSMainMenuWindowLevel+1];
     [win setOpaque:YES];
     [win setCollectionBehavior:[win collectionBehavior] | NSWindowCollectionBehaviorFullScreenPrimary];
     [win setTitle:[NSString stringWithCString:"Supremacy" encoding:NSASCIIStringEncoding]];
@@ -133,17 +112,39 @@ static NativeWindow* create_cocoa_window()
     return win;
 }
 
-static NSOpenGLContext* create_cocoa_opengl(NativeWindow* win, int major, int minor)
+static NSOpenGLContext* create_cocoa_opengl(NSWindow* win, int major, int minor)
 {
+    Array<NSOpenGLPixelFormatAttribute> gl_attr;
     NSRect frame;
 
+    (void)minor;
+
+    gl_attr.push_back(NSOpenGLPFANoRecovery);
+    gl_attr.push_back(NSOpenGLPFAAccelerated);
+    gl_attr.push_back(NSOpenGLPFAColorSize);
+    gl_attr.push_back(32);
+    gl_attr.push_back(NSOpenGLPFAAlphaSize);
+    gl_attr.push_back(8);
+    gl_attr.push_back(NSOpenGLPFADepthSize);
+    gl_attr.push_back(24);
+    gl_attr.push_back(NSOpenGLPFAStencilSize);
+    gl_attr.push_back(8);
+    gl_attr.push_back(NSOpenGLPFADoubleBuffer);
+    gl_attr.push_back(NSOpenGLPFAMinimumPolicy);
+    gl_attr.push_back(kCGLPFAOpenGLProfile);
+
+    if (major >= 3)
+        gl_attr.push_back(kCGLOGLPVersion_3_2_Core);
+    else
+        gl_attr.push_back(kCGLOGLPVersion_Legacy);
+    gl_attr.push_back(0);
+
     frame = [[NSScreen mainScreen] frame];
-    NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc]
-    initWithAttributes:glAttributes];
+    NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:gl_attr.data()];
     NSOpenGLView* view = [[NSOpenGLView alloc] initWithFrame:frame pixelFormat:pixelFormat];
-    NSOpenGLContext* context = [[[NSOpenGLContext alloc]
-    initWithFormat:pixelFormat
-    shareContext:nil] autorelease];
+    NSOpenGLContext* context = [[NSOpenGLContext alloc]
+        initWithFormat:pixelFormat
+        shareContext:nil];
     [view setWantsBestResolutionOpenGLSurface:YES];
     [view setOpenGLContext:context];
     [win setContentView:view];
@@ -156,11 +157,20 @@ static NSOpenGLContext* create_cocoa_opengl(NativeWindow* win, int major, int mi
 
 WindowCocoa* WindowCocoa::create(WindowRenderApi api, int major, int minor)
 {
-    NativeWindow*       win;
+    NSWindow*           win;
     NSOpenGLContext*    context;
 
+    if (api != WindowRenderApi::OpenGL)
+        return nullptr;
     win = create_cocoa_window();
+    if (!win)
+        return nullptr;
     context = create_cocoa_opengl(win, major, minor);
+    if (!context)
+    {
+        [win release];
+        return nullptr;
+    }
 
     return new WindowCocoa(win, context);
 }
@@ -195,7 +205,6 @@ void WindowCocoa::poll(Input& input)
                      inMode:NSDefaultRunLoopMode
                      dequeue:YES]))
     {
-        [NSApp sendEvent:event];
         NSEventType type = [event type];
         down = (type == NSEventTypeKeyDown);
         if (down || type == NSEventTypeKeyUp)
@@ -221,6 +230,10 @@ void WindowCocoa::poll(Input& input)
                 input.dispatch(e);
             }
             modifier_flags = event_modifier_flags;
+        }
+        else
+        {
+            [NSApp sendEvent:event];
         }
     }
 }

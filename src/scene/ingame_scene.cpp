@@ -82,17 +82,26 @@ void IngameScene::teardown()
 
 void IngameScene::update()
 {
-    auto& keyboard = game().keyboard();
+    auto& input = game().input();
+    InputEvent e;
 
-    if (keyboard.pressed(Keyboard::Escape))
+    while (input.poll(e))
     {
-        game().set_scene<MainMenuScene>();
-        return;
+        if (e.type == InputEventType::KeyDown)
+        {
+            switch (e.key.scancode)
+            {
+            case Keyboard::Escape:
+                game().set_scene<MainMenuScene>();
+                return;
+            }
+        }
+
     }
 
     _world->map.tick();
     update_ai(*_world, _update_tick);
-    update_ui(*_world, keyboard, _selection, _viewport);
+    //update_ui(*_world, keyboard, _selection, _viewport);
 
     _update_tick++;
     _render_tick++;

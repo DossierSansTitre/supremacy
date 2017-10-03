@@ -39,25 +39,29 @@ void WorldmapGenerationScene::teardown()
 
 void WorldmapGenerationScene::update()
 {
-    auto& keyboard = game().keyboard();
+    auto& input = game().input();
+    InputEvent e;
 
-    if (keyboard.pressed(Keyboard::Escape))
+    while (input.poll(e))
     {
-        game().set_scene<MainMenuScene>();
+        if (e.type == InputEventType::KeyDown)
+        {
+            switch (e.key.scancode)
+            {
+            case Keyboard::Enter:
+                save_worldmap(*_worldmap);
+            case Keyboard::Escape:
+                game().set_scene<MainMenuScene>();
+                return;
+            case Keyboard::Right:
+                change_size(_world_size * 2);
+                break;
+            case Keyboard::Left:
+                change_size(_world_size / 2);
+                break;
+            }
+        }
     }
-    else if (keyboard.pressed(Keyboard::Enter))
-    {
-        save_worldmap(*_worldmap);
-        game().set_scene<MainMenuScene>();
-    }
-    else if (keyboard.key_pressed(SDLK_r))
-    {
-        generate();
-    }
-    if (keyboard.pressed(Keyboard::Right))
-        change_size(_world_size * 2);
-    if (keyboard.pressed(Keyboard::Left))
-        change_size(_world_size / 2);
 }
 
 void WorldmapGenerationScene::render(DrawBuffer& draw_buffer)

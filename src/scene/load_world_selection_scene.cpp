@@ -30,16 +30,32 @@ void LoadWorldSelectionScene::setup()
 
 void LoadWorldSelectionScene::update()
 {
-    auto& kb = game().keyboard();
+    auto& input = game().input();
+    InputEvent e;
 
-    if (kb.pressed(Keyboard::Escape))
-        game().set_scene<MainMenuScene>();
-    if (kb.repeated(Keyboard::Up) && _cursor)
-        _cursor--;
-    if (kb.repeated(Keyboard::Down) && (_cursor < _worldmaps.size() - 1))
-        _cursor++;
-    if (kb.repeated(Keyboard::Enter))
-        game().set_scene<EmbarkScene>(_worldmaps[_cursor]);
+    while (input.poll(e))
+    {
+        if (e.type == InputEventType::KeyDown)
+        {
+            switch (e.key.scancode)
+            {
+            case Keyboard::Escape:
+                game().set_scene<MainMenuScene>();
+                break;
+            case Keyboard::Up:
+                if (_cursor)
+                    _cursor--;
+                break;
+            case Keyboard::Down:
+                if (_cursor < _worldmaps.size() - 1)
+                    _cursor++;
+                break;
+            case Keyboard::Enter:
+                game().set_scene<EmbarkScene>(_worldmaps[_cursor]);
+                break;
+            }
+        }
+    }
 }
 
 void LoadWorldSelectionScene::render(DrawBuffer& db)

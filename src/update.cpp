@@ -77,7 +77,7 @@ static Vector3i keyboard_motion(Keyboard& keyboard)
         delta = 1;
         delta_z = 1;
     }
-
+/*
     if (keyboard.repeated(Keyboard::Left))
         motion.x -= delta;
     if (keyboard.repeated(Keyboard::Right))
@@ -89,7 +89,7 @@ static Vector3i keyboard_motion(Keyboard& keyboard)
     if (keyboard.key_repeated(Keyboard::Unknown))
         motion.z += delta_z;
     if (keyboard.key_repeated(Keyboard::Unknown))
-        motion.z -= delta_z;
+        motion.z -= delta_z;*/
     return motion;
 }
 
@@ -156,12 +156,13 @@ static void set_action_rect(Map& map, Rect3i rect, uint16_t task)
 
 static void handle_ui_state_selection(World& world, Keyboard& keyboard, Selection& selection)
 {
+    /*
     if (keyboard.key_pressed(SDLK_RETURN))
     {
         selection.advance();
         if (selection.state() == Selection::State::Inactive)
             set_action_rect(world.map, selection.selected(), selection_task);
-    }
+    }*/
 }
 
 static void start_selection(World& world, Selection& selection, Vector2u viewport)
@@ -176,6 +177,7 @@ static void start_selection(World& world, Selection& selection, Vector2u viewpor
 
 static void handle_ui_state_none(World& world, Keyboard& keyboard, Selection& selection, Vector2u viewport)
 {
+    /*
     if (keyboard.key_pressed(SDLK_m))
     {
         selection_task = 1;
@@ -193,7 +195,7 @@ static void handle_ui_state_none(World& world, Keyboard& keyboard, Selection& se
         selection_task = 3;
         start_selection(world, selection, viewport);
         return;
-    }
+    }*/
 }
 
 void update_ui(World& world, Keyboard& keyboard, Selection& selection, Vector2u viewport)
@@ -203,6 +205,7 @@ void update_ui(World& world, Keyboard& keyboard, Selection& selection, Vector2u 
     else
         handle_ui_state_selection(world, keyboard, selection);
     handle_motion(world, keyboard, selection, viewport);
+    /*
     if (keyboard.key_pressed(SDLK_v))
-        toggle_vsync();
+        toggle_vsync();*/
 }

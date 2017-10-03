@@ -28,11 +28,6 @@ float bilinear(const float* v, float dx, float dy)
     return lerp(y0, y1, dy);
 }
 
-static uint32_t number_pair(uint32_t a, uint32_t b)
-{
-    return (a > b) ? (a * a + a + b) : (a + b * b);
-}
-
 uint32_t noise_hash(uint32_t a)
 {
     a = (a ^ 61) ^ (a >> 16);

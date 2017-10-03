@@ -29,5 +29,9 @@ bool Input::poll(InputEvent& e)
     if (_event_cursor >= _events.size())
         return false;
     e = _events[_event_cursor++];
+    if (e.type == InputEventType::KeyDown)
+        keyboard._down[e.key.scancode] = true;
+    else if (e.type == InputEventType::KeyUp)
+        keyboard._down[e.key.scancode] = false;
     return true;
 }

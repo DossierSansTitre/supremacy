@@ -5,7 +5,6 @@
 #include <engine/game_scene.h>
 #include <engine/input.h>
 #include <math/rng.h>
-#include <keyboard.h>
 #include <thread_pool.h>
 #include <rendering/renderer.h>
 #include <draw_buffer.h>
@@ -21,7 +20,6 @@ public:
 
     Input&      input() { return _input; }
     Window&     window() { return *_window; }
-    Keyboard&   keyboard() { return _keyboard; }
     Rng&        rng() { return _rng; }
     ThreadPool& thread_pool() { return _thread_pool; }
     Renderer&   renderer() { return *_renderer; }
@@ -53,7 +51,6 @@ private:
 
     Input       _input;
     Window*     _window;
-    Keyboard    _keyboard;
     Rng         _rng;
     ThreadPool  _thread_pool;
     Renderer*   _renderer;

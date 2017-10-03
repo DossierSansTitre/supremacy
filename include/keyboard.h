@@ -10,8 +10,7 @@
 class Keyboard : private NonCopyable
 {
 public:
-    Keyboard();
-    ~Keyboard();
+    friend class Input;
 
     enum
     {
@@ -25,23 +24,10 @@ public:
         Shift   = 0x07
     };
 
-    bool    down(uint32_t scancode) const { return _scancode_down[scancode]; }
-    bool    pressed(uint32_t scancode) const { return _scancode_pressed[scancode]; }
-    bool    repeated(uint32_t scancode) const;
-
-    bool    key_down(SDL_Keycode keycode) const { return false; }
-    bool    key_pressed(SDL_Keycode keycode) const { return false; }
-    bool    key_repeated(SDL_Keycode keycode) const { return false; }
-
-    void    tick();
-
-    void    set_scancode(uint32_t scancode, bool down);
+    bool down(uint32_t scancode) const { return _down[scancode]; }
 
 private:
-    uint32_t                        _tick;
-    std::bitset<128>                _scancode_down;
-    std::bitset<128>                _scancode_pressed;
-    uint32_t                        _scancode_ticks[128];
+    std::bitset<128>    _down;
 };
 
 #endif
