@@ -98,24 +98,35 @@ void Game::stop()
 void Game::select_renderer()
 {
     auto& opts = CliOptions::instance();
+    WindowType window_type;
+
+    if (opts.sdl)
+        window_type = WindowType::SDL2;
+    else
+        window_type = WindowType::Cocoa;
 
     _window = nullptr;
     if (!opts.legacy)
-        _window = Window::create(WindowType::Cocoa, WindowRenderApi::OpenGL, 3, 2);
+        _window = Window::create(window_type, WindowRenderApi::OpenGL, 3, 2);
     if (_window)
     {
+        log_line(LogLevel::Info, "OpenGL Info:");
+        log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
+        log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
+        log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
+        log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
         _renderer = new RendererOpenGLShader(*_window, _draw_buffer);
     }
     else
     {
-        _window = Window::create(WindowType::SDL2, WindowRenderApi::OpenGL, 2, 1);
+        _window = Window::create(window_type, WindowRenderApi::OpenGL, 2, 1);
+        log_line(LogLevel::Info, "OpenGL Info:");
+        log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
+        log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
+        log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
+        log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
         _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
     }
-    log_line(LogLevel::Info, "OpenGL Info:");
-    log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
-    log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
-    log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
-    log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 void Game::update()

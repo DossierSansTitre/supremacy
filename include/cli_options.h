@@ -9,6 +9,7 @@ struct CliOptions
     void                parse(int argc, char** argv);
 
     bool    legacy;
+    bool    sdl;
     bool    windowed;
 };
 

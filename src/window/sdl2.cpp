@@ -14,6 +14,8 @@ WindowSDL2::WindowSDL2(SDL_Window* window, SDL_GLContext opengl)
     SDL_GetWindowSize(_window, &w, &h);
     this->_width = w;
     this->_height = h;
+    vsync(true);
+    SDL_StartTextInput();
 }
 
 WindowSDL2::~WindowSDL2()
@@ -21,6 +23,7 @@ WindowSDL2::~WindowSDL2()
     SDL_GL_MakeCurrent(_window, nullptr);
     SDL_GL_DeleteContext(_opengl);
     SDL_DestroyWindow(_window);
+    SDL_Quit();
 }
 
 static SDL_Window* create_window()
@@ -49,15 +52,11 @@ static SDL_Window* create_window()
 static SDL_GLContext create_gl_context(SDL_Window* window)
 {
     SDL_GLContext opengl;
-    int vsync;
 
     opengl = SDL_GL_CreateContext(window);
     if (opengl == nullptr)
         return nullptr;
     glewInit();
-    vsync = SDL_GL_SetSwapInterval(-1);
-    if (vsync == -1)
-        SDL_GL_SetSwapInterval(1);
     return opengl;
 }
 
@@ -70,6 +69,8 @@ WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
     SDL_Window* window;
     SDL_GLContext opengl;
 
+    SDL_Init(SDL_INIT_VIDEO);
+
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -77,7 +78,6 @@ WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
 
     if (major >= 3)
         gl_profile = SDL_GL_CONTEXT_PROFILE_CORE;
@@ -86,11 +86,15 @@ WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, gl_profile);
     window = create_window();
     if (window == nullptr)
+    {
+        SDL_Quit();
         return nullptr;
+    }
     opengl = create_gl_context(window);
     if (opengl == nullptr)
     {
         SDL_DestroyWindow(window);
+        SDL_Quit();
         return nullptr;
     }
     return new WindowSDL2(window, opengl);
@@ -103,19 +107,75 @@ void WindowSDL2::swap()
 
 void WindowSDL2::poll(Input& input)
 {
-#if 0
-    SDL_Event e;
+    InputEvent e;
+    SDL_Event event;
+    uint32_t scancode;
+    uint32_t unicode;
     bool down;
 
-    for (;;)
+    while (SDL_PollEvent(&event))
     {
-        if (!SDL_PollEvent(&e))
-            return;
-        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
+        down = (event.type == SDL_KEYDOWN);
+        if (down || event.type == SDL_KEYUP)
         {
-            down = (e.type == SDL_KEYDOWN);
-            keyboard.set_scancode(e.key.keysym.scancode, down);
+            scancode = 0;
+            switch (event.key.keysym.scancode)
+            {
+                case SDL_SCANCODE_ESCAPE:
+                    scancode = Keyboard::Escape;
+                    break;
+                case SDL_SCANCODE_RETURN:
+                    scancode = Keyboard::Enter;
+                    break;
+                case SDL_SCANCODE_LSHIFT:
+                    scancode = Keyboard::Shift;
+                    break;
+                case SDL_SCANCODE_LEFT:
+                    scancode = Keyboard::Left;
+                    break;
+                case SDL_SCANCODE_RIGHT:
+                    scancode = Keyboard::Right;
+                    break;
+                case SDL_SCANCODE_UP:
+                    scancode = Keyboard::Up;
+                    break;
+                case SDL_SCANCODE_DOWN:
+                    scancode = Keyboard::Down;
+                    break;
+                default:
+                    break;
+            }
+            if (!scancode)
+                continue;
+            e.type = down ? InputEventType::KeyDown : InputEventType::KeyUp;
+            e.key.scancode = scancode;
+            input.dispatch(e);
+        }
+        else if (event.type == SDL_TEXTINPUT)
+        {
+            unicode = event.text.text[0];
+            if (!unicode || unicode > 0x7f)
+                continue;
+            e.type = InputEventType::Text;
+            e.text.unicode = unicode;
+            input.dispatch(e);
         }
     }
-#endif
+}
+
+void WindowSDL2::vsync(bool sync)
+{
+    int ret;
+
+    if (sync)
+    {
+        ret = SDL_GL_SetSwapInterval(-1);
+        if (ret == -1)
+            SDL_GL_SetSwapInterval(1);
+    }
+    else
+    {
+        SDL_GL_SetSwapInterval(0);
+    }
+    Window::vsync(sync);
 }

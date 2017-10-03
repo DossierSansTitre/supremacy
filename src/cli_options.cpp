@@ -3,6 +3,8 @@
 
 CliOptions::CliOptions()
 : legacy(false)
+, sdl(false)
+, windowed(false)
 {
 
 }
@@ -24,5 +26,7 @@ void CliOptions::parse(int argc, char** argv)
             legacy = true;
         else if (strcmp(argv[i], "--window") == 0)
             windowed = true;
+        else if (strcmp(argv[i], "--sdl") == 0)
+            sdl = true;
     }
 }
