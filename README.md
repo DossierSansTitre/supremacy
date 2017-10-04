@@ -6,6 +6,10 @@
 
 A dwarf fortress inspired game.
 
+## Contributing
+
+You can report bugs on [Redmine](https://bugs.dossiersanstitre.com/projects/supremacy).
+
 ## License
 
 Supremacy is distributed under the BSD 4-clause ("Original", or "Old")
