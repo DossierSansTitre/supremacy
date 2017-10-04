@@ -75,7 +75,7 @@ void RendererOpenGLLegacy::render()
 
     glBindTexture(GL_TEXTURE_2D, _texture);
     glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_CLEAR_VALUE);
     glColor4f(1.f, 1.f, 1.f, 1.f);
     glEnableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
