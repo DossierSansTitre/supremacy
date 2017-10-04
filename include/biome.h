@@ -75,6 +75,9 @@ struct Biome
     u16             rain_max;
     u16             drainage_min;
     u16             drainage_max;
+    u16             tree_density;
+    TileID          tree_tile;
+    MaterialID      tree_material;
 
     static SparseArray<Biome> _data;
 

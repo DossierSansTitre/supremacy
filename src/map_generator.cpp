@@ -145,5 +145,18 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
                 break;
         }
     }
+    size_t k;
+    for (size_t j = 0; j < height; ++j)
+    {
+        for (size_t i = 0; i < width; ++i)
+        {
+            if ((rand() % 1000) < biome.tree_density)
+            {
+                k = height_map[i + j * width];
+                map.set_tile(Vector3i(i, j, k), biome.tree_tile);
+                map.set_material(i, j, k, biome.tree_material);
+            }
+        }
+    }
     map.compute_visibility();
 }

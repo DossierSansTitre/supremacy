@@ -91,6 +91,9 @@ static void load_biome(Biome& biome, MemoryFile& file)
     file.read(&biome.rain_max);
     file.read(&biome.drainage_min);
     file.read(&biome.drainage_max);
+    file.read(&biome.tree_density);
+    file.read(&biome.tree_tile);
+    file.read(&biome.tree_material);
 }
 
 void Biome::load(Archive& archive)

@@ -12,7 +12,9 @@ class BiomeSerializer < Serializer
     temperature = biome.fetch('Temperature', '0 1000').split(' ').map{|x| x.strip.to_i}
     rain = biome.fetch('Rain', '0 1000').split(' ').map{|x| x.strip.to_i}
     drainage = biome.fetch('Drainage', '0 1000').split(' ').map{|x| x.strip.to_i}
-    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature, rain, drainage].flatten.pack('C6S<S<S<S<S<S<S<S<S<')
+    tree_density = biome.fetch('TreeDensity', '0').to_i
+    tree_tile, tree_mat = tile_pair(biome.fetch('TreeType', 'Nothing:Air'))
+    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature, rain, drainage, tree_density, tree_tile, tree_mat].flatten.pack('C6S<S<S<S<S<S<S<S<S<S<CC')
   end
 
   private
