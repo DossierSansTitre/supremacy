@@ -57,6 +57,23 @@ static bool can_move_from(World& world, int actor, Vector3i src, Vector3i delta)
     return false;
 }
 
+static bool can_act_upon(World& world, Vector3i src, Vector3i dst)
+{
+    Vector3i delta = dst - src;
+
+    if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z > 1)
+        return false;
+    if (src == dst)
+        return true;
+    if (delta.z == 0)
+        return true;
+    if (!world.map.floor(src) && delta.z < 0)
+        return true;
+    if (!world.map.floor(dst) && delta.z > 0)
+        return true;
+    return false;
+}
+
 static bool can_move(World& world, int actor, Vector3i delta)
 {
     Vector3i src;
@@ -145,7 +162,7 @@ static void try_pathfind(World& world, int actor)
             delta = deltas[i];
             dst = node + delta;
             uint16_t task = map.task_at(dst.x, dst.y, dst.z);
-            if (task)
+            if (task && can_act_upon(world, node, dst))
             {
                 path_finder.finish_with(actors.path(actor), dst);
                 actors.set_task(actor, task);
