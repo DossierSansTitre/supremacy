@@ -30,7 +30,7 @@ RendererOpenGLLegacy::RendererOpenGLLegacy(Window& window, DrawBuffer& draw_buff
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    _texture = load_texture("tileset.bmp", _texture_width, _texture_height);
+    _texture = load_texture("tileset.png", &_texture_width, &_texture_height);
     _tile_width = _texture_width / 32;
     _tile_height = _texture_height / 32;
 

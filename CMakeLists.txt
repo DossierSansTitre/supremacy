@@ -43,14 +43,16 @@ endif()
 
 configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/include/config.h")
 
-find_package(OpenGL)
-find_package(GLEW)
-find_package(SDL2)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(PNG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.mm")
 file(GLOB_RECURSE HEADERS "src/*.h")
 
 include_directories(include)
+include_directories(${PNG_INCLUDE_DIR})
 include_directories(${CMAKE_BINARY_DIR}/include)
 include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
 
@@ -63,7 +65,7 @@ else()
     add_executable(supremacy ${SOURCES} ${HEADERS})
 endif()
 
-target_link_libraries(supremacy sdl2 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+target_link_libraries(supremacy ${PNG_LIBRARIES} sdl2 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
 
 file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
 file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")

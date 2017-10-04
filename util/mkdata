@@ -7,7 +7,7 @@ require 'fileutils'
 
 COPY_FILES = [
   'shaders',
-  'tileset.bmp'
+  'tileset.png'
 ]
 
 unless ARGV.size == 2

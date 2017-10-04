@@ -199,7 +199,7 @@ void RendererOpenGLShader::init_textures()
     uint32_t w;
     uint32_t h;
 
-    _texture = load_texture("tileset.bmp", w, h);
+    _texture = load_texture("tileset.png", &w, &h);
     _texture_size.x = w / 32;
     _texture_size.y = h / 32;
     _symbol = create_texture();
