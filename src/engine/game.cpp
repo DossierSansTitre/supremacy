@@ -54,6 +54,8 @@ void Game::loop()
 
     log_line(LogLevel::Info, "Engine started");
 
+    _renderer->clear();
+
     t0 = Clock::now();
     while (_running)
     {
