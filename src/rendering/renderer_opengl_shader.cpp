@@ -73,6 +73,10 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     GLuint shader_vert;
     GLuint shader_frag;
 
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     log_line(LogLevel::Info, "Using the OpenGL Shader Renderer");
     archive.open(data_path("supremacy.bin"));
     shader_vert = load_shader(archive, GL_VERTEX_SHADER, "shaders/opengl/3.2/shader.vert.glsl");
@@ -86,6 +90,21 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     init_buffers();
     init_textures();
     resize({(_window.width() / _texture_size.x) & (~1), _window.height() / _texture_size.y});
+    glBindVertexArray(_vao);
+    glUseProgram(_program);
+    glUniform1i(_texture_uniform, 0);
+    glUniform1i(_symbol_uniform, 1);
+    glUniform1i(_color_uniform, 2);
+    glUniform1i(_color_bg_uniform, 3);
+    glUniform2f(_tile_count_uniform, _draw_buffer.width(), _draw_buffer.height());
+    glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, _symbol);
+    glActiveTexture(GL_TEXTURE0 + 2);
+    glBindTexture(GL_TEXTURE_2D, _color);
+    glActiveTexture(GL_TEXTURE0 + 3);
+    glBindTexture(GL_TEXTURE_2D, _color_bg);
 }
 
 RendererOpenGLShader::~RendererOpenGLShader()
@@ -105,37 +124,13 @@ void RendererOpenGLShader::render()
     size_t w = db.width();
     size_t h = db.height();
 
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_CLEAR_VALUE);
-
-    glBindVertexArray(_vao);
-    glUseProgram(_program);
-
-    glUniform1i(_texture_uniform, 0);
-    glUniform1i(_symbol_uniform, 1);
-    glUniform1i(_color_uniform, 2);
-    glUniform1i(_color_bg_uniform, 3);
-    glUniform2f(_tile_count_uniform, db.width(), db.height());
-
-    glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, _texture);
-
-    glActiveTexture(GL_TEXTURE0 + 1);
     glBindTexture(GL_TEXTURE_2D, _symbol);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
-
-    glActiveTexture(GL_TEXTURE0 + 2);
     glBindTexture(GL_TEXTURE_2D, _color);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color());
-
-    glActiveTexture(GL_TEXTURE0 + 3);
     glBindTexture(GL_TEXTURE_2D, _color_bg);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color_bg());
-
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
-
-    //glUseProgram(0);
-    //glBindVertexArray(0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
 
@@ -157,7 +152,7 @@ void RendererOpenGLShader::resize(Vector2u size)
 
 void RendererOpenGLShader::init_buffers()
 {
-    static const uint16_t ibo_data[] = {
+    static const uint8_t ibo_data[] = {
         0, 1, 2,
         0, 2, 3
     };
@@ -175,7 +170,7 @@ void RendererOpenGLShader::init_buffers()
     glBindVertexArray(_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * 6, ibo_data, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint8_t) * 6, ibo_data, GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, vbo_data, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));

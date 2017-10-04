@@ -29,6 +29,11 @@ RendererOpenGLLegacy::RendererOpenGLLegacy(Window& window, DrawBuffer& draw_buff
     glMatrixMode(GL_MODELVIEW);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glColor4f(1.f, 1.f, 1.f, 1.f);
 
     _texture = load_texture("tileset.png", &_texture_width, &_texture_height);
     _tile_width = _texture_width / 32;
@@ -74,9 +79,6 @@ void RendererOpenGLLegacy::render()
     glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
 
     glBindTexture(GL_TEXTURE_2D, _texture);
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_CLEAR_VALUE);
-    glColor4f(1.f, 1.f, 1.f, 1.f);
     glEnableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
