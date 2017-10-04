@@ -59,9 +59,6 @@ void Game::loop()
     {
         render();
 
-        //if (!_window->focus())
-        //    SDL_Delay(50);
-
         while (update_acc >= update_delay)
         {
             update_acc -= update_delay;
