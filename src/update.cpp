@@ -168,6 +168,10 @@ static void handle_ui_state_none(InputEvent event, Keyboard& keyboard, World& wo
                 selection_task = 3;
                 start_selection(world, selection, viewport);
                 return;
+            case U't':
+                selection_task = 4;
+                start_selection(world, selection, viewport);
+                return;
         }
     }
     if (handle_motion(event, keyboard, motion))

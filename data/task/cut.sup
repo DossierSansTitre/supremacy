@@ -1,0 +1,5 @@
+ID = 4
+Name = Cut
+Match = Tree
+Into = Nothing
+KeyShortcut = 't'
