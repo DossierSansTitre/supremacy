@@ -134,8 +134,8 @@ void RendererOpenGLShader::render()
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 
-    glUseProgram(0);
-    glBindVertexArray(0);
+    //glUseProgram(0);
+    //glBindVertexArray(0);
 }
 
 
