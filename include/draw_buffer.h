@@ -20,12 +20,12 @@ public:
         Glyph g;
 
         g.symbol = _symbol[index];
-        g.color.r = _color[index * 4 + 0];
+        g.color.r = _color[index * 4 + 2];
         g.color.g = _color[index * 4 + 1];
-        g.color.b = _color[index * 4 + 2];
-        g.color_bg.r = _color_bg[index * 4 + 0];
+        g.color.b = _color[index * 4 + 0];
+        g.color_bg.r = _color_bg[index * 4 + 2];
         g.color_bg.g = _color_bg[index * 4 + 1];
-        g.color_bg.b = _color_bg[index * 4 + 2];
+        g.color_bg.b = _color_bg[index * 4 + 0];
 
         return g;
     }
@@ -38,12 +38,12 @@ public:
 
         index = x + y * _size.x;
         _symbol[index] = glyph.symbol;
-        _color[index * 4 + 0] = glyph.color.r;
+        _color[index * 4 + 0] = glyph.color.b;
         _color[index * 4 + 1] = glyph.color.g;
-        _color[index * 4 + 2] = glyph.color.b;
-        _color_bg[index * 4 + 0] = glyph.color_bg.r;
+        _color[index * 4 + 2] = glyph.color.r;
+        _color_bg[index * 4 + 0] = glyph.color_bg.b;
         _color_bg[index * 4 + 1] = glyph.color_bg.g;
-        _color_bg[index * 4 + 2] = glyph.color_bg.b;
+        _color_bg[index * 4 + 2] = glyph.color_bg.r;
     }
 
     void resize(uint32_t width, uint32_t height);

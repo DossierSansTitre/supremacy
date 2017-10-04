@@ -129,13 +129,13 @@ void Game::select_renderer()
 void Game::update()
 {
     _scene->update();
+    _renderer->clear();
+    _scene->render(_draw_buffer);
     _fps_counter_update.update();
 }
 
 void Game::render()
 {
-    _renderer->clear();
-    _scene->render(_draw_buffer);
     _renderer->render();
     _window->swap();
     _fps_counter_render.update();
