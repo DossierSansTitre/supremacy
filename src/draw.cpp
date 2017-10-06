@@ -255,44 +255,59 @@ static void draw_map(DrawBuffer& db, World& world, Game& game, u32 render_tick)
     thread_pool.run_over(&draw_line_cmd, &cmd, view_h, lines_per_job);
 }
 
-static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick, int delta_z)
+#include <log.h>
+
+static bool clip_element(Vector3i& out, Vector3i pos, Vector3i camera, Vector2i viewport, World& world)
+{
+    Vector3i local_pos;
+
+    local_pos = pos - camera;
+    if (local_pos.z > 0)
+        return false;
+    if (local_pos.z <= -5)
+        return false;
+    if (local_pos.x < 0 || local_pos.x >= viewport.x || local_pos.y < 0 || local_pos.y >= viewport.y)
+        return false;
+    for (int i = 0; i < -(local_pos.z); ++i)
+    {
+        Vector3i tmp(pos.x, pos.y, pos.z - i);
+        log_line(LogLevel::Debug, "Check on (%d, %d, %d)", pos.x, pos.y, pos.z);
+        if (world.map.material_at(tmp.x, tmp.y, tmp.z))
+            return false;
+        log_line(LogLevel::Debug, "Check on (%d, %d, %d)", pos.x, pos.y, pos.z);
+    }
+    out = local_pos;
+    return true;
+}
+
+static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick)
 {
     int count;
-    int x;
-    int y;
-    int z;
-    int view_w;
-    int view_h;
+    Vector2i view;
     uint16_t sym;
     Color color;
     Color color_bg;
     int anim;
     static const char anim_str[] = "-\\|/";
 
-    view_w = draw_buffer.width();
-    view_h = draw_buffer.height();
+    view.x = draw_buffer.width() - 2;
+    view.y = draw_buffer.height() - 2;
     Vector3i camera = world.camera;
     auto& actors = world.actors;
 
-    z = camera.z - delta_z;
     count = actors.count();
     color_bg = {0, 0, 0};
     for (int i = 0; i < count; ++i)
     {
         ActorID actor_id;
         Vector3i pos;
+        Vector3i local_pos;
 
         actor_id = actors.actor_id(i);
         if (actor_id == ActorID::None)
             continue;
         pos = actors.pos(i);
-        if (pos.z != z)
-            continue;
-
-        x = pos.x - camera.x;
-        y = pos.y - camera.y;
-
-        if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
+        if (!clip_element(local_pos, pos, camera, view, world))
             continue;
 
         const ActorData& actor_data = ActorData::from_id(actor_id);
@@ -305,16 +320,10 @@ static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick, 
             color = {255, 255, 255};
             sym = anim_str[anim];
         }
-        for (int j = 0; j < delta_z; ++j)
+        for (int j = 0; j < -local_pos.z; ++j)
             color *= 0.5;
-        putchar(draw_buffer, x + 1, y + 1, sym, color, color_bg);
+        putchar(draw_buffer, local_pos.x + 1, local_pos.y + 1, sym, color, color_bg);
     }
-}
-
-static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick)
-{
-    for (int i = 0; i < 4; ++i)
-        draw_actors(draw_buffer, world, render_tick, 3 - i);
 }
 
 static void draw_items(DrawBuffer& draw_buffer, World& world)
