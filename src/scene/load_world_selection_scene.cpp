@@ -26,6 +26,7 @@ void LoadWorldSelectionScene::setup()
         _worldmaps.push_back(world_id);
     }
     closedir(dir);
+    sort(_worldmaps);
 }
 
 void LoadWorldSelectionScene::update()
