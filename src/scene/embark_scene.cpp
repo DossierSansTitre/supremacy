@@ -56,7 +56,8 @@ void EmbarkScene::update()
                 game().set_scene<LoadWorldSelectionScene>();
                 break;
             case Keyboard::Enter:
-                game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
+                if (embark())
+                    return;
                 break;
             case Keyboard::Right:
                 move_cursor(Vector2i(speed, 0));
@@ -79,6 +80,7 @@ void EmbarkScene::update()
 void EmbarkScene::render(DrawBuffer& db)
 {
     static const Color white = {255, 255, 255};
+    static const Color red = {255, 0, 0};
     static const Color black = {0, 0, 0};
 
     int w = _width;
@@ -94,7 +96,7 @@ void EmbarkScene::render(DrawBuffer& db)
     putchar_fast(db, w + 2 + _cursor.x - _camera.x, 1 + _cursor.y - _camera.y, 'X', {255, 0, 0}, white);
 
     const auto& biome = Biome::from_id(_worldmap->biome(_cursor));
-    print(db, 2 * w + 3, 1, biome.name, white, black);
+    print(db, 2 * w + 3, 1, biome.name, biome.no_embark ? red : white, black);
     printf(db, 2 * w + 3, 2, "Height:      %-4d", white, black, _worldmap->height(_cursor));
     printf(db, 2 * w + 3, 3, "Temperature: %-4d", white, black, _worldmap->temperature(_cursor));
     printf(db, 2 * w + 3, 4, "Rain:        %-4d", white, black, _worldmap->rain(_cursor));
@@ -134,4 +136,16 @@ void EmbarkScene::fix_camera()
                 _camera[i] = _worldmap->size()[i] - _width;
         }
     }
+}
+
+bool EmbarkScene::embark()
+{
+    const auto& biome = Biome::from_id(_worldmap->biome(_cursor));
+
+    if (!biome.no_embark)
+    {
+        game().set_scene<IngameScene>(_world_id, _cursor.x + _worldmap->size().x * _cursor.y);
+        return true;
+    }
+    return false;
 }

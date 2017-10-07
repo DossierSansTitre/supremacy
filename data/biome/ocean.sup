@@ -5,3 +5,4 @@ BackgroundColor = #0000cc
 Symbol = '~'
 Height = 0 250
 Temperature = 250 1000
+NoEmbark

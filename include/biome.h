@@ -78,6 +78,7 @@ struct Biome
     u16             tree_density;
     TileID          tree_tile;
     MaterialID      tree_material;
+    bool            no_embark:1;
 
     static SparseArray<Biome> _data;
 

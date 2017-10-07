@@ -19,6 +19,7 @@ public:
 private:
     void move_cursor(Vector2i delta);
     void fix_camera();
+    bool embark();
 
     u16         _world_id;
     Worldmap*   _worldmap;
