@@ -50,27 +50,24 @@ static void generate_dwarfs(World& world)
 }
 
 IngameScene::IngameScene(u16 world_id, u32 region_id)
-: _world_id(world_id)
-, _region_id(region_id)
-{
-
-}
-
-void IngameScene::setup()
 {
     Worldmap* worldmap;
     Vector2i region;
     BiomeID biome_id;
 
-    worldmap = load_worldmap(_world_id);
-    region.x = _region_id % worldmap->size().x;
-    region.y = _region_id / worldmap->size().x;
+    worldmap = load_worldmap(world_id);
+    region.x = region_id % worldmap->size().x;
+    region.y = region_id / worldmap->size().x;
     biome_id = worldmap->biome(region);
     delete worldmap;
 
-    _world = new World({1024, 1024, 64});
+    _world = new World(world_id, region_id, {1024, 1024, 64});
     generate_map(_world->map, biome_id, rand());
     generate_dwarfs(*_world);
+}
+
+void IngameScene::setup()
+{
     _update_tick = 0;
     _render_tick = 0;
 }
@@ -92,6 +89,7 @@ void IngameScene::update()
             switch (e.key.scancode)
             {
             case Keyboard::Escape:
+                save_world(*_world);
                 game().set_scene<MainMenuScene>();
                 return;
             default:
