@@ -47,7 +47,9 @@ static void load_layer_replace(Biome::Layer& layer, MemoryFile& file)
 static void load_biome(Biome& biome, MemoryFile& file)
 {
     u16 name_len;
-    uint16_t layer_count;
+    u16 layer_count;
+    u8 flags;
+
     file.read(&name_len);
     biome.name = new char[name_len + 1];
     biome.name[name_len] = 0;
@@ -94,6 +96,8 @@ static void load_biome(Biome& biome, MemoryFile& file)
     file.read(&biome.tree_density);
     file.read(&biome.tree_tile);
     file.read(&biome.tree_material);
+    file.read(&flags);
+    biome.no_embark = flags & 0x01;
 }
 
 void Biome::load(Archive& archive)
