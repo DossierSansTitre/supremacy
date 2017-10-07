@@ -255,8 +255,6 @@ static void draw_map(DrawBuffer& db, World& world, Game& game, u32 render_tick)
     thread_pool.run_over(&draw_line_cmd, &cmd, view_h, lines_per_job);
 }
 
-#include <log.h>
-
 static bool clip_element(Vector3i& out, Vector3i pos, Vector3i camera, Vector2i viewport, World& world)
 {
     Vector3i local_pos;
@@ -270,11 +268,9 @@ static bool clip_element(Vector3i& out, Vector3i pos, Vector3i camera, Vector2i 
         return false;
     for (int i = 0; i < -(local_pos.z); ++i)
     {
-        Vector3i tmp(pos.x, pos.y, pos.z - i);
-        log_line(LogLevel::Debug, "Check on (%d, %d, %d)", pos.x, pos.y, pos.z);
-        if (world.map.material_at(tmp.x, tmp.y, tmp.z))
+        Vector3i tmp(pos.x, pos.y, camera.z - i);
+        if (world.map.material_at(tmp.x, tmp.y, tmp.z) || world.map.floor(tmp))
             return false;
-        log_line(LogLevel::Debug, "Check on (%d, %d, %d)", pos.x, pos.y, pos.z);
     }
     out = local_pos;
     return true;
@@ -329,16 +325,14 @@ static void draw_actors(DrawBuffer& draw_buffer, World& world, u32 render_tick)
 static void draw_items(DrawBuffer& draw_buffer, World& world)
 {
     int count;
-    int x;
-    int y;
-    int view_w;
-    int view_h;
     uint16_t sym;
     Color color;
     Color color_bg;
 
-    view_w = draw_buffer.width();
-    view_h = draw_buffer.height();
+    Vector2i viewport;
+
+    viewport.x = draw_buffer.width() - 2;
+    viewport.y = draw_buffer.height() - 2;
 
     color_bg = {0, 0, 0};
 
@@ -350,24 +344,20 @@ static void draw_items(DrawBuffer& draw_buffer, World& world)
     {
         ItemID item_id;
         Vector3i pos;
+        Vector3i local_pos;
 
         item_id = items.item_id(i);
         if (!item_id)
             continue;
         pos = items.pos(i);
-        if (pos.z != camera.z)
-            continue;
 
-        x = pos.x - camera.x;
-        y = pos.y - camera.y;
-
-        if (x < 0 || x >= view_w - 2 || y < 0 || y >= view_h - 2)
+        if (!clip_element(local_pos, pos, world.camera, viewport, world))
             continue;
 
         const ItemData& item_data = ItemData::from_id(item_id);
         sym = item_data.sym;
         color = item_data.color;
-        putchar(draw_buffer, x + 1, y + 1, sym, color, color_bg);
+        putchar(draw_buffer, local_pos.x + 1, local_pos.y + 1, sym, color, color_bg);
     }
 }
 
