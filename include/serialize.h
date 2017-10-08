@@ -48,4 +48,8 @@ struct World;
 void save_world(const World& world);
 void serialize_world(std::ofstream& stream, const World& world);
 
+class Map;
+void serialize_map(std::ofstream& stream, const Map& map);
+void unserialize_map(Map& map, std::ifstream& stream);
+
 #endif

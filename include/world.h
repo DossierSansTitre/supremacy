@@ -19,10 +19,10 @@ struct World
 
     u16         world_id;
     u32         region_id;
-    Vector3i    camera;
     Map         map;
-    Items       items;
     Actors      actors;
+    Items       items;
+    Vector3i    camera;
 };
 
 

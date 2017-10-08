@@ -12,6 +12,9 @@
 class Map : private NonCopyable
 {
 public:
+    friend void serialize_map(std::ofstream& stream, const Map& map);
+    friend void unserialize_map(Map& map, std::ifstream& stream);
+
     enum class Flash : uint8_t
     {
         None,
