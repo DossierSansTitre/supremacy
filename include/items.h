@@ -1,6 +1,7 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
+#include <fstream>
 #include <vector>
 #include <types.h>
 #include <math/vector.h>

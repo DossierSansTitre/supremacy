@@ -2,6 +2,7 @@
 #define MAP_H
 
 #include <vector>
+#include <fstream>
 #include <types.h>
 #include <non_copyable.h>
 #include <map_action.h>
