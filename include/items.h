@@ -8,6 +8,9 @@
 class Items
 {
 public:
+    friend void serialize_items(std::ofstream& stream, const Items& items);
+    friend void unserialize_items(Items& items, std::ifstream& stream);
+
     Items();
     ~Items();
 
@@ -25,8 +28,8 @@ public:
 private:
     std::vector<ItemID>     _item_id;
     std::vector<Vector3i>   _pos;
-    std::vector<int>        _free;
     std::vector<u16>        _item_count;
+    std::vector<int>        _free;
     int                     _count;
 };
 

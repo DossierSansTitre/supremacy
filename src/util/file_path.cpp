@@ -118,3 +118,12 @@ bool make_path(const char* path)
         return false;
     return true;
 }
+
+bool file_exist(const char* path)
+{
+    struct stat stat_buf;
+    int ret;
+
+    ret = stat(path, &stat_buf);
+    return (ret == 0);
+}

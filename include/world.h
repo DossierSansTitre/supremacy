@@ -10,15 +10,21 @@ class Game;
 
 struct World
 {
-    World(Vector3i size)
+    World(u16 world_id, u32 region_id, Vector3i size)
+    : world_id(world_id)
+    , region_id(region_id)
+    , size(size)
     {
         map.create(size.x, size.y, size.z);
     }
 
-    Vector3i    camera;
+    u16         world_id;
+    u32         region_id;
+    Vector3i    size;
     Map         map;
-    Items       items;
     Actors      actors;
+    Items       items;
+    Vector3i    camera;
 };
 
 

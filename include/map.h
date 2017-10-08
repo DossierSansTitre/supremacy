@@ -7,11 +7,15 @@
 #include <map_action.h>
 #include <math/vector.h>
 #include <std/array.h>
+#include <std/bit_array.h>
 #include <std/sparse_array.h>
 
 class Map : private NonCopyable
 {
 public:
+    friend void serialize_map(std::ofstream& stream, const Map& map);
+    friend void unserialize_map(Map& map, std::ifstream& stream);
+
     enum class Flash : uint8_t
     {
         None,
@@ -199,7 +203,7 @@ private:
     MaterialID*             _materials;
     Array<MaterialID>       _floors;
     SparseArray<uint16_t>   _tasks;
-    std::vector<bool>       _visible;
+    BitArray<>              _visible;
     std::vector<bool>       _occupied;
     std::vector<Flash>      _flash;
     std::vector<int>        _flash_reset;

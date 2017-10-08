@@ -12,6 +12,9 @@
 class Actors
 {
 public:
+    friend void serialize_actors(std::ofstream& stream, const Actors& actors);
+    friend void unserialize_actors(Actors& actors, std::ifstream& stream);
+
     Actors();
     ~Actors();
 

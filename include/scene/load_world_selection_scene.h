@@ -12,6 +12,7 @@ public:
     void    render(DrawBuffer& db) override;
 
 private:
+    void    submit();
     Array<u16>  _worldmaps;
     u16         _cursor;
 };

@@ -1,9 +1,10 @@
 #include <scene/load_world_selection_scene.h>
 #include <scene/main_menu_scene.h>
 #include <scene/embark_scene.h>
+#include <scene/ingame_scene.h>
 #include <engine/game.h>
 #include <dirent.h>
-#include <util/file_path.h>
+#include <util/save_helper.h>
 #include <log.h>
 
 void LoadWorldSelectionScene::setup()
@@ -52,8 +53,8 @@ void LoadWorldSelectionScene::update()
                     _cursor++;
                 break;
             case Keyboard::Enter:
-                game().set_scene<EmbarkScene>(_worldmaps[_cursor]);
-                break;
+                submit();
+                return;
             }
         }
     }
@@ -67,5 +68,29 @@ void LoadWorldSelectionScene::render(DrawBuffer& db)
     for (size_t i = 0; i < _worldmaps.size(); ++i)
     {
         printf(db, 5, 5 + i, "World %u", (i == _cursor ? selected : unselected), {0, 0, 0}, _worldmaps[i]);
+    }
+}
+
+void LoadWorldSelectionScene::submit()
+{
+    const char* fortress_path;
+    u16 world_id;
+
+    world_id = _worldmaps[_cursor];
+    fortress_path = save_path_fortress(world_id);
+    if (file_exist(fortress_path))
+    {
+        u32 region_id;
+        std::ifstream stream;
+
+        stream.open(fortress_path, std::ios::binary);
+        stream.read((char*)&region_id, 4);
+        stream.close();
+
+        game().set_scene<IngameScene>(world_id, region_id);
+    }
+    else
+    {
+        game().set_scene<EmbarkScene>(world_id);
     }
 }

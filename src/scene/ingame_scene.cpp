@@ -5,6 +5,7 @@
 #include <serialize.h>
 #include <worldmap.h>
 #include <tile.h>
+#include <util/save_helper.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -50,27 +51,33 @@ static void generate_dwarfs(World& world)
 }
 
 IngameScene::IngameScene(u16 world_id, u32 region_id)
-: _world_id(world_id)
-, _region_id(region_id)
 {
-
-}
-
-void IngameScene::setup()
-{
+    const char* region_path;
     Worldmap* worldmap;
     Vector2i region;
     BiomeID biome_id;
 
-    worldmap = load_worldmap(_world_id);
-    region.x = _region_id % worldmap->size().x;
-    region.y = _region_id / worldmap->size().x;
-    biome_id = worldmap->biome(region);
-    delete worldmap;
+    region_path = save_path_region(world_id, region_id);
+    if (file_exist(region_path))
+    {
+        _world = load_world(world_id, region_id);
+    }
+    else
+    {
+        worldmap = load_worldmap(world_id);
+        region.x = region_id % worldmap->size().x;
+        region.y = region_id / worldmap->size().x;
+        biome_id = worldmap->biome(region);
+        delete worldmap;
 
-    _world = new World({1024, 1024, 64});
-    generate_map(_world->map, biome_id, rand());
-    generate_dwarfs(*_world);
+        _world = new World(world_id, region_id, {1024, 1024, 64});
+        generate_map(_world->map, biome_id, rand());
+        generate_dwarfs(*_world);
+    }
+}
+
+void IngameScene::setup()
+{
     _update_tick = 0;
     _render_tick = 0;
 }
@@ -92,6 +99,7 @@ void IngameScene::update()
             switch (e.key.scancode)
             {
             case Keyboard::Escape:
+                save_world(*_world);
                 game().set_scene<MainMenuScene>();
                 return;
             default:
