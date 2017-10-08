@@ -69,10 +69,11 @@ void sort(Iter first, Iter last)
         return;
 
     auto pivot = *first;
-    Iter middle = partition(first, last, [pivot](const auto& value) { return value < pivot; });
+    Iter middle1 = partition(first, last, [pivot](const auto& value) { return value < pivot; });
+    Iter middle2 = partition(middle1, last, [pivot](const auto& value) { return !(pivot < value); });
 
-    sort(first, middle);
-    sort(middle, last);
+    sort(first, middle1);
+    sort(middle2, last);
 }
 
 #endif

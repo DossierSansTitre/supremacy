@@ -14,6 +14,7 @@ void serialize_map(std::ofstream& stream, const Map& map)
     stream.write((char*)map._tiles, sizeof(TileID) * size);
     stream.write((char*)map._materials, sizeof(MaterialID) * size);
     stream.write((char*)map._floors.data(), sizeof(MaterialID) * size);
+    stream.write(map._visible.data(), size / 8);
 }
 
 void unserialize_map(Map& map, std::ifstream& stream)
@@ -33,4 +34,5 @@ void unserialize_map(Map& map, std::ifstream& stream)
     stream.read((char*)map._tiles, sizeof(TileID) * size);
     stream.read((char*)map._materials, sizeof(MaterialID) * size);
     stream.read((char*)map._floors.data(), sizeof(MaterialID) * size);
+    stream.read(map._visible.data(), size / 8);
 }

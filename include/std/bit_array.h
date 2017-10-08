@@ -3,6 +3,7 @@
 
 #include <std/array.h>
 #include <cstdint>
+#include <log.h>
 
 template <typename T>
 class BitArrayReference
@@ -17,21 +18,21 @@ public:
 
     operator bool() const
     {
-        return ((*_ptr) & (1 << _bits));
+        return ((*_ptr) & (T(1) << _bits));
     }
 
     BitArrayReference& operator=(bool value)
     {
         if (value)
-            (*_ptr) ||= (1 << _bits);
+            (*_ptr) |= (T(1) << _bits);
         else
-            (*_ptr) &= ~(1 << _bits);
+            (*_ptr) &= ~(T(1) << _bits);
         return *this;
     }
 
 private:
     T*          _ptr;
-    size_t      _bit;
+    size_t      _bits;
 };
 
 template <typename T = size_t, typename Alloc = Allocator<T>>
@@ -102,12 +103,12 @@ public:
 
     const char* data() const
     {
-        return static_cast<const char*>(_data.data());
+        return reinterpret_cast<const char*>(_data.data());
     }
 
     char* data()
     {
-        return static_cast<char*>(_data.data());
+        return reinterpret_cast<char*>(_data.data());
     }
 
     void push_back(bool value)
@@ -118,7 +119,7 @@ public:
         if (bit_position == 0)
             _data.push_back(T(value));
         else if (value)
-            _data.back() ||= (T(value) << bit_position);
+            _data.back() |= (T(value) << bit_position);
         _size++;
     }
 
@@ -129,12 +130,12 @@ public:
 
     bool operator[](size_t i) const
     {
-        return _data[i / bits_per_chunk] & (1 << (i % bits_per_chunk));
+        return _data[i / bits_per_chunk] & (T(1) << (i % bits_per_chunk));
     }
 
     BitArrayReference<T> operator[](size_t i)
     {
-        return BitArrayReference(_data.data() + (i / bits_per_chunk), i % bits_per_chunk);
+        return BitArrayReference<T>(_data.data() + (i / bits_per_chunk), i % bits_per_chunk);
     }
 
     void resize(size_t size)
