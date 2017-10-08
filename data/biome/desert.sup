@@ -5,3 +5,9 @@ BackgroundColor = #dddd22
 Symbol = "."
 Height = 250 750
 Temperature = 700 1000
+
+LayerTop = Sand
+LayerMiddle = Sand
+LayerBottom = Rock
+
+NoiseAmplitude = 6

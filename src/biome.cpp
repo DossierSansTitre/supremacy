@@ -28,13 +28,14 @@ static void load_biome(Biome& biome, MemoryFile& file)
     file.read(&biome.drainage_min);
     file.read(&biome.drainage_max);
 
-    file.read(&biome.layers + 0);
-    file.read(&biome.layers + 1);
-    file.read(&biome.layers + 2);
+    file.read(&biome.layers);
+    file.read(&biome.noise_amplitude);
+    file.read(&biome.noise_power);
 
     file.read(&biome.tree_density);
     file.read(&biome.tree_tile);
     file.read(&biome.tree_material);
+
     file.read(&flags);
     biome.no_embark = flags & 0x01;
 }

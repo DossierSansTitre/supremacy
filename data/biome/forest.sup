@@ -7,3 +7,13 @@ Height = 250 750
 Drainage = 333 1000
 Rain = 500 1000
 Temperature = 333 1000
+
+LayerTop = Grass
+LayerMiddle = Dirt
+LayerBottom = Rock
+
+NoisePower = 1.1
+NoiseAmplitude = 25
+
+TreeDensity = 650
+TreeType = Tree:Wood

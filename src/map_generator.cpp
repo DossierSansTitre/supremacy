@@ -3,7 +3,7 @@
 #include <map.h>
 #include <biome.h>
 #include <tile.h>
-#include <log.h>
+#include <math/algorithm.h>
 
 static bool exposed_block(const Map& map, uint16_t tile, int x, int y, int z)
 {
@@ -54,27 +54,6 @@ static void smooth_pass(Map& map, Array<int>& height_map, uint16_t from, uint16_
     }
 }
 
-static void replace_pass(Map& map, uint16_t from_tile, uint16_t from_material, uint16_t to_tile, uint16_t to_material, uint32_t frequency)
-{
-    for (int k = 0; k < map.depth(); ++k)
-    {
-        for (int j = 0; j < map.height(); ++j)
-        {
-            for (int i = 0; i < map.width(); ++i)
-            {
-                if (map.tile_at(i, j, k) == TileID(from_tile)  && map.material_at(i, j, k) == MaterialID(from_material))
-                {
-                    if (rand() % frequency == 0)
-                    {
-                        map.set_tile(i, j, k, TileID(to_tile));
-                        map.set_material(i, j, k, MaterialID(to_material));
-                    }
-                }
-            }
-        }
-    }
-}
-
 static void fill_height(Map& map, int x, int y, int base, int length, TileID tile, MaterialID material)
 {
     if (base == 0 && length)
@@ -95,68 +74,29 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
 
     Array<int> height_map;
     height_map.resize(width * height);
-    for (int i = 0; i < width * height; ++i)
-        height_map[i] = 0;
 
     const Biome& biome = Biome::from_id(biome_id);
     map.create(width, height, depth);
-    for (const auto& layer : biome.layers)
-    {
-        switch (layer.type)
-        {
-            case Biome::LayerType::Fill:
-                for (int j = 0; j < height; ++j)
-                {
-                    for (int i = 0; i < width; ++i)
-                    {
-                        int base;
-                        base = height_map[j * width + i];
-                        if (base == 0 || Tile::from_id(map.tile_at(i, j, base - 1)).block)
-                        {
-                            fill_height(map, i, j, base, layer.fill.height, TileID(layer.fill.tile), MaterialID(layer.fill.material));
-                            height_map[j * width + i] += layer.fill.height;
-                        }
-                    }
-                }
-                break;
-            case Biome::LayerType::Octave:
-                for (int j = 0; j < height; ++j)
-                {
-                    for (int i = 0; i < width; ++i)
-                    {
-                        float n;
-                        n = perlin_octave_corrected(seed, i, j, layer.octave.persistance, layer.octave.octaves, 1.5f);
-                        n = pow(n, layer.octave.power);
 
-                        int h;
-                        h = layer.octave.a * n + layer.octave.b;
-                        fill_height(map, i, j, height_map[j * width + i], h, TileID(layer.octave.tile), MaterialID(layer.octave.material));
-                        height_map[j * width + i] += h;
-                    }
-                }
-                break;
-            case Biome::LayerType::Smooth:
-                smooth_pass(map, height_map, layer.smooth.from, layer.smooth.to);
-                break;
-            case Biome::LayerType::Replace:
-                replace_pass(map, layer.replace.from_tile, layer.replace.from_material, layer.replace.to_tile, layer.replace.to_material, layer.replace.frequency);
-                break;
-            default:
-                break;
-        }
-    }
-    size_t k;
-    for (size_t j = 0; j < height; ++j)
-    {
-        for (size_t i = 0; i < width; ++i)
+    iterate(Vector2i(height, width), [&] (Vector2i pos) {
+        float f = perlin_octave_corrected(seed, pos.x, pos.y, 2.f, 7, 2.f);
+        float variable_part = biome.noise_amplitude / 100.f;
+
+        f = std::pow(f, biome.noise_power);
+        int h = (30 * (1.f - variable_part)) + 30 * variable_part * f;
+        fill_height(map, pos.x, pos.y, 0, h, 0x01, biome.layers[2]);
+        fill_height(map, pos.x, pos.y, h, 8, 0x01, biome.layers[1]);
+        fill_height(map, pos.x, pos.y, h + 8, 1, 0x01, biome.layers[0]);
+        height_map[pos.x + width * pos.y] = h + 9;
+    });
+    smooth_pass(map, height_map, 0x01, 0x03);
+    iterate(Vector2i(height, width), [&] (Vector2i pos) {
+        int h = height_map[pos.x + pos.y * width];
+        if (rand() % 10000 < biome.tree_density)
         {
-            if ((rand() % 1000) < biome.tree_density)
-            {
-                k = height_map[i + j * width];
-                map.set_tile(Vector3i(i, j, k), biome.tree_tile);
-                map.set_material(i, j, k, biome.tree_material);
-            }
+            map.set_tile(pos.x, pos.y, h, biome.tree_tile);
+            map.set_material(pos.x, pos.y, h, biome.tree_material);
         }
-    }
+    });
     map.compute_visibility();
 }

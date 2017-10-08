@@ -5,11 +5,3 @@ BackgroundColor = #bbbbbb
 Symbol = "^"
 Height = 750 1000
 NoEmbark
-Layers = ---
-OCTAVE 3.0 7 2.2 15 30 Block:Rock
-FILL 10 Block:Rock
-FILL 1 Block:Dirt
-FILL 2 Block:Ice
-FILL 1 Block:Snow
-SMOOTH Block Slope
----

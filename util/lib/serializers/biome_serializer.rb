@@ -18,6 +18,9 @@ class BiomeSerializer < Serializer
     layer_middle = biome.ref(:material, 'LayerMiddle', 'Air')
     layer_bottom = biome.ref(:material, 'LayerBottom', 'Air')
 
+    noise_amplitude = biome.integer('NoiseAmplitude', 20)
+    noise_power = biome.fetch('NoisePower', '1.0').to_f
+
     tree_density = biome.fetch('TreeDensity', '0').to_i
     tree_tile, tree_mat = tile_pair(biome.fetch('TreeType', 'Nothing:Air'))
 
@@ -30,18 +33,21 @@ class BiomeSerializer < Serializer
     emit(bg_color, 'C3')
     emit(symbol, 'S<')
 
-    emit(height, 'S<')
-    emit(temperature, 'S<')
-    emit(rain, 'S<')
-    emit(drainage, 'S<')
+    emit(height, 'S<2')
+    emit(temperature, 'S<2')
+    emit(rain, 'S<2')
+    emit(drainage, 'S<2')
 
-    emit(layer_top, 'S<')
-    emit(layer_middle, 'S<')
-    emit(layer_bottom, 'S<')
+    emit(layer_top, 'C')
+    emit(layer_middle, 'C')
+    emit(layer_bottom, 'C')
+
+    emit(noise_amplitude, 'C')
+    emit(noise_power, 'F')
 
     emit(tree_density, 'S<')
-    emit(tree_tile, 'S<')
-    emit(tree_mat, 'S<')
+    emit(tree_tile, 'C')
+    emit(tree_mat, 'C')
 
     emit(flags, 'S<')
   end
