@@ -1,6 +1,5 @@
 #include <cstring>
 #include <cstdio>
-#include <util/file_path.h>
 #include <util/save_helper.h>
 
 static constexpr const size_t helper_buffer_size = 4096;
@@ -17,7 +16,7 @@ const char* save_path_world_folder(u16 world_id)
     return helper_buffer;
 }
 
-const char* save_path_fortress_folder(u16 world_id)
+const char* save_path_fortress(u16 world_id)
 {
     save_path_world_folder(world_id);
     strcat(helper_buffer, "/fortress.bin");
@@ -33,7 +32,7 @@ const char* save_path_region_folder(u16 world_id)
     return helper_buffer;
 }
 
-const char* save_path_region_folder(u16 world_id, u32 region_id)
+const char* save_path_region(u16 world_id, u32 region_id)
 {
     char tmp[32];
 

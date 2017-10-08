@@ -13,12 +13,14 @@ struct World
     World(u16 world_id, u32 region_id, Vector3i size)
     : world_id(world_id)
     , region_id(region_id)
+    , size(size)
     {
         map.create(size.x, size.y, size.z);
     }
 
     u16         world_id;
     u32         region_id;
+    Vector3i    size;
     Map         map;
     Actors      actors;
     Items       items;

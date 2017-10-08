@@ -47,6 +47,8 @@ Worldmap* unserialize_worldmap(std::ifstream& stream, u16 world_id);
 struct World;
 void save_world(const World& world);
 void serialize_world(std::ofstream& stream, const World& world);
+World* load_world(u16 world_id, u32 region_id);
+World* unserialize_world(std::ifstream& stream, u16 world_id, u32 region_id);
 
 class Map;
 void serialize_map(std::ofstream& stream, const Map& map);
