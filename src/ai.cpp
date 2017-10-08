@@ -224,8 +224,14 @@ static void ai_task(World& world, int actor, uint16_t task)
 
     auto& actors = world.actors;
     auto& map = world.map;
+    auto& path = actors.path(actor);
 
-    pos = actors.path(actor).front();
+    if (path.empty())
+    {
+        actors.set_task(actor, 0);
+        return;
+    }
+    pos = path.front();
     delta = pos - actors.pos(actor);
     if (delta.x * delta.x + delta.y * delta.y > 1 || delta.z * delta.z > 1)
     {
