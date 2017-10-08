@@ -56,4 +56,8 @@ class Actors;
 void serialize_actors(std::ofstream& stream, const Actors& actors);
 void unserialize_actors(Actors& actors, std::ifstream& stream);
 
+class Items;
+void serialize_items(std::ofstream& stream, const Items& items);
+void unserialize_items(Items& items, std::ifstream& stream);
+
 #endif
