@@ -6,3 +6,13 @@ Symbol = "~"
 Height = 250 750
 Drainage = 0 333
 Rain = 666 1000
+
+LayerTop = Dirt
+LayerMiddle = Dirt
+LayerBottom = Rock
+
+NoisePower = 1.0
+NoiseAmplitude = 15
+
+TreeDensity = 20
+TreeType = Tree:Wood

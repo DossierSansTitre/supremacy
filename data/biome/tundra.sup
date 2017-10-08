@@ -5,3 +5,13 @@ BackgroundColor = #aaaaaa
 Symbol = "'"
 Height = 250 750
 Temperature = 0 333
+
+LayerTop = Snow
+LayerMiddle = Dirt
+LayerBottom = Rock
+
+NoiseAmplitude = 55
+NoisePower = 1.2
+
+TreeDensity = 80
+TreeType = Tree:Wood

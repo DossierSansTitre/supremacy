@@ -6,11 +6,13 @@ Symbol = "'"
 Height = 250 750
 Temperature = 333 750
 Rain = 0 666
-TreeDensity = 20
+
+LayerTop = Grass
+LayerMiddle = Dirt
+LayerBottom = Rock
+
+NoisePower = 1.2
+NoiseAmplitude = 40
+
+TreeDensity = 100
 TreeType = Tree:Wood
-Layers = ---
-OCTAVE 2.0 7 2.2 20 15 Block:Rock
-FILL 10 Block:Dirt
-FILL 1 Block:Grass
-SMOOTH Block Slope
----

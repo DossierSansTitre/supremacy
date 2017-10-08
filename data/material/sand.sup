@@ -1,0 +1,6 @@
+ID = 7
+Name = Sand
+Color = #bbbb00
+BackgroundColor = #dddd22
+FloorSymbol = 130
+Minable
