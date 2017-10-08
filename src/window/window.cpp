@@ -37,6 +37,7 @@ Window* Window::create(WindowType type, WindowRenderApi api, int major, int mino
 #else
             return nullptr;
 #endif
+        default:
+            return nullptr;
     }
-    return nullptr;
 }
