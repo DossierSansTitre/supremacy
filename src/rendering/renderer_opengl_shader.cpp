@@ -20,7 +20,7 @@ static GLuint load_shader(Archive& archive, GLenum type, const char* path)
     std::memcpy(shader_text, shader_data, shader_data_size);
     shader_text[shader_data_size] = 0;
     delete [] shader_data;
-    glShaderSource(shader, 1, &shader_text, nullptr);
+    glShaderSource(shader, 1, (const char**)&shader_text, nullptr);
     delete [] shader_text;
     glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
