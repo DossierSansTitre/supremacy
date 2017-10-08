@@ -8,9 +8,10 @@ class TaskSeriaslizer < Serializer
     match = task.fetch('Match', '').split(' ').map(&:strip).map{|t| SupFile.reference(:tile, t)}
     into = task.ref(:tile, 'Into', 'Nothing')
 
-    data = [task.id, name.size, name].pack('S<S<a*')
-    data += [match.size].pack('S<') + match.pack('S<*')
-    data += [into].pack('S<')
-    data
+    emit(task.id, 'S<')
+    emit([name.size, name], 'S<a*')
+    emit(match.size, 'S<')
+    emit(match, 'S<*')
+    emit(into, 'S<')
   end
 end

@@ -7,6 +7,12 @@ class MaterialSerializer < Serializer
     drop_item = material.ref(:item, 'DropItem', 0)
     floor_symbol = material.symbol('FloorSymbol', 0)
     minable = material.boolean('Minable') ? 1 : 0
-    [material.id, color, background_color, drop_item, floor_symbol, minable].flatten.pack('S<C3C3S<S<C')
+
+    emit(material.id, 'S<')
+    emit(color, 'C3')
+    emit(background_color, 'C3')
+    emit(drop_item, 'S<')
+    emit(floor_symbol, 'S<')
+    emit(minable, 'C')
   end
 end

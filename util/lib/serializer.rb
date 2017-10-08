@@ -4,6 +4,22 @@ require 'sup_file'
 class Serializer
   @@serializers = {}
 
+  def compile(sup)
+    @data = []
+    serialize(sup)
+    @data.join('')
+  end
+
+  def emit(data, format)
+    data = [data] unless data.kind_of?(Array)
+    @data << data.pack(format)
+    nil
+  end
+
+  def serialize(sup)
+    throw :not_implemented
+  end
+
   def self.type(type)
     @@serializers[type] = self
   end
@@ -21,7 +37,7 @@ class Serializer
       serializer = klass.new
       data = []
       sup_files[type].sort_by!(&:id)
-      sup_files[type].each {|sup| data << serializer.serialize(sup)}
+      sup_files[type].each {|sup| data << serializer.compile(sup)}
       file_data = data.join('')
       File.open(File.join(dest_dir, type.to_s + '.bin'), "wb") do |file|
         file.write("SUP\x00")
