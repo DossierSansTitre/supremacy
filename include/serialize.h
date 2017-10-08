@@ -52,4 +52,8 @@ class Map;
 void serialize_map(std::ofstream& stream, const Map& map);
 void unserialize_map(Map& map, std::ifstream& stream);
 
+class Actors;
+void serialize_actors(std::ofstream& stream, const Actors& actors);
+void unserialize_actors(Actors& actors, std::ifstream& stream);
+
 #endif
