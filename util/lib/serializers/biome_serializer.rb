@@ -1,6 +1,8 @@
 class BiomeSerializer < Serializer
   type :biome
 
+  # Not converted to the new system since
+  # this will be refactored a lot
   def serialize(biome)
     name = biome.fetch('DisplayName', biome.name)
     layers = biome.fetch('Layers', []).map{|layer| serialize_layer(biome, layer)}
@@ -16,7 +18,8 @@ class BiomeSerializer < Serializer
     tree_tile, tree_mat = tile_pair(biome.fetch('TreeType', 'Nothing:Air'))
     flags = 0
     flags |= (biome.boolean('NoEmbark') ? 0x01 : 0)
-    [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature, rain, drainage, tree_density, tree_tile, tree_mat, flags].flatten.pack('C6S<S<S<S<S<S<S<S<S<S<CCC')
+    data = [biome.id].pack('S<') + [name.size, name].pack('S<a*') + layers_data + [color, bg_color, symbol, height, temperature, rain, drainage, tree_density, tree_tile, tree_mat, flags].flatten.pack('C6S<S<S<S<S<S<S<S<S<S<CCC')
+    emit(data, 'a*')
   end
 
   private
