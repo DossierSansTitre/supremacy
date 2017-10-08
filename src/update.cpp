@@ -116,6 +116,8 @@ static void handle_ui_state_selection(InputEvent event, Keyboard& keyboard, Worl
 {
     Vector3i motion;
 
+    (void)viewport;
+
     if (event.type == InputEventType::KeyDown)
     {
         switch (event.key.scancode)

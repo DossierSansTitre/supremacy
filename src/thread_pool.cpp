@@ -9,8 +9,8 @@
 #if !defined(NO_THREADING)
 ThreadPool::ThreadPool()
 : _running(true)
-, _task_size(0u)
 , _job_size(0u)
+, _task_size(0u)
 {
     size_t thread_count;
 

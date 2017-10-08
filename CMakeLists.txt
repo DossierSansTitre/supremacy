@@ -48,8 +48,13 @@ find_package(GLEW REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(PNG REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.mm")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES_MAC "src/*.mm")
 file(GLOB_RECURSE HEADERS "src/*.h")
+
+if (APPLE)
+    list(APPEND SOURCES ${SOURCES_MAC})
+endif()
 
 include_directories(include)
 include_directories(${PNG_INCLUDE_DIR})
