@@ -1,7 +1,7 @@
 require 'serializer'
 
-class TaskSeriaslizer < Serializer
-  type :task
+class TaskTerrainSeriaslizer < Serializer
+  type :task_terrain
 
   def serialize(task)
     name = task.fetch('DisplayName', task.name)

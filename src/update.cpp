@@ -1,5 +1,5 @@
 #include <SDL2/SDL.h>
-#include <task.h>
+#include <game/resource/task_terrain_data.h>
 #include <math/rect.h>
 #include <math/linear.h>
 #include <update.h>
@@ -97,7 +97,7 @@ static void set_action_rect(Map& map, Rect3i rect, uint16_t task)
                 y = rect.origin.y + j;
                 z = rect.origin.z + k;
 
-                const Task& task_data = Task::from_id(task);
+                const auto& task_data = TaskTerrainData::from_id(task);
 
                 for (uint16_t tile : task_data.match)
                 {

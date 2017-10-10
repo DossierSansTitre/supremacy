@@ -4,7 +4,7 @@ SET(PNG_FOUND "NO")
 
 if (ZLIB_FOUND)
     find_path(
-        PNG_PNG_INCLUDE_DIR
+        PNG_INCLUDE_DIR
         png.h
         PATHS
         /usr/local/include
@@ -52,4 +52,5 @@ if (ZLIB_FOUND)
     ENDIF ()
 ENDIF()
 
-MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR PNG_LIBRARY )
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(PNG REQUIRED_VARS PNG_LIBRARY PNG_INCLUDE_DIR)

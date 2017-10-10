@@ -2,7 +2,7 @@
 #include <tile.h>
 #include <path.h>
 #include <action_id.h>
-#include <task.h>
+#include <game/resource/task_terrain_data.h>
 #include <material.h>
 #include <std/fixed_array.h>
 #include <math/linear.h>
@@ -241,7 +241,7 @@ static void ai_task(World& world, int actor, uint16_t task)
     map.set_flash(pos, Map::Flash::Action);
     if (!actors.use_speed(actor, 2000))
         return;
-    const Task& task_data = Task::from_id(task);
+    const auto& task_data = TaskTerrainData::from_id(task);
     if (task_data.into == 0)
     {
         drop_item_at(world, pos);
