@@ -27,6 +27,7 @@ public:
 
     uint32_t        width() const { return _width; }
     uint32_t        height() const { return _height; }
+    float           scale() const { return _scale; }
     virtual void    swap() = 0;
     virtual void    poll(Input& input) = 0;
     virtual void    vsync(bool sync);
@@ -37,6 +38,7 @@ public:
 protected:
     uint32_t    _width;
     uint32_t    _height;
+    float       _scale;
     bool        _vsync;
 };
 

@@ -78,9 +78,10 @@ WindowCocoa::WindowCocoa(void* window, void* context)
     NSRect frame;
 
     vsync(true);
+    _scale = [[NSScreen mainScreen] backingScaleFactor];
     frame = [[NSScreen mainScreen] frame];
-    this->_width = frame.size.width;
-    this->_height = frame.size.height;
+    this->_width = frame.size.width * _scale;
+    this->_height = frame.size.height * _scale;
 }
 
 WindowCocoa::~WindowCocoa()

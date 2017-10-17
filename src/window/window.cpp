@@ -6,6 +6,7 @@
 #endif
 
 Window::Window()
+: _scale(1.f)
 {
 
 }
