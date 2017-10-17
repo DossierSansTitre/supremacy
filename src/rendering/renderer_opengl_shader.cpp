@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 #include <rendering/renderer_opengl_shader.h>
 #include <opengl.h>
 #include <log.h>
@@ -194,7 +195,10 @@ void RendererOpenGLShader::init_textures()
     uint32_t w;
     uint32_t h;
 
-    _texture = load_texture("tileset.png", &w, &h);
+    if (std::round(_window.scale()) >= 2)
+        _texture = load_texture("tileset@2x.png", &w, &h);
+    else
+        _texture = load_texture("tileset.png", &w, &h);
     _texture_size.x = w / 32;
     _texture_size.y = h / 32;
     _symbol = create_texture();
