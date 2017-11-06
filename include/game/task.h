@@ -9,19 +9,10 @@ enum class TaskType
     Terrain
 };
 
-struct TaskTerrain
-{
-    TaskTerrainID   id;
-    Vector3i        target;
-};
-
 struct Task
 {
-    TaskType type;
-    union
-    {
-        TaskTerrain terrain;
-    };
+    TaskType    type;
+    Vector3i    target;
 };
 
 #endif

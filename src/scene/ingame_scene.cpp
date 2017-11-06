@@ -75,6 +75,7 @@ IngameScene::IngameScene(u16 world_id, u32 region_id)
         generate_map(_world->map, biome_id, rand());
         generate_dwarfs(*_world);
     }
+    _ai = AISystem(_world);
 }
 
 void IngameScene::setup()
@@ -123,7 +124,8 @@ void IngameScene::update()
     }
 
     _world->map.tick();
-    update_ai(*_world, _update_tick);
+    //update_ai(*_world, _update_tick);
+    _ai.run();
 
     _update_tick++;
     _render_tick++;

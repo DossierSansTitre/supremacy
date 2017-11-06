@@ -16,7 +16,9 @@ Actors::~Actors()
 int Actors::add(ActorID actor_id, Vector3i pos)
 {
     const ActorData actor_data = ActorData::from_id(actor_id);
+    Task task_none;
 
+    task_none.type = TaskType::None;
     if (_free.size() > 0)
     {
         int id = _free.back();
@@ -24,7 +26,7 @@ int Actors::add(ActorID actor_id, Vector3i pos)
         _actor_id[id] = actor_id;
         _pos[id] = pos;
         _health[id] = actor_data.max_health;
-        _task[id] = 0;
+        _task[id] = task_none;
         _speed[id] = rand() % (10 * actor_data.speed + 1);
         _counter[id] = 1;
         _path_finder[id].reset();
@@ -35,7 +37,7 @@ int Actors::add(ActorID actor_id, Vector3i pos)
     {
         _actor_id.push_back(actor_id);
         _pos.push_back(pos);
-        _task.push_back(0);
+        _task.push_back(task_none);
         _health.push_back(actor_data.max_health);
         _speed.push_back(rand() % (10 * actor_data.speed + 1));
         _counter.push_back(1);
@@ -91,9 +93,4 @@ bool Actors::use_speed(int id, int speed)
         return true;
     }
     return false;
-}
-
-void Actors::set_task(int id, uint16_t task)
-{
-    _task[id] = task;
 }
