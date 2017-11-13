@@ -13,11 +13,13 @@ find_path(
 find_library(ZLIB_LIBRARY
     NAMES
     zlib
-    libz
+    z
     PATHS
+    /usr/local/lib64
+    /usr/local/lib
+    /opt/local/lib
     /usr/lib64
     /usr/lib
-    /usr/local/lib
     ${ZLIB_DIR}/lib
     )
 

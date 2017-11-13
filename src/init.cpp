@@ -9,8 +9,9 @@
 #include <util/file_path.h>
 #include <log.h>
 #include <core/file_system.h>
+#include <core/os.h>
 
-#if defined(__unix__)
+#if OS_UNIX
 # include <unistd.h>
 #else
 # include <windows.h>
@@ -38,12 +39,12 @@ bool init_game_data()
 {
     bool good;
     Archive archive;
-	uint32_t pid;
+    uint32_t pid;
 
 #if defined(WIN32)
-	pid = GetCurrentProcessId();
+    pid = GetCurrentProcessId();
 #else
-	pid = getpid();
+    pid = getpid();
 #endif
 
     log_line(LogLevel::Info, "Game started with PID %u", pid);
