@@ -1,4 +1,4 @@
-INCLUDE(FindZLIB)
+find_package(ZLIB REQUIRED)
 
 SET(PNG_FOUND "NO")
 
@@ -10,14 +10,27 @@ if (ZLIB_FOUND)
         /usr/local/include
         /opt/local/include
         /usr/include
+        ${PNG_DIR}/include
         NO_DEFAULT_PATH
         )
 
-    SET(PNG_NAMES ${PNG_NAMES} png libpng)
+    SET(PNG_NAMES ${PNG_NAMES} png libpng libpng16)
     FIND_LIBRARY(PNG_LIBRARY
         NAMES ${PNG_NAMES}
-        PATHS /usr/lib64 /usr/lib /usr/local/lib
+        PATHS
+        /usr/lib64
+        /usr/lib
+        /usr/local/lib
+        ${PNG_DIR}/lib
         )
+
+    if (WIN32)
+        find_file(PNG_DLL
+            NAMES libpng.dll libpng16.dll
+            PATHS
+            ${PNG_DIR}/bin
+            )
+    endif()
 
     IF (PNG_LIBRARY AND PNG_PNG_INCLUDE_DIR)
         # png.h includes zlib.h. Sigh.

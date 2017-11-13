@@ -3,30 +3,31 @@
 #include <scene/embark_scene.h>
 #include <scene/ingame_scene.h>
 #include <engine/game.h>
-#include <dirent.h>
 #include <util/save_helper.h>
 #include <log.h>
+#include <core/file_system.h>
 
 void LoadWorldSelectionScene::setup()
 {
     static const char* prefix = "world_";
 
-    const char* name;
-    DIR* dir;
-    dirent* ent;
+	FileSystem::Directory* dir;
+	const char* name;
     u16 world_id;
 
     _cursor = 0;
-    dir = opendir(save_path("worlds"));
-    while ((ent = readdir(dir)))
+    dir = FileSystem::open_directory(save_path("worlds"));
+    for (;;)
     {
-        name = ent->d_name;
+        name = FileSystem::read_directory(dir);
+		if (!name)
+			break;
         if (strncmp(name, prefix, strlen(prefix)) != 0)
             continue;
         world_id = atol(name + strlen(prefix));
         _worldmaps.push_back(world_id);
     }
-    closedir(dir);
+    FileSystem::close_directory(dir);
     sort(_worldmaps);
 }
 
@@ -78,7 +79,7 @@ void LoadWorldSelectionScene::submit()
 
     world_id = _worldmaps[_cursor];
     fortress_path = save_path_fortress(world_id);
-    if (file_exist(fortress_path))
+    if (FileSystem::file_exists(fortress_path))
     {
         u32 region_id;
         std::ifstream stream;

@@ -12,6 +12,8 @@ Archive::~Archive()
     close();
 }
 
+#include <iostream>
+
 void Archive::open(const char* path)
 {
     char supa[4];

@@ -6,6 +6,7 @@
 #include <worldmap.h>
 #include <tile.h>
 #include <util/save_helper.h>
+#include <core/file_system.h>
 
 static int find_suitable_height(const Map& map, int x, int y)
 {
@@ -58,7 +59,7 @@ IngameScene::IngameScene(u16 world_id, u32 region_id)
     BiomeID biome_id;
 
     region_path = save_path_region(world_id, region_id);
-    if (file_exist(region_path))
+    if (FileSystem::file_exists(region_path))
     {
         _world = load_world(world_id, region_id);
     }

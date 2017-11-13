@@ -2,12 +2,13 @@
 #include <serialize.h>
 #include <world.h>
 #include <util/save_helper.h>
+#include <core/file_system.h>
 
 void save_world(const World& world)
 {
     std::ofstream stream;
 
-    make_path(save_path_region_folder(world.world_id));
+    FileSystem::mkpath(save_path_region_folder(world.world_id));
     stream.open(save_path_region(world.world_id, world.region_id), std::ios::binary);
     serialize_world(stream, world);
     stream.close();

@@ -49,8 +49,24 @@ find_package(SDL2 REQUIRED)
 find_package(PNG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-file(GLOB_RECURSE SOURCES_MAC "src/*.mm")
+file(GLOB_RECURSE SOURCES_MAC "src/*.mm" "src/*_Mac.cpp")
+file(GLOB_RECURSE SOURCES_LINUX "src/*_Linux.cpp")
+file(GLOB_RECURSE SOURCES_WIN32 "src/*_Win32.cpp")
+file(GLOB_RECURSE SOURCES_UNIX "src/*_UNIX.cpp")
+
+list(APPEND SOURCES_MAC ${SOURCES_UNIX})
+list(APPEND SOURCES_LINUX ${SOURCES_UNIX})
+
+list(REMOVE_ITEM SOURCES ${SOURCES_MAC} ${SOURCES_LINUX} ${SOURCES_WIN32})
+
 file(GLOB_RECURSE HEADERS "src/*.h")
+
+if (WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+    add_definitions(-D_UNICODE=1)
+    add_definitions(-DUNICODE=1)
+    list(APPEND SOURCES ${SOURCES_WIN32})
+endif()
 
 if (APPLE)
     list(APPEND SOURCES ${SOURCES_MAC})
@@ -78,7 +94,7 @@ file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")
 add_custom_command(
     OUTPUT "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
     DEPENDS ${SUP_DATA} ${SUP_TOOLS}
-    COMMAND "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
+    COMMAND "ruby" "${CMAKE_SOURCE_DIR}/util/mkdata" "${CMAKE_SOURCE_DIR}/data" "${CMAKE_BINARY_DIR}/${DATA_DIR}"
     COMMENT "Generating supremacy.bin"
     VERBATIM
     )
@@ -88,7 +104,7 @@ add_custom_target(
     ALL
     DEPENDS "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin"
     VERBATIM
-)
+    )
 
 if (APP_BUNDLE)
     set_target_properties(supremacy PROPERTIES OUTPUT_NAME "Supremacy" MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/data/Info.plist")
@@ -101,23 +117,41 @@ if (APP_BUNDLE)
         COMMAND "${CMAKE_COMMAND}" -E copy "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/"
         COMMENT "Copying supremacy.bin into bundle"
         VERBATIM
-    )
+        )
 
     add_custom_target(
         data-bundle
         ALL
         DEPENDS "${CMAKE_BINARY_DIR}/Supremacy.app/Contents/Resources/supremacy.bin"
         VERBATIM
-    )
+        )
 endif()
 
 if (APP_BUNDLE)
     install(CODE "
-        include(BundleUtilities)
-        fixup_bundle(\"${CMAKE_BINARY_DIR}/Supremacy.app\" \"\" \"\")
+    include(BundleUtilities)
+    fixup_bundle(\"${CMAKE_BINARY_DIR}/Supremacy.app\" \"\" \"\")
     ")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/Supremacy.app" DESTINATION "/Applications" USE_SOURCE_PERMISSIONS)
 else()
     install(TARGETS supremacy DESTINATION ${RUNTIME_DIR})
     install(FILES "${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin" DESTINATION ${DATA_DIR})
+endif()
+
+if (WIN32)
+    add_custom_command(TARGET supremacy POST_BUILD
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        ${SDL2_DLL}
+        ${PNG_DLL}
+        ${ZLIB_DLL}
+        $<TARGET_FILE_DIR:supremacy>)
+    add_custom_command(TARGET data POST_BUILD
+        COMMAND
+        ${CMAKE_COMMAND} -E make_directory
+        $<TARGET_FILE_DIR:supremacy>/data/
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin
+        $<TARGET_FILE_DIR:supremacy>/data/supremacy.bin)
 endif()

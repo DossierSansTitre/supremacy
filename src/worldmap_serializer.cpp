@@ -2,6 +2,7 @@
 #include <worldmap.h>
 #include <serialize.h>
 #include <util/file_path.h>
+#include <core/file_system.h>
 
 void save_worldmap(const Worldmap& worldmap)
 {
@@ -10,7 +11,7 @@ void save_worldmap(const Worldmap& worldmap)
     char buffer[4096];
 
     snprintf(buffer, 4096, "worlds/world_%05u", id);
-    make_path(save_path(buffer));
+    FileSystem::mkpath(save_path(buffer));
     strcat(buffer, "/map.bin");
     file.open(save_path(buffer), std::ios::binary);
 
