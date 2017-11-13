@@ -66,10 +66,10 @@ if (WIN32)
     add_definitions(-D_UNICODE=1)
     add_definitions(-DUNICODE=1)
     list(APPEND SOURCES ${SOURCES_WIN32})
-endif()
-
-if (APPLE)
+elseif (APPLE)
     list(APPEND SOURCES ${SOURCES_MAC})
+else()
+    list(APPEND SOURCES ${SOURCES_LINUX})
 endif()
 
 include_directories(include)
