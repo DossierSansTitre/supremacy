@@ -54,7 +54,10 @@ const char* data_path(const char* rel_path)
 #endif
     strcat(tmp, "/");
     strcat(tmp, rel_path);
+
+#if !(defined(WIN32))
     realpath(tmp, buffer);
+#endif
 
     return buffer;
 }
@@ -88,42 +91,4 @@ const char* save_path(const char* rel_path)
     strcpy(buffer, tmp);
 
     return buffer;
-}
-
-bool make_path(const char* path)
-{
-    char buffer[buffer_size];
-    size_t i;
-    int ret;
-
-    strcpy(buffer, path);
-    i = 0;
-    if (buffer[0] == '/')
-        i++;
-
-    while (buffer[i])
-    {
-        if (buffer[i] == '/')
-        {
-            buffer[i] = 0;
-            mkdir(buffer, S_IRWXU | S_IRWXG | S_IRWXO);
-            buffer[i] = '/';
-        }
-        i++;
-    }
-    errno = 0;
-    ret = mkdir(buffer, S_IRWXU | S_IRWXG | S_IRWXO);
-
-    if (ret == -1 && errno != EEXIST)
-        return false;
-    return true;
-}
-
-bool file_exist(const char* path)
-{
-    struct stat stat_buf;
-    int ret;
-
-    ret = stat(path, &stat_buf);
-    return (ret == 0);
 }

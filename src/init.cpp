@@ -8,14 +8,20 @@
 #include <tile.h>
 #include <util/file_path.h>
 #include <log.h>
-#include <unistd.h>
+#include <core/file_system.h>
+
+#if defined(__unix__)
+# include <unistd.h>
+#else
+# include <windows.h>
+#endif
 
 static bool make_save_path(const char* path)
 {
     const char* p;
 
     p = save_path(path);
-    if (!make_path(p))
+    if (!FileSystem::mkpath(p))
     {
         log_line(LogLevel::Fatal, "Could not create dir: %s", p);
         return false;
@@ -32,8 +38,15 @@ bool init_game_data()
 {
     bool good;
     Archive archive;
+	uint32_t pid;
 
-    log_line(LogLevel::Info, "Game started with PID %u", getpid());
+#if defined(WIN32)
+	pid = GetCurrentProcessId();
+#else
+	pid = getpid();
+#endif
+
+    log_line(LogLevel::Info, "Game started with PID %u", pid);
 
     good = true;
     good &= make_game_paths();
