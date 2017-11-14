@@ -59,7 +59,7 @@ list(APPEND SOURCES_LINUX ${SOURCES_UNIX})
 
 list(REMOVE_ITEM SOURCES ${SOURCES_MAC} ${SOURCES_LINUX} ${SOURCES_WIN32})
 
-file(GLOB_RECURSE HEADERS "src/*.h")
+file(GLOB_RECURSE HEADERS "include/*.h")
 
 if (WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
@@ -76,6 +76,9 @@ include_directories(include)
 include_directories(${PNG_INCLUDE_DIR})
 include_directories(${CMAKE_BINARY_DIR}/include)
 include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
+
+source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX src FILES ${SOURCES})
+source_group(TREE ${CMAKE_SOURCE_DIR}/include PREFIX include FILES ${HEADERS})
 
 if(APP_BUNDLE)
     set(MACOSX_BUNDLE_ICON_FILE Supremacy.icns)

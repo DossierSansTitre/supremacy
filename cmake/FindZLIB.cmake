@@ -7,6 +7,7 @@ find_path(
     /usr/local/include
     /opt/local/include
     /usr/include
+    "/Program Files/zlib/include"
     ${ZLIB_DIR}/include
     )
 
@@ -20,6 +21,7 @@ find_library(ZLIB_LIBRARY
     /opt/local/lib
     /usr/lib64
     /usr/lib
+    "/Program Files/zlib/lib"
     ${ZLIB_DIR}/lib
     )
 
@@ -28,6 +30,7 @@ if (WIN32)
         NAMES
         zlib.dll
         PATHS
+        "/Program Files/zlib/bin"
         ${ZLIB_DIR}/bin
         )
 endif()

@@ -5,6 +5,10 @@
 # include <window/cocoa.h>
 #endif
 
+#if defined(WIN32)
+# include <window/win32.h>
+#endif
+
 Window::Window()
 : _scale(1.f)
 {
@@ -37,6 +41,12 @@ Window* Window::create(WindowType type, WindowRenderApi api, int major, int mino
             return WindowCocoa::create(api, major, minor);
 #else
             return nullptr;
+#endif
+		case WindowType::Win32:
+#if defined(WIN32)
+			return WindowWin32::create(api, major, minor);
+#else
+			return nullptr;
 #endif
         default:
             return nullptr;

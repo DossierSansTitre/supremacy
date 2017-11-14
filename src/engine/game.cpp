@@ -99,14 +99,16 @@ void Game::select_renderer()
     auto& opts = CliOptions::instance();
     WindowType window_type;
 
-#if defined(WIN32)
-	window_type = WindowType::SDL2;
-#else
 	if (opts.sdl)
         window_type = WindowType::SDL2;
-    else
-        window_type = WindowType::Cocoa;
+	else
+	{
+#if defined(WIN32)
+		window_type = WindowType::Win32;
+#else
+		window_type = WindowType::Cocoa;
 #endif
+	}
 
     _window = nullptr;
     if (!opts.legacy)
