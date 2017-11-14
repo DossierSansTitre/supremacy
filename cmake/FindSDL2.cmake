@@ -2,6 +2,7 @@ find_path(
     SDL2_INCLUDE_DIR
     SDL2/SDL.h
     PATHS
+    "/Program Files/SDL2"
     ${SDL2_DIR}
     PATH_SUFFIXES
     include
@@ -12,6 +13,7 @@ find_library(
     NAMES
     SDL2
     PATHS
+    "/Program Files/SDL2"
     ${SDL2_DIR}
     PATH_SUFFIXES
     lib64
@@ -23,6 +25,7 @@ find_library(
     NAMES
     SDL2main
     PATHS
+    "/Program Files/SDL2"
     ${SDL2_DIR}
     PATH_SUFFIXES
     lib64
@@ -34,6 +37,7 @@ if(WIN32)
         SDL2_DLL_TMP
         SDL2.dll
         PATHS
+        "/Program Files/SDL2"
         ${SDL2_DIR}
         PATH_SUFFIXES
         bin

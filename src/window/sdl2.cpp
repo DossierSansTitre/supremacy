@@ -3,6 +3,7 @@
 #include <window/sdl2.h>
 #include <cli_options.h>
 #include <keyboard.h>
+#include <GL/glew.h>
 
 WindowSDL2::WindowSDL2(SDL_Window* window, SDL_GLContext opengl)
 : _window(window)
@@ -65,7 +66,6 @@ WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
     if (api != WindowRenderApi::OpenGL)
         return nullptr;
 
-    SDL_GLprofile gl_profile;
     SDL_Window* window;
     SDL_GLContext opengl;
 
@@ -77,22 +77,29 @@ WindowSDL2* WindowSDL2::create(WindowRenderApi api, int major, int minor)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, major);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minor);
-    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     if (major >= 3)
-        gl_profile = SDL_GL_CONTEXT_PROFILE_CORE;
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     else
-        gl_profile = SDL_GL_CONTEXT_PROFILE_COMPATIBILITY;
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, gl_profile);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
     window = create_window();
     if (window == nullptr)
     {
+        std::cout << "WARN: Could not create SDL Window" << std::endl;
         SDL_Quit();
         return nullptr;
     }
     opengl = create_gl_context(window);
+    if (!opengl)
+    {
+        SDL_DestroyWindow(window);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+        window = create_window();
+        opengl = create_gl_context(window);
+    }
     if (opengl == nullptr)
     {
+        std::cout << "WARN: Could not create SDL OpenGL " << major << "." << minor << std::endl;
         SDL_DestroyWindow(window);
         SDL_Quit();
         return nullptr;

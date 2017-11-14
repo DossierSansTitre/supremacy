@@ -6,6 +6,7 @@
 #include <rendering/renderer_opengl_legacy.h>
 #include <rendering/renderer_opengl_shader.h>
 #include <cli_options.h>
+#include <core/os.h>
 
 static void init_rng(Rng& rng)
 {
@@ -99,14 +100,18 @@ void Game::select_renderer()
     auto& opts = CliOptions::instance();
     WindowType window_type;
 
-#if defined(WIN32)
-	window_type = WindowType::SDL2;
+#if OS_MAC
+    window_type = WindowType::Cocoa;
+#elif OS_LINUX
+    window_type = WindowType::SDL2;
+#elif OS_WINDOWS
+    window_type = WIndowType::Win32;
 #else
-	if (opts.sdl)
-        window_type = WindowType::SDL2;
-    else
-        window_type = WindowType::Cocoa;
+    window_type = WindowType::SDL2;
 #endif
+
+    if (opts.sdl)
+        window_type = WindowType::SDL2;
 
     _window = nullptr;
     if (!opts.legacy)

@@ -1,13 +1,10 @@
 #include <sys/types.h>
 #include <sys/dir.h>
 #include <sys/stat.h>
+#include <dirent.h>
+#include <cerrno>
 #include <cstring>
 #include <core/file_system.h>
-
-struct FileSystem::Directory
-{
-    DIR     dir;
-};
 
 bool FileSystem::file_exists(const char* path)
 {

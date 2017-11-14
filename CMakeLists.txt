@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
 
 project(supremacy C CXX)
+set(VERSION "0.1.0")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
@@ -51,7 +52,9 @@ find_package(PNG REQUIRED)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 file(GLOB_RECURSE SOURCES_MAC "src/*.mm" "src/*_Mac.cpp")
 file(GLOB_RECURSE SOURCES_LINUX "src/*_Linux.cpp")
-file(GLOB_RECURSE SOURCES_WIN32 "src/*_Win32.cpp")
+file(GLOB_RECURSE SOURCES_WIN32
+    "src/*_Win32.cpp"
+    "src/window/win32.cpp")
 file(GLOB_RECURSE SOURCES_UNIX "src/*_UNIX.cpp")
 
 list(APPEND SOURCES_MAC ${SOURCES_UNIX})
@@ -59,7 +62,7 @@ list(APPEND SOURCES_LINUX ${SOURCES_UNIX})
 
 list(REMOVE_ITEM SOURCES ${SOURCES_MAC} ${SOURCES_LINUX} ${SOURCES_WIN32})
 
-file(GLOB_RECURSE HEADERS "src/*.h")
+file(GLOB_RECURSE HEADERS "include/*.h")
 
 if (WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
@@ -76,6 +79,11 @@ include_directories(include)
 include_directories(${PNG_INCLUDE_DIR})
 include_directories(${CMAKE_BINARY_DIR}/include)
 include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
+
+if (WIN32)
+    source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX src FILES ${SOURCES})
+    source_group(TREE ${CMAKE_SOURCE_DIR}/include PREFIX include FILES ${HEADERS})
+endif()
 
 if(APP_BUNDLE)
     set(MACOSX_BUNDLE_ICON_FILE Supremacy.icns)
@@ -154,4 +162,20 @@ if (WIN32)
         ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_BINARY_DIR}/${DATA_DIR}/supremacy.bin
         $<TARGET_FILE_DIR:supremacy>/data/supremacy.bin)
+endif()
+
+if (NOT WIN32)
+    set(CPACK_PACKAGE_VERSION ${VERSION})
+    if (APPLE)
+        set(CPACK_GENERATOR "TGZ")
+    else()
+        set(CPACK_GENERATOR "TGZ;RPM;DEB")
+    endif()
+    set(CPACK_PACKAGE_NAME "supremacy")
+    set(CPACK_PACKAGE_RELEASE 1)
+    set(CPACK_PACKAGE_CONTACT "Maxime Bacoux")
+    set(CPACK_PACKAGE_VENDOR "Dossier Sans Titre")
+    set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CMAKE_SYSTEM_PROCESSOR}")
+    include(CPack)
 endif()

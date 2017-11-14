@@ -10,6 +10,7 @@ if (ZLIB_FOUND)
         /usr/local/include
         /opt/local/include
         /usr/include
+        "/Program Files/libpng/include"
         ${PNG_DIR}/include
         NO_DEFAULT_PATH
         )
@@ -21,6 +22,7 @@ if (ZLIB_FOUND)
         /usr/lib64
         /usr/lib
         /usr/local/lib
+        "/Program Files/libpng/lib"
         ${PNG_DIR}/lib
         )
 
@@ -28,6 +30,7 @@ if (ZLIB_FOUND)
         find_file(PNG_DLL
             NAMES libpng.dll libpng16.dll
             PATHS
+            "/Program Files/libpng/bin"
             ${PNG_DIR}/bin
             )
     endif()
