@@ -80,8 +80,10 @@ include_directories(${PNG_INCLUDE_DIR})
 include_directories(${CMAKE_BINARY_DIR}/include)
 include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
 
-source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX src FILES ${SOURCES})
-source_group(TREE ${CMAKE_SOURCE_DIR}/include PREFIX include FILES ${HEADERS})
+if (WIN32)
+    source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX src FILES ${SOURCES})
+    source_group(TREE ${CMAKE_SOURCE_DIR}/include PREFIX include FILES ${HEADERS})
+endif()
 
 if(APP_BUNDLE)
     set(MACOSX_BUNDLE_ICON_FILE Supremacy.icns)
