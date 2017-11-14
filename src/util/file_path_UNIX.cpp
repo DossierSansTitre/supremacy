@@ -6,6 +6,8 @@
 #if defined(__APPLE__)
 # include <mach-o/dyld.h>
 # include <CoreServices/CoreServices.h>
+#else
+# include <unistd.h>
 #endif
 
 #include <sys/stat.h>
@@ -20,10 +22,13 @@ const char* root_path()
 
     if (*root == 0)
     {
-#if defined(__APPLE__)
         char buffer[buffer_size];
+#if defined(__APPLE__)
         uint32_t bufsize = buffer_size;
         _NSGetExecutablePath(buffer, &bufsize);
+#else
+        readlink("/proc/self/exe", buffer, buffer_size);
+#endif
         for (size_t i = strlen(buffer) - 1; i > 0; --i)
         {
             if (buffer[i] == '/')
@@ -34,7 +39,6 @@ const char* root_path()
         }
         strcat(buffer, "/..");
         realpath(buffer, root);
-#endif
     }
     return root;
 }
@@ -54,11 +58,7 @@ const char* data_path(const char* rel_path)
 #endif
     strcat(tmp, "/");
     strcat(tmp, rel_path);
-
-#if !(defined(WIN32))
     realpath(tmp, buffer);
-#endif
-
     return buffer;
 }
 
