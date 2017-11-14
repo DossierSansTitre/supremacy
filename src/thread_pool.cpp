@@ -1,5 +1,5 @@
+#include <core/os.h>
 #include <thread_pool.h>
-#include <iostream>
 
 #if defined(__APPLE__)
 # include <mach/thread_act.h>
@@ -24,9 +24,9 @@ ThreadPool::ThreadPool()
     for (size_t i = 0; i < thread_count; ++i)
     {
         _threads.emplace_back(&ThreadPool::worker_main, this);
-        auto& thread = _threads.back();
 
-#if defined(__APPLE__)
+#if OS_MAC
+        auto& thread = _threads.back();
         thread_act_t thread_id = pthread_mach_thread_np(thread.native_handle());
         thread_affinity_policy_data_t affinity;
         affinity.affinity_tag = i + 1;

@@ -8,10 +8,11 @@
 
 static uint16_t float16(float in)
 {
-    uint32_t inu = *((uint32_t*)&in);
+    uint32_t inu;
     uint16_t e;
     uint16_t m;
 
+    memcpy((char*)&inu, (char*)&in, 4);
     e = (uint16_t)((inu & 0x7f800000) >> 23);
     if (e == 0u)
         return 0;

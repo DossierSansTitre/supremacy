@@ -47,7 +47,7 @@ uint32_t noise_uniform_hash_2d(uint32_t seed, int32_t x, int32_t y)
 {
     uint32_t result;
 
-    result = noise_hash(x + y * 10000 ^ seed);
+    result = noise_hash((x + y * 10000) ^ seed);
     return result;
 }
 

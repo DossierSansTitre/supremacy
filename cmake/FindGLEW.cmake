@@ -13,7 +13,7 @@ find_path(
 
 find_library(GLEW_LIBRARY
     NAMES
-    libGLEW.a GLEW
+    GLEW libGLEW.a GLEW
     PATHS
     /usr/local/lib
     /opt/local/lib

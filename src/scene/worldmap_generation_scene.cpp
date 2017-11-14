@@ -50,6 +50,8 @@ void WorldmapGenerationScene::update()
             {
             case Keyboard::Enter:
                 save_worldmap(*_worldmap);
+                game().set_scene<MainMenuScene>();
+                return;
             case Keyboard::Escape:
                 game().set_scene<MainMenuScene>();
                 return;
