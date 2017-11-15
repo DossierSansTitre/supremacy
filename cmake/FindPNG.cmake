@@ -22,6 +22,7 @@ if (ZLIB_FOUND)
         /usr/lib64
         /usr/lib
         /usr/local/lib
+        /opt/local/lib
         "/Program Files/libpng/lib"
         ${PNG_DIR}/lib
         )
@@ -35,9 +36,9 @@ if (ZLIB_FOUND)
             )
     endif()
 
-    IF (PNG_LIBRARY AND PNG_PNG_INCLUDE_DIR)
+    IF (PNG_LIBRARY AND PNG_INCLUDE_DIR)
         # png.h includes zlib.h. Sigh.
-        SET(PNG_INCLUDE_DIR ${PNG_PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
+        SET(PNG_INCLUDE_DIRS ${PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
         SET(PNG_LIBRARIES ${PNG_LIBRARY} ${ZLIB_LIBRARY})
         SET(PNG_FOUND "YES")
         SET(HAVE_PNG_H)
@@ -48,19 +49,7 @@ if (ZLIB_FOUND)
                 SET (PNG_DEFINITIONS -DPNG_STATIC)
             ENDIF(BUILD_SHARED_LIBS)
         ENDIF (CYGWIN)
-
-    ENDIF (PNG_LIBRARY AND PNG_PNG_INCLUDE_DIR)
-
-ENDIF(ZLIB_FOUND)
-
-IF (PNG_FOUND)
-    IF (NOT PNG_FIND_QUIETLY)
-        MESSAGE(STATUS "Found PNG: ${PNG_LIBRARY}")
-    ENDIF (NOT PNG_FIND_QUIETLY)
-ELSE (PNG_FOUND)
-    IF (PNG_FIND_REQUIRED)
-        MESSAGE(FATAL_ERROR "Could not find PNG library")
-    ENDIF (PNG_FIND_REQUIRED)
-ENDIF (PNG_FOUND)
+    ENDIF ()
+ENDIF()
 
 MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR PNG_LIBRARY )

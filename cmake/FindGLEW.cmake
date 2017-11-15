@@ -28,15 +28,5 @@ if (GLEW_LIBRARY AND GLEW_INCLUDE_DIR)
     set(GLEW_FOUND "YES")
 endif()
 
-
-if (GLEW_FOUND)
-    if (NOT GLEW_FIND_QUIETLY)
-        message(STATUS "Found GLEW: ${GLEW_LIBRARY}")
-    endif()
-else()
-    if (GLEW_FIND_REQUIRED)
-        message(FATAL_ERROR "Could not find GLEW library")
-    endif()
-endif()
-
-mark_as_advanced(GLEW_LIBRARY GLEW_INCLUDE_DIR)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(GLEW REQUIRED_VARS GLEW_LIBRARY GLEW_INCLUDE_DIR)

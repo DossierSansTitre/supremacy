@@ -41,15 +41,5 @@ if (ZLIB_LIBRARY AND ZLIB_INCLUDE_DIR)
     set(ZLIB_FOUND "YES")
 endif()
 
-
-if (ZLIB_FOUND)
-    if (NOT ZLIB_FIND_QUIETLY)
-        message(STATUS "Found ZLIB: ${ZLIB_LIBRARY}")
-    endif()
-else()
-    if (ZLIB_FIND_REQUIRED)
-        message(FATAL_ERROR "Could not find ZLIB library")
-    endif()
-endif()
-
-mark_as_advanced(ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(ZLIB REQUIRED_VARS ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
