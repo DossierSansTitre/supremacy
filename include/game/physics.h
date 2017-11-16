@@ -2,6 +2,7 @@
 #define GAME_PHYSICS_H
 
 #include <math/vector.h>
+#include <math/linear.h>
 #include <path_finder.h>
 #include <world.h>
 
@@ -28,6 +29,30 @@ bool can_act_upon(World& world, int actor, Vector3i src, Vector3i delta);
 bool can_move(World& world, int actor, Vector3i delta);
 bool try_move(World& world, int actor, Vector3i delta);
 
+inline bool can_act_upon_immediate(World& world, int actor, Vector3i dst)
+{
+    Vector3i pos;
+
+    pos = world.actors.pos(actor);
+    return can_act_upon(world, actor, pos, dst - pos);
+}
+
+inline bool can_move_immediate(World& world, int actor, Vector3i dst)
+{
+    Vector3i pos;
+
+    pos = world.actors.pos(actor);
+    return can_move_from(world, actor, pos, dst - pos);
+}
+
+inline bool try_move_immediate(World& world, int actor, Vector3i dst)
+{
+    Vector3i pos;
+
+    pos = world.actors.pos(actor);
+    return try_move(world, actor, dst - pos);
+}
+
 template <typename Container>
 uint32_t distance_heuristic(Vector3i pos, const Container& container)
 {
@@ -51,7 +76,6 @@ bool pathfind(Path& out, World& world, int actor, const Container& targets, Pred
 {
     static const size_t nodes_max = 500;
     auto& actors = world.actors;
-    auto& map = world.map;
 
     PathFinder path_finder;
     Vector3i pos = actors.pos(actor);
@@ -68,10 +92,13 @@ bool pathfind(Path& out, World& world, int actor, const Container& targets, Pred
         {
             delta = delta_permutations[i];
             dst = node + delta;
-            if (pred(world, actor, node, delta))
+            for (auto v : targets)
             {
-                path_finder.finish_with(out, dst);
-                return true;
+                if (dst == v && pred(world, actor, node, delta))
+                {
+                    path_finder.finish_with(out, dst);
+                    return true;
+                }
             }
             if (can_move_from(world, actor, node, delta))
                 path_finder.explore(dst, distance_heuristic(dst, targets));

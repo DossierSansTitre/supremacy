@@ -12,7 +12,9 @@ enum class TaskType
 struct Task
 {
     TaskType    type;
+    uint16_t    terrain_task_id;
     Vector3i    target;
+    Path        path;
 };
 
 #endif

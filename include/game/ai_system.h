@@ -16,7 +16,9 @@ public:
 private:
     void tick(int actor);
     bool assign_task(int actor);
+    bool assign_task_terrain(int actor);
     void run_task(int actor);
+    void run_task_terrain(int actor);
     void wander(int actor);
     bool move(int actor, Vector3i delta);
 

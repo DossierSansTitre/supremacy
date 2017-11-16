@@ -32,10 +32,11 @@ bool can_move_from(World& world, int actor, Vector3i src, Vector3i delta)
     return false;
 }
 
-bool can_act_upon(World& world, Vector3i src, Vector3i dst)
+bool can_act_upon(World& world, int actor, Vector3i src, Vector3i delta)
 {
-    Vector3i delta = dst - src;
+    Vector3i dst;
 
+    dst = src + delta;
     if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z > 1)
         return false;
     if (src == dst)
