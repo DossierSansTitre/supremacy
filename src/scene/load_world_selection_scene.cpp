@@ -77,6 +77,9 @@ void LoadWorldSelectionScene::submit()
     const char* fortress_path;
     u16 world_id;
 
+    if (_worldmaps.empty())
+        return;
+
     world_id = _worldmaps[_cursor];
     fortress_path = save_path_fortress(world_id);
     if (FileSystem::file_exists(fortress_path))
