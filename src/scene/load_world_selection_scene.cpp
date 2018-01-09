@@ -11,8 +11,8 @@ void LoadWorldSelectionScene::setup()
 {
     static const char* prefix = "world_";
 
-	FileSystem::Directory* dir;
-	const char* name;
+    FileSystem::Directory* dir;
+    const char* name;
     u16 world_id;
 
     _cursor = 0;
@@ -20,8 +20,8 @@ void LoadWorldSelectionScene::setup()
     for (;;)
     {
         name = FileSystem::read_directory(dir);
-		if (!name)
-			break;
+        if (!name)
+            break;
         if (strncmp(name, prefix, strlen(prefix)) != 0)
             continue;
         world_id = atol(name + strlen(prefix));
@@ -42,20 +42,20 @@ void LoadWorldSelectionScene::update()
         {
             switch (e.key.scancode)
             {
-            case Keyboard::Escape:
-                game().set_scene<MainMenuScene>();
-                break;
-            case Keyboard::Up:
-                if (_cursor)
-                    _cursor--;
-                break;
-            case Keyboard::Down:
-                if (_cursor < _worldmaps.size() - 1)
-                    _cursor++;
-                break;
-            case Keyboard::Enter:
-                submit();
-                return;
+                case Keyboard::Escape:
+                    game().set_scene<MainMenuScene>();
+                    break;
+                case Keyboard::Up:
+                    if (_cursor)
+                        _cursor--;
+                    break;
+                case Keyboard::Down:
+                    if (_cursor < _worldmaps.size() - 1)
+                        _cursor++;
+                    break;
+                case Keyboard::Enter:
+                    submit();
+                    return;
             }
         }
     }

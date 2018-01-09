@@ -15,4 +15,14 @@
 # define OS_UNIX 1
 #endif
 
+#if defined(__LP64__) || defined(__LLP64__)
+# define OS_64 1
+# define OS_BITS 64
+#else
+# define OS_32 1
+# define OS_BITS 32
+#endif
+
+#define OS_BITS_BYTES   (OS_BITS / 8)
+
 #endif

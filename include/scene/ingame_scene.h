@@ -5,6 +5,7 @@
 #include <world.h>
 #include <selection.h>
 #include <draw.h>
+#include <game/ai_system.h>
 
 class IngameScene : public GameScene
 {
@@ -17,6 +18,7 @@ public:
 
 private:
     World*      _world;
+    AISystem    _ai;
     Selection   _selection;
     u32         _update_tick;
     u32         _render_tick;

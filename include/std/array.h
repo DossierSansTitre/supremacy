@@ -170,7 +170,7 @@ public:
         if (new_capacity < 16)
             new_capacity = 16;
         while (new_capacity < target_size)
-            new_capacity *= 2;
+            new_capacity += new_capacity / 2;
         new_data = _alloc.allocate_array(new_capacity);
         if (_data)
         {

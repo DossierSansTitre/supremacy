@@ -80,6 +80,11 @@ void Map::set_material(int x, int y, int z, MaterialID material)
     set_material(index(x, y, z), material);
 }
 
+void Map::set_material(Vector3i pos, MaterialID material)
+{
+    set_material(index(pos.x, pos.y, pos.z), material);
+}
+
 void Map::set_task(int x, int y, int z, uint16_t task)
 {
     int i;
@@ -92,6 +97,11 @@ void Map::set_task(int x, int y, int z, uint16_t task)
         _tasks.append(i, task);
     else
         _tasks.remove(i);
+}
+
+void Map::set_task(Vector3i pos, uint16_t task)
+{
+    set_task(pos.x, pos.y, pos.z, task);
 }
 
 void Map::set_occupied(Vector3i pos, bool occupied)

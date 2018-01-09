@@ -1,5 +1,3 @@
-set(GLEW_FOUND "NO")
-
 find_path(
     GLEW_INCLUDE_DIR
     GL/glew.h
@@ -25,8 +23,7 @@ find_library(GLEW_LIBRARY
 if (GLEW_LIBRARY AND GLEW_INCLUDE_DIR)
     set(GLEW_LIBRARIES ${GLEW_LIBRARY})
     set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDE_DIR})
-    set(GLEW_FOUND "YES")
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GLEW REQUIRED_VARS GLEW_LIBRARY GLEW_INCLUDE_DIR)
+find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_LIBRARY GLEW_INCLUDE_DIR)

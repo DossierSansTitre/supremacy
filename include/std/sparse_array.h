@@ -101,13 +101,23 @@ public:
 
     void remove(uint32_t i)
     {
+        /*
+         * Caution: tricky logic.
+         * Do not edit unless you know what you are doing.
+         * If you took more than one second to answer this very question,
+         * then you probably don't know what you are doing.
+         */
         uint32_t internal;
+
+        if (i >= _external.size())
+            return;
 
         internal = _external[i];
         if (internal == 0)
             return;
         if (internal != _data.size())
         {
+            _external[_reverse.back()] = internal;
             swap(_data[internal - 1], _data.back());
             swap(_reverse[internal - 1], _reverse.back());
         }

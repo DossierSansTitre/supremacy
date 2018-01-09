@@ -83,6 +83,11 @@ public:
         return material_at(index(x, y, z));
     }
 
+    MaterialID material_at(Vector3i pos) const
+    {
+        return material_at(index(pos.x, pos.y, pos.z));
+    }
+
     uint16_t task_at(int i) const
     {
         if (i == -1)
@@ -171,7 +176,9 @@ public:
     void        set_tile(Vector3i pos, TileID tile);
     void        set_material(int index, MaterialID material);
     void        set_material(int x, int y, int z, MaterialID material);
+    void        set_material(Vector3i pos, MaterialID material);
     void        set_task(int x, int y, int z, uint16_t task);
+    void        set_task(Vector3i pos, uint16_t task);
     void        set_occupied(Vector3i pos, bool occupied);
     void        set_flash(Vector3i pos, Flash flash);
 

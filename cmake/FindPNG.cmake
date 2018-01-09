@@ -1,10 +1,8 @@
 find_package(ZLIB REQUIRED)
 
-SET(PNG_FOUND "NO")
-
 if (ZLIB_FOUND)
     find_path(
-        PNG_PNG_INCLUDE_DIR
+        PNG_INCLUDE_DIR
         png.h
         PATHS
         /usr/local/include
@@ -40,7 +38,6 @@ if (ZLIB_FOUND)
         # png.h includes zlib.h. Sigh.
         SET(PNG_INCLUDE_DIRS ${PNG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} )
         SET(PNG_LIBRARIES ${PNG_LIBRARY} ${ZLIB_LIBRARY})
-        SET(PNG_FOUND "YES")
         SET(HAVE_PNG_H)
         IF (CYGWIN)
             IF(BUILD_SHARED_LIBS)
@@ -52,4 +49,5 @@ if (ZLIB_FOUND)
     ENDIF ()
 ENDIF()
 
-MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR PNG_LIBRARY )
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(PNG DEFAULT_MSG PNG_LIBRARY PNG_INCLUDE_DIR)

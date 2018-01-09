@@ -1,9 +1,9 @@
-#include <task.h>
+#include <game/resource/task_terrain_data.h>
 #include <serialize.h>
 
-SparseArray<Task> Task::_data;
+SparseArray<TaskTerrainData> TaskTerrainData::_data;
 
-static void load_task(Task& task, MemoryFile& file)
+static void load_task(TaskTerrainData& task, MemoryFile& file)
 {
     uint16_t len;
 
@@ -23,7 +23,7 @@ static void load_task(Task& task, MemoryFile& file)
     file.read(&task.into);
 }
 
-void Task::load(Archive& archive)
+void TaskTerrainData::load(Archive& archive)
 {
-    unserialize_resource_array(Task::_data, archive, "task.bin", load_task);
+    unserialize_resource_array(TaskTerrainData::_data, archive, "task_terrain.bin", load_task);
 }

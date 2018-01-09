@@ -4,7 +4,7 @@
 #include <item_data.h>
 #include <log.h>
 #include <material.h>
-#include <task.h>
+#include <game/resource/task_terrain_data.h>
 #include <tile.h>
 #include <util/file_path.h>
 #include <log.h>
@@ -57,7 +57,7 @@ bool init_game_data()
     Material::load(archive);
     ItemData::load(archive);
     Biome::load(archive);
-    Task::load(archive);
+    TaskTerrainData::load(archive);
     log_line(LogLevel::Info, "Game data loaded");
     return good;
 }
