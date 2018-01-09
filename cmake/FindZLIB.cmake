@@ -2,6 +2,7 @@ set(ZLIB_SEARCH_PATHS
     "/usr/local"
     "/opt/local"
     "/usr"
+    "/"
     "/Program Files/zlib")
 
 find_path(
