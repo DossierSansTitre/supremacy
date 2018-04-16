@@ -74,8 +74,10 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     GLuint shader_vert;
     GLuint shader_frag;
 
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_DITHER);
+    glDisable(GL_MULTISAMPLE);
+    glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, 0);
+
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     log_line(LogLevel::Info, "Using the OpenGL Shader Renderer");
