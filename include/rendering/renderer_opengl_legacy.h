@@ -18,7 +18,7 @@ public:
 
 private:
     void render_tiles();
-    void render_tile(size_t index);
+    void render_tile(size_t x, size_t y);
     void render_vertex(size_t index, size_t sub_index, uint16_t tx, uint16_t ty, Color color, Color color_bg);
 
     struct Vertex {

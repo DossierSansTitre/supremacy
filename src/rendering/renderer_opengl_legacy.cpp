@@ -94,14 +94,16 @@ void RendererOpenGLLegacy::render()
 
 void RendererOpenGLLegacy::render_tiles()
 {
-    size_t max;
-
-    max = _tiles_x * _tiles_y;
-    for (size_t i = 0; i < max; ++i)
-        render_tile(i);
+    for (size_t y = 0; y < _tiles_y; ++y)
+    {
+        for (size_t x = 0; x < _tiles_x; ++x)
+        {
+            render_tile(x, y);
+        }
+    }
 }
 
-void RendererOpenGLLegacy::render_tile(size_t index)
+void RendererOpenGLLegacy::render_tile(size_t x, size_t y)
 {
     static const float texture_size = 1.f / 32.f;
 
@@ -110,9 +112,10 @@ void RendererOpenGLLegacy::render_tile(size_t index)
     float       ty[2];
     uint16_t    t16x[2];
     uint16_t    t16y[2];
+    size_t index;
 
-
-    glyph = _draw_buffer.at(index);
+    index = x + y * _tiles_x;
+    glyph = _draw_buffer.at(x, y);
 
     tx[0] = (glyph.symbol % 32) * texture_size;
     ty[0] = (glyph.symbol / 32) * texture_size;
@@ -123,7 +126,6 @@ void RendererOpenGLLegacy::render_tile(size_t index)
     t16x[1] = float16(tx[1]);
     t16y[0] = float16(ty[0]);
     t16y[1] = float16(ty[1]);
-
 
     render_vertex(index, 0, t16x[0], t16y[0], glyph.color, glyph.color_bg);
     render_vertex(index, 1, t16x[1], t16y[0], glyph.color, glyph.color_bg);

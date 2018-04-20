@@ -92,7 +92,7 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     _tile_count_uniform = glGetUniformLocation(_program, "uTileCount");
     init_buffers();
     init_textures();
-    resize({(_window.width() / _texture_size.x) & (~1), _window.height() / _texture_size.y});
+    resize({_window.width() / _texture_size.x, _window.height() / _texture_size.y});
     glBindVertexArray(_vao);
     glUseProgram(_program);
     glUniform1i(_texture_uniform, 0);
@@ -117,7 +117,7 @@ RendererOpenGLShader::~RendererOpenGLShader()
 
 void RendererOpenGLShader::clear()
 {
-    _draw_buffer.resize((_window.width() / _texture_size.x) & (~1), _window.height() / _texture_size.y);
+    _draw_buffer.resize(_window.width() / _texture_size.x, _window.height() / _texture_size.y);
 }
 
 void RendererOpenGLShader::render()
@@ -203,6 +203,7 @@ void RendererOpenGLShader::init_textures()
         _texture = load_texture("tileset.png", &w, &h);
     _texture_size.x = w / 32;
     _texture_size.y = h / 32;
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
     _symbol = create_texture();
     _color = create_texture();
     _color_bg = create_texture();

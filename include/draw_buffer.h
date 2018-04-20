@@ -15,35 +15,40 @@ public:
     uint32_t width() const { return _size.x; }
     uint32_t height() const { return _size.y; }
 
-    Glyph at(size_t index) const
+    Glyph at(uint32_t x, uint32_t y) const
     {
+        size_t index_symbol;
+        size_t index_color;
         Glyph g;
 
-        g.symbol = _symbol[index];
-        g.color.r = _color[index * 4 + 2];
-        g.color.g = _color[index * 4 + 1];
-        g.color.b = _color[index * 4 + 0];
-        g.color_bg.r = _color_bg[index * 4 + 2];
-        g.color_bg.g = _color_bg[index * 4 + 1];
-        g.color_bg.b = _color_bg[index * 4 + 0];
+        index_symbol = y * _row_size_symbol + x;
+        index_color = y * _row_size_color + x * 4;
+        g.symbol = _symbol[index_symbol];
+        g.color.b = _color[index_color + 0];
+        g.color.g = _color[index_color + 1];
+        g.color.r = _color[index_color + 2];
+        g.color_bg.b = _color_bg[index_color + 0];
+        g.color_bg.g = _color_bg[index_color + 1];
+        g.color_bg.r = _color_bg[index_color + 2];
 
         return g;
     }
 
-    Glyph at(uint32_t x, uint32_t y) const { return at(x + y * _size.x); }
 
     void set(uint32_t x, uint32_t y, Glyph glyph)
     {
-        size_t index;
+        size_t index_symbol;
+        size_t index_color;
 
-        index = x + y * _size.x;
-        _symbol[index] = glyph.symbol;
-        _color[index * 4 + 0] = glyph.color.b;
-        _color[index * 4 + 1] = glyph.color.g;
-        _color[index * 4 + 2] = glyph.color.r;
-        _color_bg[index * 4 + 0] = glyph.color_bg.b;
-        _color_bg[index * 4 + 1] = glyph.color_bg.g;
-        _color_bg[index * 4 + 2] = glyph.color_bg.r;
+        index_symbol = y * _row_size_symbol + x;
+        index_color = y * _row_size_color + x * 4;
+        _symbol[index_symbol] = glyph.symbol;
+        _color[index_color + 0] = glyph.color.b;
+        _color[index_color + 1] = glyph.color.g;
+        _color[index_color + 2] = glyph.color.r;
+        _color_bg[index_color + 0] = glyph.color_bg.b;
+        _color_bg[index_color + 1] = glyph.color_bg.g;
+        _color_bg[index_color + 2] = glyph.color_bg.r;
     }
 
     void resize(uint32_t width, uint32_t height);
@@ -55,6 +60,8 @@ public:
 
 private:
     Vector2u        _size;
+    size_t          _row_size_color;
+    size_t          _row_size_symbol;
     Array<uint16_t> _symbol;
     Array<uint8_t>  _color;
     Array<uint8_t>  _color_bg;
