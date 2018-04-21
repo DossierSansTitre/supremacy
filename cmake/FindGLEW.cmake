@@ -17,13 +17,23 @@ find_path(
 
 find_library(GLEW_LIBRARY
     NAMES
-    libGLEW.a glew32s glew
+    libGLEW.a glew32 glew
     PATHS
 	${GLEW_SEARCH_PATH}
     PATH_SUFFIXES
 	lib
     )
 
+if (WIN32)
+	find_file(GLEW_DLL
+	NAMES
+	glew32.dll
+	PATHS
+	${GLEW_SEARCH_PATH}
+	PATH_SUFFIXES
+	bin
+	)
+endif()
 if (GLEW_LIBRARY AND GLEW_INCLUDE_DIR)
     set(GLEW_LIBRARIES ${GLEW_LIBRARY})
     set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDE_DIR})

@@ -32,7 +32,7 @@ if (WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
     add_definitions(-D_UNICODE=1)
     add_definitions(-DUNICODE=1)
-	add_definitions(-DGLEW_STATIC=1)
+	#add_definitions(-DGLEW_STATIC=1)
     list(APPEND SOURCES ${SOURCES_WIN32})
 elseif (APPLE)
     list(APPEND SOURCES ${SOURCES_MAC})
@@ -119,6 +119,7 @@ if (WIN32)
         ${SDL2_DLL}
         ${PNG_DLL}
         ${ZLIB_DLL}
+		${GLEW_DLL}
         $<TARGET_FILE_DIR:supremacy>)
     add_custom_command(TARGET supremacy POST_BUILD
         COMMAND
