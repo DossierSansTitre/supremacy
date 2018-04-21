@@ -149,11 +149,6 @@ void RendererOpenGLShader::resize(Vector2u size)
     glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, nullptr);
     glBindTexture(GL_TEXTURE_RECTANGLE, _color);
     glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, w * 2, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[0]);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, db.row_size_symbol() * h * 2, nullptr, GL_STREAM_DRAW);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[1]);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, db.row_size_color() * h, nullptr, GL_STREAM_DRAW);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 void RendererOpenGLShader::init_buffers()
@@ -173,7 +168,6 @@ void RendererOpenGLShader::init_buffers()
     glGenVertexArrays(1, &_vao);
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
-    glGenBuffers(2, _pbo);
     glBindVertexArray(_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);

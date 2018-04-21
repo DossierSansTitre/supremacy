@@ -24,7 +24,6 @@ private:
     GLuint  _vao;
     GLuint  _vbo;
     GLuint  _ibo;
-    GLuint  _pbo[2];
     GLuint  _texture;
     GLuint  _symbol;
     GLuint  _color;
