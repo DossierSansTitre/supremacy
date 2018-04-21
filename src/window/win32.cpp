@@ -174,8 +174,11 @@ static HWND create_window()
 	return hwnd;
 }
 
-static HGLRC create_opengl(HWND win, HDC dc)
+static HGLRC create_opengl(HWND win, HDC dc, int major, int minor)
 {
+	int gl_attr[32] = { 0 };
+	int count = 0;
+
 	static const int attr[] = {
 		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
 		WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
@@ -187,12 +190,20 @@ static HGLRC create_opengl(HWND win, HDC dc)
 		0,
 	};
 
-	static const int gl_attr[] = {
-		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 2,
-		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-		0
-	};
+	gl_attr[count++] = WGL_CONTEXT_MAJOR_VERSION_ARB;
+	gl_attr[count++] = major;
+	gl_attr[count++] = WGL_CONTEXT_MINOR_VERSION_ARB;
+	gl_attr[count++] = minor;
+
+	gl_attr[count++] = WGL_CONTEXT_PROFILE_MASK_ARB;
+	if (major >= 3)
+	{
+		gl_attr[count++] = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
+	}
+	else
+	{
+		gl_attr[count++] = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+	}
 
 	int pf;
 	UINT pf_count;
@@ -238,7 +249,7 @@ WindowWin32* WindowWin32::create(WindowRenderApi api, int major, int minor)
 	init_opengl();
 	window = create_window();
 	dc = GetDC(window);
-	gl = create_opengl(window, dc);
+	gl = create_opengl(window, dc, major, minor);
 	return new WindowWin32(window, dc, gl);
 }
 

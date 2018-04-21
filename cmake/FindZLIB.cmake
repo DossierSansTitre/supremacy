@@ -1,15 +1,15 @@
 set(ZLIB_SEARCH_PATHS
+	${ZLIB_DIR}
     "/usr/local"
     "/opt/local"
     "/usr"
-    "/"
-    "/Program Files/zlib")
+    "/Program Files/zlib"
+	)
 
 find_path(
     ZLIB_INCLUDE_DIR
     zlib.h
     PATHS
-    ${ZLIB_DIR}
     ${ZLIB_SEARCH_PATHS}
     PATH_SUFFIXES
     include
@@ -19,7 +19,6 @@ find_library(ZLIB_LIBRARY
     NAMES
     z zlib
     PATHS
-    ${ZLIB_DIR}
     ${ZLIB_SEARCH_PATHS}
     PATH_SUFFIXES
     lib
@@ -31,10 +30,9 @@ if (WIN32)
         NAMES
         zlib.dll
         PATHS
-        ${ZLIB_DIR}
         ${ZLIB_SEARCH_PATHS}
         PATH_SUFFIXES
-        lib
+        bin
         )
 endif()
 

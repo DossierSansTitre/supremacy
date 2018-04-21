@@ -105,7 +105,7 @@ void Game::select_renderer()
 #elif OS_LINUX
     window_type = WindowType::SDL2;
 #elif OS_WINDOWS
-    window_type = WIndowType::Win32;
+    window_type = WindowType::Win32;
 #else
     window_type = WindowType::SDL2;
 #endif
