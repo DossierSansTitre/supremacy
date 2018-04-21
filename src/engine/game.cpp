@@ -5,6 +5,7 @@
 #include <opengl.h>
 #include <rendering/renderer_opengl_legacy.h>
 #include <rendering/renderer_opengl_shader.h>
+#include <rendering/renderer_vulkan.h>
 #include <cli_options.h>
 #include <core/os.h>
 
@@ -95,6 +96,15 @@ void Game::stop()
     log_line(LogLevel::Info, "Engine stopped");
 }
 
+static const void dump_opengl()
+{
+	log_line(LogLevel::Info, "OpenGL Info:");
+	log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
+	log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
+	log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
+	log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+}
+
 void Game::select_renderer()
 {
     auto& opts = CliOptions::instance();
@@ -102,8 +112,6 @@ void Game::select_renderer()
 
 #if OS_MAC
     window_type = WindowType::Cocoa;
-#elif OS_LINUX
-    window_type = WindowType::SDL2;
 #elif OS_WINDOWS
     window_type = WindowType::Win32;
 #else
@@ -114,27 +122,25 @@ void Game::select_renderer()
         window_type = WindowType::SDL2;
 
     _window = nullptr;
-    if (!opts.legacy)
-        _window = Window::create(window_type, WindowRenderApi::OpenGL, 3, 2);
-    if (_window)
-    {
-        log_line(LogLevel::Info, "OpenGL Info:");
-        log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
-        log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
-        log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
-        log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-        _renderer = new RendererOpenGLShader(*_window, _draw_buffer);
-    }
-    else
-    {
-        _window = Window::create(window_type, WindowRenderApi::OpenGL, 2, 1);
-        log_line(LogLevel::Info, "OpenGL Info:");
-        log_line(LogLevel::Info, "  %s", glGetString(GL_VERSION));
-        log_line(LogLevel::Info, "  From: %s", glGetString(GL_VENDOR));
-        log_line(LogLevel::Info, "  Renderer: %s", glGetString(GL_RENDERER));
-        log_line(LogLevel::Info, "  GLSL: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-        _renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
-    }
+	if (!opts.legacy)
+	{
+		_window = Window::create(window_type, WindowRenderApi::Vulkan, 1, 0);
+		if (_window)
+		{
+			_renderer = new RendererVulkan(*_window, _draw_buffer);
+			return;
+		}
+		_window = Window::create(window_type, WindowRenderApi::OpenGL, 3, 2);
+		if (_window)
+		{
+			dump_opengl();
+			_renderer = new RendererOpenGLShader(*_window, _draw_buffer);
+			return;
+		}
+	}
+    _window = Window::create(window_type, WindowRenderApi::OpenGL, 2, 1);
+	dump_opengl();
+	_renderer = new RendererOpenGLLegacy(*_window, _draw_buffer);
 }
 
 void Game::update()

@@ -1,5 +1,6 @@
 #include <window/win32.h>
 #include <window/win32_opengl.h>
+#include <window/win32_vulkan.h>
 #include <cli_options.h>
 #include <keyboard.h>
 
@@ -106,6 +107,8 @@ WindowWin32* WindowWin32::create(WindowRenderApi api, int major, int minor)
 		WindowWin32OpenGL::init();
 		window = create_window();
 		return WindowWin32OpenGL::create(window, major, minor);
+	case WindowRenderApi::Vulkan:
+		return WindowWin32Vulkan::create(window, major, minor);
 	default:
 		return nullptr;
 	}
