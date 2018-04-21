@@ -13,6 +13,10 @@ find_package(GLEW REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(PNG REQUIRED)
 
+if (WIN32)
+	find_package(Vulkan REQUIRED)
+endif()
+
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_MAC "*.mm" "*_Mac.cpp")
 file(GLOB_RECURSE SOURCES_LINUX "*_Linux.cpp")
@@ -60,6 +64,10 @@ else()
 endif()
 
 target_link_libraries(supremacy ${PNG_LIBRARIES} sdl2 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+
+if (WIN32)
+	target_link_libraries(supremacy Vulkan::Vulkan)
+endif()
 
 file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
 file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")
