@@ -69,6 +69,7 @@ static GLuint link_shader(GLuint vert, GLuint frag)
 
 RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buffer)
 : Renderer(window, draw_buffer)
+, _dirty(true)
 {
     Archive archive;
     GLuint shader_vert;
@@ -114,6 +115,7 @@ RendererOpenGLShader::~RendererOpenGLShader()
 void RendererOpenGLShader::clear()
 {
     _draw_buffer.resize(_window.width() / _texture_size.x, _window.height() / _texture_size.y);
+    _dirty = true;
 }
 
 void RendererOpenGLShader::render()
@@ -123,10 +125,14 @@ void RendererOpenGLShader::render()
     size_t w = db.width();
     size_t h = db.height();
 
-    glBindTexture(GL_TEXTURE_RECTANGLE, _symbol);
-    glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
-    glBindTexture(GL_TEXTURE_RECTANGLE, _color);
-    glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w * 2, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color());
+    if (_dirty)
+    {
+        glBindTexture(GL_TEXTURE_RECTANGLE, _symbol);
+        glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
+        glBindTexture(GL_TEXTURE_RECTANGLE, _color);
+        glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w * 2, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color());
+    }
+    _dirty = false;
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
@@ -143,6 +149,11 @@ void RendererOpenGLShader::resize(Vector2u size)
     glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, nullptr);
     glBindTexture(GL_TEXTURE_RECTANGLE, _color);
     glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, w * 2, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[0]);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, db.row_size_symbol() * h * 2, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, _pbo[1]);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, db.row_size_color() * h, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 void RendererOpenGLShader::init_buffers()
@@ -162,6 +173,7 @@ void RendererOpenGLShader::init_buffers()
     glGenVertexArrays(1, &_vao);
     glGenBuffers(1, &_vbo);
     glGenBuffers(1, &_ibo);
+    glGenBuffers(2, _pbo);
     glBindVertexArray(_vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);

@@ -14,6 +14,8 @@ public:
     Vector2u size() const { return _size; }
     uint32_t width() const { return _size.x; }
     uint32_t height() const { return _size.y; }
+    size_t row_size_symbol() const { return _row_size_symbol; }
+    size_t row_size_color() const { return _row_size_color; }
 
     Glyph at(uint32_t x, uint32_t y) const
     {

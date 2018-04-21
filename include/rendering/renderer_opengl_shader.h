@@ -24,6 +24,7 @@ private:
     GLuint  _vao;
     GLuint  _vbo;
     GLuint  _ibo;
+    GLuint  _pbo[2];
     GLuint  _texture;
     GLuint  _symbol;
     GLuint  _color;
@@ -33,6 +34,7 @@ private:
     GLint   _tile_count_uniform;
 
     Vector2i    _texture_size;
+    bool        _dirty;
 };
 
 #endif
