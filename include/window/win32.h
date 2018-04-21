@@ -7,19 +7,15 @@
 class WindowWin32 : public Window
 {
 public:
-	WindowWin32(HWND window, HDC dc, HGLRC gl);
+	WindowWin32(HWND window);
 	~WindowWin32();
 
 	static WindowWin32* create(WindowRenderApi api, int major, int minor);
 
-	void    swap() override;
 	void    poll(Input& input) override;
-	void    vsync(bool sync) override;
 
-private:
+protected:
 	HWND	_window;
-	HDC		_dc;
-	HGLRC	_gl;
 };
 
 #endif
