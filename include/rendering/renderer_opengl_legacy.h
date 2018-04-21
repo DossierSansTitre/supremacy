@@ -64,6 +64,8 @@ private:
     uint32_t    _tiles_y;
 
     std::vector<Vertex> _vertices;
+
+    bool        _dirty;
 };
 
 #endif

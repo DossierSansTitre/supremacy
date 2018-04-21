@@ -23,6 +23,7 @@ static uint16_t float16(float in)
 
 RendererOpenGLLegacy::RendererOpenGLLegacy(Window& window, DrawBuffer& draw_buffer)
 : Renderer(window, draw_buffer)
+, _dirty(true)
 {
     log_line(LogLevel::Info, "Using the OpenGL Legacy Renderer");
     glMatrixMode(GL_PROJECTION);
@@ -62,6 +63,7 @@ void RendererOpenGLLegacy::resize(Vector2u size)
 
 void RendererOpenGLLegacy::clear()
 {
+    _dirty = true;
     _draw_buffer.resize(_window.width() / _tile_width, _window.height() / _tile_height);
 }
 
@@ -75,9 +77,12 @@ void RendererOpenGLLegacy::render()
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
 
-    glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
-    render_tiles();
-    glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
+    if (_dirty)
+    {
+        glBufferData(GL_ARRAY_BUFFER, _tiles_x * _tiles_y * 4 * sizeof(Vertex), nullptr, GL_STREAM_DRAW);
+        render_tiles();
+        glBufferSubData(GL_ARRAY_BUFFER, 0, _tiles_x * _tiles_y * 4 * sizeof(Vertex), _vertices.data());
+    }
 
     glBindTexture(GL_TEXTURE_2D, _texture);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -90,6 +95,7 @@ void RendererOpenGLLegacy::render()
     glTexCoordPointer(2, GL_HALF_FLOAT, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texture_x));
     glColorPointer(3, GL_UNSIGNED_BYTE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color_r));
     glDrawElements(GL_TRIANGLES, _tiles_x * _tiles_y * 6, GL_UNSIGNED_INT, (GLvoid*)0);
+    _dirty = false;
 }
 
 void RendererOpenGLLegacy::render_tiles()
