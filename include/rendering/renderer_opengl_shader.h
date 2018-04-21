@@ -27,14 +27,12 @@ private:
     GLuint  _texture;
     GLuint  _symbol;
     GLuint  _color;
-    GLuint  _color_bg;
     GLint   _texture_uniform;
     GLint   _symbol_uniform;
     GLint   _color_uniform;
-    GLint   _color_bg_uniform;
     GLint   _tile_count_uniform;
 
-    Vector2i _texture_size;
+    Vector2i    _texture_size;
 };
 
 #endif
