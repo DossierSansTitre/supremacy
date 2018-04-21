@@ -76,7 +76,7 @@ struct VectorBuilder
     {
         static_assert(Count < N, "Extra elements in vector");
 
-        dst[Count] = value;
+        dst[Count] = (T)value;
         ::priv::VectorBuilder<T, N, Count + 1>::build(dst, args...);
     }
 };
@@ -209,7 +209,8 @@ public:
         return *this;
     }
 
-
+#pragma warning(push)
+#pragma warning(disable: 4244)
     template <typename TT>
     Vector<T, N>& operator*=(TT scalar)
     {
@@ -217,6 +218,7 @@ public:
             this->_data[i] *= scalar;
         return *this;
     }
+#pragma warning(pop)
 
     template <typename TT>
     Vector<T, N>& operator/=(TT scalar)

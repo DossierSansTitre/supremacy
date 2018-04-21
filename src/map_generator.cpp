@@ -83,7 +83,7 @@ void generate_map(Map& map, BiomeID biome_id, uint32_t seed)
         float variable_part = biome.noise_amplitude / 100.f;
 
         f = std::pow(f, biome.noise_power);
-        int h = (30 * (1.f - variable_part)) + 30 * variable_part * f;
+        int h = (int)((30 * (1.f - variable_part)) + 30 * variable_part * f);
         fill_height(map, pos.x, pos.y, 0, h, 0x01, biome.layers[2]);
         fill_height(map, pos.x, pos.y, h, 8, 0x01, biome.layers[1]);
         fill_height(map, pos.x, pos.y, h + 8, 1, 0x01, biome.layers[0]);

@@ -100,16 +100,19 @@ void RendererOpenGLLegacy::render()
 
 void RendererOpenGLLegacy::render_tiles()
 {
-    for (size_t y = 0; y < _tiles_y; ++y)
+	uint32_t max_x = (uint32_t)_tiles_x;
+	uint32_t max_y = (uint32_t)_tiles_y;
+
+    for (uint32_t y = 0; y < max_y; ++y)
     {
-        for (size_t x = 0; x < _tiles_x; ++x)
+        for (uint32_t x = 0; x < max_x; ++x)
         {
             render_tile(x, y);
         }
     }
 }
 
-void RendererOpenGLLegacy::render_tile(size_t x, size_t y)
+void RendererOpenGLLegacy::render_tile(uint32_t x, uint32_t y)
 {
     static const float texture_size = 1.f / 32.f;
 
@@ -188,14 +191,14 @@ void RendererOpenGLLegacy::build_vertices()
     data = (int16_t*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     for (size_t i = 0; i < count; ++i)
     {
-        data[i * 8 + 0] = (i % _tiles_x + 0) * _tile_width;
-        data[i * 8 + 1] = (i / _tiles_x + 0) * _tile_height;
-        data[i * 8 + 2] = (i % _tiles_x + 1) * _tile_width;
-        data[i * 8 + 3] = (i / _tiles_x + 0) * _tile_height;
-        data[i * 8 + 4] = (i % _tiles_x + 1) * _tile_width;
-        data[i * 8 + 5] = (i / _tiles_x + 1) * _tile_height;
-        data[i * 8 + 6] = (i % _tiles_x + 0) * _tile_width;
-        data[i * 8 + 7] = (i / _tiles_x + 1) * _tile_height;
+        data[i * 8 + 0] = (uint16_t)((i % _tiles_x + 0) * _tile_width);
+        data[i * 8 + 1] = (uint16_t)((i / _tiles_x + 0) * _tile_height);
+        data[i * 8 + 2] = (uint16_t)((i % _tiles_x + 1) * _tile_width);
+        data[i * 8 + 3] = (uint16_t)((i / _tiles_x + 0) * _tile_height);
+        data[i * 8 + 4] = (uint16_t)((i % _tiles_x + 1) * _tile_width);
+        data[i * 8 + 5] = (uint16_t)((i / _tiles_x + 1) * _tile_height);
+        data[i * 8 + 6] = (uint16_t)((i % _tiles_x + 0) * _tile_width);
+        data[i * 8 + 7] = (uint16_t)((i / _tiles_x + 1) * _tile_height);
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
 }

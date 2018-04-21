@@ -39,7 +39,7 @@ char* load_png(MemoryFile& file, uint32_t* out_width, uint32_t* out_height)
         NULL, NULL, NULL);
     png_set_packing(png_ptr);
     png_set_palette_to_rgb(png_ptr);
-    const png_uint_32 bytes_per_row = png_get_rowbytes(png_ptr, info_ptr);
+    const png_size_t bytes_per_row = png_get_rowbytes(png_ptr, info_ptr);
     data = new char[width * height * 4];
     char* row_buffer = new char[bytes_per_row];
     for (size_t j = 0; j < height; ++j)

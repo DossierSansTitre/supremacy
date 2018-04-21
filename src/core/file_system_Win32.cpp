@@ -12,7 +12,7 @@ struct FileSystem::Directory
 static wchar_t* to_utf16(const char* str)
 {
     wchar_t* res;
-    size_t res_size;
+    int res_size;
 
     res_size = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
     res = new wchar_t[res_size];
@@ -23,7 +23,7 @@ static wchar_t* to_utf16(const char* str)
 static char* to_utf8(const wchar_t* wstr)
 {
     char* res;
-    size_t res_size;
+    int res_size;
 
     res_size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
     res = new char[res_size];

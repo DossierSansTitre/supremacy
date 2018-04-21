@@ -192,9 +192,9 @@ public:
         Vector3i pos;
 
         key = _tasks.key(index);
-        pos.x = key % _width;
-        pos.y = (key / _width) % _height;
-        pos.z = key / (_width * _height);
+        pos.x = (int32_t)(key % _width);
+        pos.y = (int32_t)((key / _width) % _height);
+        pos.z = (int32_t)(key / (_width * _height));
         return pos;
     }
 

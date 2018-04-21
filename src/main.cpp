@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     status = 0;
 
     CliOptions::instance().parse(argc, argv);
-    srand(time(nullptr));
+    srand((unsigned int)time(nullptr));
 
     game.select_renderer();
     if (init_game_data())

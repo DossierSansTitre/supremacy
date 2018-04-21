@@ -6,8 +6,8 @@ void serialize_actors(std::ofstream& stream, const Actors& actors)
     u32 size;
     u32 free_size;
 
-    size = actors._actor_id.size();
-    free_size = actors._free.size();
+    size = (u32)actors._actor_id.size();
+    free_size = (u32)actors._free.size();
 
     stream.write((char*)&size, sizeof(size));
     stream.write((char*)&free_size, sizeof(free_size));

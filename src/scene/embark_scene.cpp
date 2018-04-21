@@ -92,7 +92,7 @@ void EmbarkScene::render(DrawBuffer& db)
     print(db, 1, 0, "Global", white, black);
     print(db, w + 2, 0, "Region", white, black);
 
-    putchar_fast(db, 1 + _cursor.x * dt, 1 + _cursor.y * dt, 'X', {255, 0, 0}, white);
+    putchar_fast(db, (int)(1 + _cursor.x * dt), (int)(1 + _cursor.y * dt), 'X', {255, 0, 0}, white);
     putchar_fast(db, w + 2 + _cursor.x - _camera.x, 1 + _cursor.y - _camera.y, 'X', {255, 0, 0}, white);
 
     const auto& biome = Biome::from_id(_worldmap->biome(_cursor));

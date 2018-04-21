@@ -71,7 +71,7 @@ public:
         internal = _external[i];
         if (internal == 0)
         {
-            internal = _data.size() + 1;
+            internal = (uint32_t)_data.size() + 1;
             _data.resize(internal);
             _external[i] = internal;
             _reverse.push_back(i);

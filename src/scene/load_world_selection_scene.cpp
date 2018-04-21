@@ -24,7 +24,7 @@ void LoadWorldSelectionScene::setup()
             break;
         if (strncmp(name, prefix, strlen(prefix)) != 0)
             continue;
-        world_id = atol(name + strlen(prefix));
+        world_id = (u16)atol(name + strlen(prefix));
         _worldmaps.push_back(world_id);
     }
     FileSystem::close_directory(dir);
@@ -68,7 +68,7 @@ void LoadWorldSelectionScene::render(DrawBuffer& db)
 
     for (size_t i = 0; i < _worldmaps.size(); ++i)
     {
-        printf(db, 5, 5 + i, "World %u", (i == _cursor ? selected : unselected), {0, 0, 0}, _worldmaps[i]);
+        printf(db, 5, 5 + (int)i, "World %u", (i == _cursor ? selected : unselected), {0, 0, 0}, _worldmaps[i]);
     }
 }
 

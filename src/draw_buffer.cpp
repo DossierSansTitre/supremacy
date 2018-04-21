@@ -39,7 +39,7 @@ void putchar(DrawBuffer& draw_buffer, int x, int y, uint16_t symbol, Color color
 
 void print(DrawBuffer& draw_buffer, int x, int y, const char* str, Color color, Color color_bg)
 {
-    for (size_t i = 0; str[i]; ++i)
+    for (int i = 0; str[i]; ++i)
         putchar(draw_buffer, x + i, y, str[i], color, color_bg);
 }
 

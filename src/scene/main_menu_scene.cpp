@@ -8,7 +8,7 @@ static void render_centered(DrawBuffer& buffer, int y, const char* str, Color co
 {
     int x;
 
-    x = buffer.width() / 2 - strlen(str) / 2;
+    x = (int)(buffer.width() / 2 - strlen(str) / 2);
     print(buffer, x, y, str, color, {0, 0, 0});
 }
 
@@ -58,9 +58,9 @@ void MainMenuScene::render(DrawBuffer& draw_buffer)
 
     render_centered(draw_buffer, 8, "SUPREMACY", {255, 0, 0});
 
-    max = sizeof(menu_items) / sizeof(*menu_items);
+    max = (int)(sizeof(menu_items) / sizeof(*menu_items));
     sel = 0;
-    for (size_t i = 0; i < max; ++i)
+    for (int i = 0; i < max; ++i)
     {
         color = {255, 255, 255};
         if (menu_items[i] == nullptr)

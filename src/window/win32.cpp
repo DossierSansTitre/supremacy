@@ -315,7 +315,7 @@ void WindowWin32::poll(Input& input)
 		else if (msg.message == WM_CHAR)
 		{
 			e.type = InputEventType::Text;
-			e.text.unicode = msg.wParam;
+			e.text.unicode = (uint32_t)msg.wParam;
 			input.dispatch(e);
 		}
 	}

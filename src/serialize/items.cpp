@@ -6,8 +6,8 @@ void serialize_items(std::ofstream& stream, const Items& items)
     u32 size;
     u32 free_size;
 
-    size = items._item_id.size();
-    free_size = items._free.size();
+    size = (u32)items._item_id.size();
+    free_size = (u32)items._free.size();
 
     stream.write((char*)&size, sizeof(size));
     stream.write((char*)&free_size, sizeof(free_size));
