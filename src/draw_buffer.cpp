@@ -15,8 +15,6 @@ DrawBuffer::~DrawBuffer()
 
 void DrawBuffer::resize(uint32_t width, uint32_t height)
 {
-    size_t size;
-
     _size.x = width;
     _size.y = height;
     _row_size_color = ((width * 4 + 7) / 8) * 8;

@@ -1,9 +1,9 @@
 #version 150
 
-uniform sampler2D   uTexture;
-uniform usampler2D  uSymbol;
-uniform sampler2D   uColor;
-uniform sampler2D   uColorBg;
+uniform sampler2D       uTexture;
+uniform usampler2DRect  uSymbol;
+uniform sampler2DRect   uColor;
+uniform sampler2DRect   uColorBg;
 
 uniform vec2 uTileCount;
 
@@ -15,9 +15,9 @@ void main()
 {
     ivec2 texCoords = ivec2(uTileCount * fTexCoord);
 
-    float sym = texelFetch(uSymbol, texCoords, 0).r;
-    vec4 fColor = texelFetch(uColor, texCoords, 0);
-    vec4 bColor = texelFetch(uColorBg, texCoords, 0);
+    float sym = texelFetch(uSymbol, texCoords).r;
+    vec4 fColor = texelFetch(uColor, texCoords);
+    vec4 bColor = texelFetch(uColorBg, texCoords);
 
     vec2 symIntCoords = vec2(mod(sym, 32.0), floor(sym * 0.03125));
     vec2 symCoords = (fract(uTileCount * fTexCoord) + symIntCoords) * 0.03125;

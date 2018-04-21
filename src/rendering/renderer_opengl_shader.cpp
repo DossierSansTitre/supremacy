@@ -103,11 +103,11 @@ RendererOpenGLShader::RendererOpenGLShader(Window& window, DrawBuffer& draw_buff
     glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, _texture);
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, _symbol);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _symbol);
     glActiveTexture(GL_TEXTURE0 + 2);
-    glBindTexture(GL_TEXTURE_2D, _color);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color);
     glActiveTexture(GL_TEXTURE0 + 3);
-    glBindTexture(GL_TEXTURE_2D, _color_bg);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color_bg);
 }
 
 RendererOpenGLShader::~RendererOpenGLShader()
@@ -127,12 +127,12 @@ void RendererOpenGLShader::render()
     size_t w = db.width();
     size_t h = db.height();
 
-    glBindTexture(GL_TEXTURE_2D, _symbol);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
-    glBindTexture(GL_TEXTURE_2D, _color);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color());
-    glBindTexture(GL_TEXTURE_2D, _color_bg);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color_bg());
+    glBindTexture(GL_TEXTURE_RECTANGLE, _symbol);
+    glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w, h, GL_RED_INTEGER, GL_UNSIGNED_SHORT, db.symbol());
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color);
+    glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color());
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color_bg);
+    glTexSubImage2D(GL_TEXTURE_RECTANGLE, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, db.color_bg());
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)0);
 }
 
@@ -145,12 +145,12 @@ void RendererOpenGLShader::resize(Vector2u size)
     size_t w = db.width();
     size_t h = db.height();
 
-    glBindTexture(GL_TEXTURE_2D, _symbol);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, _color);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glBindTexture(GL_TEXTURE_2D, _color_bg);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _symbol);
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER, GL_UNSIGNED_SHORT, nullptr);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color);
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_RECTANGLE, _color_bg);
+    glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 }
 
 void RendererOpenGLShader::init_buffers()
@@ -186,9 +186,9 @@ static GLuint create_texture()
     GLuint tex;
 
     glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_RECTANGLE, tex);
+    glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     return tex;
 }
 
