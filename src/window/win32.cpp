@@ -108,6 +108,7 @@ WindowWin32* WindowWin32::create(WindowRenderApi api, int major, int minor)
 		window = create_window();
 		return WindowWin32OpenGL::create(window, major, minor);
 	case WindowRenderApi::Vulkan:
+		window = create_window();
 		return WindowWin32Vulkan::create(window, major, minor);
 	default:
 		return nullptr;
