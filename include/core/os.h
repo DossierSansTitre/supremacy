@@ -15,7 +15,7 @@
 # define OS_UNIX 1
 #endif
 
-#if defined(__LP64__) || defined(__LLP64__)
+#if defined(__LP64__) || defined(__LLP64__) || defined(_M_X64) || defined(__amd64__)
 # define OS_64 1
 # define OS_BITS 64
 #else

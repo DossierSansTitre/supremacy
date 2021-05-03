@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <fstream>
 #include <engine/game.h>
 #include <log.h>
@@ -10,14 +11,27 @@
 
 static void init_rng(Rng& rng)
 {
+#if defined(OS_WINDOWS)
+    unsigned int r[4];
+
+    do
+    {
+        for (int i = 0; i < 4; ++i)
+            rand_s(r + i);
+    } while (r[0] == 0 && r[1] == 0 && r[2] == 0 && r[3] == 0);
+
+    rng.seed(r);
+#else
     u64 s[2];
-    std::ifstream stream("/dev/random", std::ios::binary);
+    std::ifstream stream("/dev/urandom", std::ios::binary);
 
     do
     {
         stream.read((char*)s, 16);
     } while (s[0] == 0 && s[1] == 0);
+
     rng.seed(s);
+#endif
 }
 
 Game::Game()

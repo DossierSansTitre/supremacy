@@ -9,9 +9,6 @@ endif()
 configure_file("${CMAKE_SOURCE_DIR}/src/config.h.in" "${CMAKE_BINARY_DIR}/include/config.h")
 
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(PNG REQUIRED)
 
 file(GLOB_RECURSE SOURCES "*.cpp")
 file(GLOB_RECURSE SOURCES_MAC "*.mm" "*_Mac.cpp")
@@ -30,9 +27,9 @@ file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/include/*.h")
 
 if (WIN32)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+    add_definitions(-D_CRT_RAND_S=1)
     add_definitions(-D_UNICODE=1)
     add_definitions(-DUNICODE=1)
-	#add_definitions(-DGLEW_STATIC=1)
     list(APPEND SOURCES ${SOURCES_WIN32})
 elseif (APPLE)
     list(APPEND SOURCES ${SOURCES_MAC})
@@ -41,9 +38,7 @@ else()
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${PNG_INCLUDE_DIR})
 include_directories(${CMAKE_BINARY_DIR}/include)
-include_directories(${GLEW_INCLUDE_DIR} SYSTEM)
 
 if (WIN32)
     source_group(TREE ${CMAKE_SOURCE_DIR}/src PREFIX src FILES ${SOURCES})
@@ -59,7 +54,7 @@ else()
     add_executable(supremacy ${SOURCES} ${HEADERS})
 endif()
 
-target_link_libraries(supremacy ${PNG_LIBRARIES} sdl2 ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+target_link_libraries(supremacy ZLIB::ZLIB PNG::PNG SDL2::SDL OpenGL::GL GLEW::GLEW)
 
 file(GLOB_RECURSE SUP_DATA "${CMAKE_SOURCE_DIR}/data/*")
 file(GLOB_RECURSE SUP_TOOLS "${CMAKE_SOURCE_DIR}/util/*")
@@ -115,11 +110,11 @@ endif()
 if (WIN32)
     add_custom_command(TARGET supremacy POST_BUILD
         COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-        ${SDL2_DLL}
-        ${PNG_DLL}
-        ${ZLIB_DLL}
-		${GLEW_DLL}
+        ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:SDL2::SDL>
+        $<TARGET_FILE:PNG::PNG>
+        $<TARGET_FILE:ZLIB::ZLIB>
+        $<TARGET_FILE:GLEW::GLEW>
         $<TARGET_FILE_DIR:supremacy>)
     add_custom_command(TARGET supremacy POST_BUILD
         COMMAND

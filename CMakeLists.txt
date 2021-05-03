@@ -1,14 +1,11 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.7")
 
 project(supremacy C CXX)
 set(VERSION "0.1.0")
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif()
-
+# Options
 if (APPLE)
     option(APP_BUNDLE "Build a macOS bundle application")
 endif()
@@ -51,4 +48,5 @@ if (NOT WIN32)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(vendor)
 #add_subdirectory(test)

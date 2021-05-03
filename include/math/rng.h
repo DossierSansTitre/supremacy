@@ -18,10 +18,10 @@ public:
         return _state;
     }
 
-    void seed(const u64 values[2])
+    void seed(const void* values)
     {
-        _state[0] = values[0];
-        _state[1] = values[1];
+        _state[0] = ((std::uint64_t*)values)[0];
+        _state[1] = ((std::uint64_t*)values)[1];
     }
 
     void seed(Rng& rng)
